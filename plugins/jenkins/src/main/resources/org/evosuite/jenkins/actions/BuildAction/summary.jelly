@@ -1,0 +1,12 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
+  <t:summary icon="/plugin/evosuite-jenkins-plugin/icons/evosuite.png">
+    <b>EvoSuite Statistics</b> <br/>
+
+    Number of Modules: ${it.getNumberOfModules()}<br/>
+    Number of Testable Classes: ${it.getNumberOfTestableClasses()}<br/>
+    Number of Tested Classes: ${it.getNumberOfTestedClasses()}<br/>
+    Overall Coverage: ${it.getOverallCoverage()}%<br/>
+    Total Time Budget: ${it.getTimeBudget()} minutes<br/>
+    Time Budget Used: ${it.getTotalEffort()} minutes<br/>
+  </t:summary>
+</j:jelly>

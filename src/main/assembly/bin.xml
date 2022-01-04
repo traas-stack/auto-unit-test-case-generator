@@ -1,0 +1,103 @@
+<!--
+
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+    contributors
+
+    This file is part of EvoSuite.
+
+    EvoSuite is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
+
+    EvoSuite is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+  <id>bin</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>${project.basedir}</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+	<include>README*</include>
+	<include>LICENSE*</include>
+	<include>NOTICE*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/assembly</directory>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+      <includes>
+	<include>EvoSuite</include>
+	<include>etc</include>
+      </includes>
+      <fileMode>0755</fileMode>
+    </fileSet>    
+    <fileSet>
+      <directory>src/main/assembly/etc</directory>
+      <outputDirectory>/etc</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>    
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+	<include>*.jar</include>
+      </includes>
+      <excludes>
+	<exclude>evosuite-0.1-SNAPSHOT.jar</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/assembly</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+	<include>evosuite.properties</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/site</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>examples</directory>
+      <outputDirectory>examples</outputDirectory>
+      <includes>
+	<include>**</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>lib</directory>
+      <outputDirectory>lib</outputDirectory>
+      <includes>
+	<include>**</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <!--
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <excludes>
+	<exclude>evosuite-*.jar</exclude>
+      </excludes>
+    </dependencySet>
+  </dependencySets>
+  -->
+</assembly>

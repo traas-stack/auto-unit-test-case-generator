@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+    contributors
+
+    This file is part of EvoSuite.
+
+    EvoSuite is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
+
+    EvoSuite is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!-- NOTE: ":-" is used for default values in case a variable is not defined 
+	Here we configure the logs for both the master and client nodes. The client 
+	nodes shouldn't print anything in their console, they should rather connect 
+	to master through TCP. -->
+
+<configuration>
+
+	<!-- different appenders for std out and err -->
+
+	<appender name="STDOUT_MASTER" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.out</target>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>DENY</onMatch>
+			<onMismatch>ACCEPT</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>[MASTER] %d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="STDERR_MASTER" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.err</target>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>[MASTER] %d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- appenders for client. -->
+
+	<appender name="STDOUT_CLIENT" class="ch.qos.logback.classic.net.SocketAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>DENY</onMatch>
+			<onMismatch>ACCEPT</onMismatch>
+		</filter>
+		<remoteHost>${master_host:-localhost}</remoteHost>
+		<port>${master_log_port:-12345}</port>
+		<reconnectionDelay>10000</reconnectionDelay>
+	</appender>
+
+	<appender name="STDERR_CLIENT" class="ch.qos.logback.classic.net.SocketAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<remoteHost>${master_host:-localhost}</remoteHost>
+		<port>${master_log_port:-12345}</port>
+		<reconnectionDelay>10000</reconnectionDelay>
+	</appender>
+
+
+	<!-- the "EVO" logger is used both by master and client. it is used for 
+		outputting standard information to the user. so, it's level is always ALL. -->
+
+	<appender name="EVO_LOGGER_MASTER" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="EVO_LOGGER_CLIENT" class="ch.qos.logback.classic.net.SocketAppender">
+		<remoteHost>${master_host:-localhost}</remoteHost>
+		<port>${master_log_port:-12345}</port>
+		<reconnectionDelay>10000</reconnectionDelay>
+	</appender>
+
+
+
+	<!-- Loggers  -->
+
+	<logger name="evo_logger" level="ALL" additivity="false">
+		<appender-ref ref="EVO_LOGGER_${evosuite.log.appender:-MASTER}" />
+	</logger>
+
+
+	<logger name="org.evosuite" level="${log.level:-WARN}">
+		<appender-ref ref="STDOUT_${evosuite.log.appender:-MASTER}" />
+		<appender-ref ref="STDERR_${evosuite.log.appender:-MASTER}" />
+	</logger>
+
+	<logger name="shaded.org.evosuite" level="${log.level:-WARN}">
+		<appender-ref ref="STDOUT_${evosuite.log.appender:-MASTER}" />
+		<appender-ref ref="STDERR_${evosuite.log.appender:-MASTER}" />
+	</logger>
+
+	<logger name="org.evosuite.shaded" level="OFF" />
+
+	<!-- for a specific logger, enables all the logging. this is useful when 
+		we are debugging a particular class -->
+
+	<logger name="${log.target:-NOTHING}" level="ALL" />
+
+	<!-- main root logger. Note: it is turned OFF to avoid SUT using it-->
+
+	<root level="OFF">
+	</root>
+
+
+
+</configuration>

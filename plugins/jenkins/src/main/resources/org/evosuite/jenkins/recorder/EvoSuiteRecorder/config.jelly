@@ -1,0 +1,15 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:entry title="${%Disable automatic commit of new generated test cases}" help="...">
+    <f:checkbox name="evosuite.disableAutoCommit" checked="${instance.disableAutoCommit}" />
+  </f:entry>
+  <f:entry title="${%Disable automatic push of new generated test cases}" help="...">
+    <f:checkbox name="evosuite.disableAutoPush" checked="${instance.disableAutoPush}" />
+  </f:entry>
+  <f:entry title="${%Branch's name to which new generated test cases will be committed and pushed}" help="...">
+    <f:textbox name="evosuite.branchName" value="${instance.branchName}" default="evosuite-tests" />
+  </f:entry>
+  <f:entry title="${%Directory's path from which new generated test cases will be committed}" help="...">
+    <f:textbox name="evosuite.ctgBestsDir" value="${instance.ctgBestsDir}" default=".evosuite/best-tests" />
+  </f:entry>
+</j:jelly>

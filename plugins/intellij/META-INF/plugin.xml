@@ -1,0 +1,93 @@
+<!--
+
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+    contributors
+
+    This file is part of EvoSuite.
+
+    EvoSuite is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
+
+    EvoSuite is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<idea-plugin version="2">
+  <id>org.evosuite.plugin.intellij</id>
+  <name>EvoSuite Plugin</name>
+  <version>1.0.5-SNAPSHOT</version>
+  <vendor email="arcuri82@gmail.com" url="http://www.evosuite.org">EvoSuite</vendor>
+
+  <description><![CDATA[
+      <p>
+        IntelliJ plugin for the EvoSuite tool, which is used to automatically generate high coverage JUnit tests.
+        To generate test cases, EvoSuite uses advanced evolutionary algorithms enhanced by static analysis of
+        the bytecode of the tested classes.
+      </p>
+
+       <p>
+        <b>Note</b>: this plugin is just used to call EvoSuite from inside IntelliJ IDEA, and so you still need to
+        configure and install EvoSuite separately.
+        You can do it automatically via its Maven plugin, or add the executable jar directly into your project.
+      </p>
+
+
+       Main features:
+        <ul>
+          <li>Generation of JUnit 4 tests for the selected classes</li>
+          <li>Optimization of different coverage criteria, like lines, branches, outputs, mutation testing, etc.</li>
+          <li>Tests are minimized: only the ones contributing to achieve coverage are retained</li>
+          <li>Generation of JUnit asserts to capture the current behavior of the tested classes</li>
+          <li>Tests run in a sandbox to prevent potentially dangerous operations</li>
+          <li>Virtual file system</li>
+          <li>Virtual network</li>
+        </ul>
+
+      <p>
+        For more information, see the documentation on www.evosuite.org
+      </p>
+    ]]></description>
+
+  <change-notes><![CDATA[
+    ]]>
+  </change-notes>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="143"/>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <application-components>
+    <!-- Add your application components here -->
+      <component>
+          <implementation-class>org.evosuite.intellij.ApplicationRegistration</implementation-class>
+      </component>
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+      <component>
+          <implementation-class>org.evosuite.intellij.ProjectRegistration</implementation-class>
+      </component>
+  </project-components>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+
+</idea-plugin>

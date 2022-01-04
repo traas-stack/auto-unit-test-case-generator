@@ -1,0 +1,55 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+  <l:layout title="trendlayout">
+    <st:include it="${it.getBuild()}" page="sidepanel.jelly"/>
+    <l:main-panel>
+      <h1>EvoSuite statistics of Module '${it.getName()}' #${it.build.number}</h1>
+      <div>
+        <!--
+             red    #EF2929
+             yellow #FCE94F
+             green  #008000
+        -->
+        <div> ${it.getOverallCoverage()}% overall coverage</div>
+        <div style="width:100%; height:1em; background-color: #FCE94F">
+          <div style="width:${it.getOverallCoverage()}%; height: 1em; background-color: #008000; float: left"></div>
+        </div>
+        <j:forEach var="criterion" items="${it.getCriteria()}">
+        	<br />
+        	<div> ${it.getAverageCriterionCoverage(criterion)}% ${criterion}</div>
+	        <div style="width:100%; height:1em; background-color: #FCE94F">
+	          <div style="width:${it.getAverageCriterionCoverage(criterion)}%; height: 1em; background-color: #008000; float: left"></div>
+	        </div>
+        </j:forEach>
+        <br />
+      </div>
+      <table id="evosuite-module-report" class="sortable pane bigtable">
+        <tr>
+          <td class="pane-header">Class</td>
+          <td class="pane-header">Overall Coverage</td>
+          <td class="pane-header">Number of Tests</td>
+          <td class="pane-header">Number of Statements</td>
+          <td class="pane-header">Total Effort (minutes)</td>
+        </tr>
+        <j:forEach var="testableClass" items="${it.getClasses()}">
+          <tr>
+         	<td>
+              <a href="${testableClass.getName()}"><st:out value="${testableClass.getName()}"/></a>
+            </td>
+            <td>
+              <st:out value="${testableClass.getOverallCoverage()}%"/>
+            </td>
+            <td>
+              <st:out value="${testableClass.getNumberOfTests()}"/>
+            </td>
+            <td>
+              <st:out value="${testableClass.getNumberOfStatements()}"/>
+            </td>
+            <td>
+              <st:out value="${testableClass.getTimeBudget()}"/>
+            </td>
+          </tr>
+        </j:forEach>
+      </table>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
