@@ -25,7 +25,7 @@ import org.smartut.Properties;
 import org.smartut.SystemTestBase;
 import org.smartut.ga.metaheuristics.GeneticAlgorithm;
 import org.smartut.runtime.TooManyResourcesException;
-import org.smartut.runtime.instrumentation.EvoClassLoader;
+import org.smartut.runtime.instrumentation.SmartUtClassLoader;
 import org.smartut.testsuite.TestSuiteChromosome;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class InfiniteWhile_SystemTest  extends SystemTestBase {
 
     @Test(timeout = 5000)
     public void testLoading() throws Exception{
-        EvoClassLoader loader = new EvoClassLoader();
+        SmartUtClassLoader loader = new SmartUtClassLoader();
         Class<?> clazz = loader.loadClass(InfiniteWhile.class.getCanonicalName());
         Method m = clazz.getMethod("infiniteLoop");
         try {

@@ -35,14 +35,14 @@ import org.slf4j.LoggerFactory;
  * An instrumenting class loader used in special cases in the generated JUnit tests
  * when Java Agent is not used
  */
-public class EvoClassLoader extends ClassLoader {
-	private final static Logger logger = LoggerFactory.getLogger(EvoClassLoader.class);
+public class SmartUtClassLoader extends ClassLoader {
+	private final static Logger logger = LoggerFactory.getLogger(SmartUtClassLoader.class);
 	private final RuntimeInstrumentation instrumentation;
 	private final ClassLoader classLoader;
 	private final Map<String, Class<?>> classes = new HashMap<>();
 	private final Set<String> skipInstrumentationForPrefix = new HashSet<>();
 
-	public EvoClassLoader() {
+	public SmartUtClassLoader() {
 		this(new RuntimeInstrumentation());
 	}
 
@@ -55,9 +55,9 @@ public class EvoClassLoader extends ClassLoader {
 	 *            a {@link org.smartut.runtime.instrumentation.RuntimeInstrumentation}
 	 *            object.
 	 */
-	public EvoClassLoader(RuntimeInstrumentation instrumentation) {
-		super(EvoClassLoader.class.getClassLoader());
-		classLoader = EvoClassLoader.class.getClassLoader();
+	public SmartUtClassLoader(RuntimeInstrumentation instrumentation) {
+		super(SmartUtClassLoader.class.getClassLoader());
+		classLoader = SmartUtClassLoader.class.getClassLoader();
 		this.instrumentation = instrumentation;
 	}
 

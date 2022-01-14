@@ -24,14 +24,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation needed to pass parameters to EvoRunner
+ * Annotation needed to pass parameters to SmartUtRunner
  * 
  * @author arcuri
  *
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME) 
-public @interface EvoRunnerParameters {
+public @interface SmartUtRunnerParameters {
 
 	boolean mockJVMNonDeterminism() default false; 
 

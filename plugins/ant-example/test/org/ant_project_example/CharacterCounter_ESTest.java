@@ -9,11 +9,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.smartut.runtime.EvoAssertions.*;
 import org.ant_project_example.CharacterCounter;
-import org.smartut.runtime.EvoRunner;
-import org.smartut.runtime.EvoRunnerParameters;
+import org.smartut.runtime.SmartUtRunner;
+import org.smartut.runtime.SmartUtRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
+@RunWith(SmartUtRunner.class) @SmartUtRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
 public class CharacterCounter_ESTest extends CharacterCounter_ESTest_scaffolding {
 
   @Test(timeout = 4000)

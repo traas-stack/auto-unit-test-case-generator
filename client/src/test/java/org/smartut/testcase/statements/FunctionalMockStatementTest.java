@@ -27,7 +27,7 @@ import org.smartut.classpath.ClassPathHandler;
 import org.smartut.instrumentation.InstrumentingClassLoader;
 import org.smartut.instrumentation.NonInstrumentingClassLoader;
 import org.smartut.runtime.RuntimeSettings;
-import org.smartut.runtime.instrumentation.EvoClassLoader;
+import org.smartut.runtime.instrumentation.SmartUtClassLoader;
 import org.smartut.runtime.instrumentation.RuntimeInstrumentation;
 import org.smartut.testcase.DefaultTestCase;
 import org.smartut.testcase.TestCase;
@@ -216,7 +216,7 @@ public class FunctionalMockStatementTest {
 
 
         ClassPathHandler.getInstance().changeTargetCPtoTheSameAsSmartUt();
-        EvoClassLoader loader = new EvoClassLoader();
+        SmartUtClassLoader loader = new SmartUtClassLoader();
         loader.skipInstrumentation(IssueWithNumber.class.getName());
         org.smartut.runtime.Runtime.getInstance().resetRuntime();
         Class<?> klass = loader.loadClass(IssueWithNumber.class.getName());

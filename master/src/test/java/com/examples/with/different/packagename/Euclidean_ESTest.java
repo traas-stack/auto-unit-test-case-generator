@@ -21,13 +21,13 @@ package com.examples.with.different.packagename;
 
 import static org.junit.Assert.assertEquals;
 
-import org.smartut.runtime.EvoRunner;
-import org.smartut.runtime.EvoRunnerParameters;
+import org.smartut.runtime.SmartUtRunner;
+import org.smartut.runtime.SmartUtRunnerParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true)
+@RunWith(SmartUtRunner.class)
+@SmartUtRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true)
 public class Euclidean_ESTest extends Euclidean_ESTest_scaffolding {
 
 	@Test

@@ -36,7 +36,7 @@ import org.smartut.coverage.mutation.Mutation;
 import org.smartut.coverage.mutation.MutationObserver;
 import org.smartut.coverage.mutation.MutationPool;
 import org.smartut.rmi.ClientServices;
-import org.smartut.runtime.EvoRunner;
+import org.smartut.runtime.SmartUtRunner;
 import org.smartut.runtime.sandbox.Sandbox;
 import org.smartut.setup.DependencyAnalysis;
 import org.smartut.statistics.RuntimeVariable;
@@ -145,17 +145,17 @@ public class CoverageAnalysis {
 		Class<?>[] tests = testClasses.toArray(new Class<?>[testClasses.size()]);
 		LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Executing test(s)");
 		if (Properties.SELECTED_JUNIT == null) {
-			boolean origUseAgent = EvoRunner.useAgent;
-			boolean origUseClassLoader = EvoRunner.useClassLoader;
+			boolean origUseAgent = SmartUtRunner.useAgent;
+			boolean origUseClassLoader = SmartUtRunner.useClassLoader;
 			try {
-				EvoRunner.useAgent = false; //avoid double instrumentation
-				EvoRunner.useClassLoader = false; //avoid double instrumentation
+				SmartUtRunner.useAgent = false; //avoid double instrumentation
+				SmartUtRunner.useClassLoader = false; //avoid double instrumentation
 
 				List<JUnitResult> results = executeTests(tests);
 				printReport(results);
 			} finally {
-				EvoRunner.useAgent = origUseAgent;
-				EvoRunner.useClassLoader = origUseClassLoader;
+				SmartUtRunner.useAgent = origUseAgent;
+				SmartUtRunner.useClassLoader = origUseClassLoader;
 			}
 		} else {
 			// instead of just running junit tests, carve them

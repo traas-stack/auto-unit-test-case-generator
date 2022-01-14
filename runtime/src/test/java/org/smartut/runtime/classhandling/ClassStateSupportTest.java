@@ -21,7 +21,7 @@ package org.smartut.runtime.classhandling;
 
 import org.junit.Assert;
 import org.smartut.runtime.RuntimeSettings;
-import org.smartut.runtime.instrumentation.EvoClassLoader;
+import org.smartut.runtime.instrumentation.SmartUtClassLoader;
 import org.junit.Test;
 
 /**
@@ -33,7 +33,7 @@ public class ClassStateSupportTest {
     public void testInitializeClasses(){
 
 
-        EvoClassLoader loader = new EvoClassLoader();
+        SmartUtClassLoader loader = new SmartUtClassLoader();
         String className = "com.examples.with.different.packagename.classhandling.TimeA";
         //no mocking
         RuntimeSettings.deactivateAllMocking();

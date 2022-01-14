@@ -21,7 +21,7 @@ package org.smartut.runtime.classhandling;
 
 import com.examples.with.different.packagename.classhandling.MutableEnum;
 import org.smartut.runtime.RuntimeSettings;
-import org.smartut.runtime.instrumentation.EvoClassLoader;
+import org.smartut.runtime.instrumentation.SmartUtClassLoader;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class ClassResetterTest {
     @Test
     public void testResetOfEnum() throws Exception{
 
-        ClassLoader loader = new EvoClassLoader();
+        ClassLoader loader = new SmartUtClassLoader();
         RuntimeSettings.resetStaticState = true;
         ClassResetter.getInstance().setClassLoader(loader);
 
@@ -61,7 +61,7 @@ public class ClassResetterTest {
     @Test
     public void testResetOfMutableEnum() throws Exception{
 
-        ClassLoader loader = new EvoClassLoader();
+        ClassLoader loader = new SmartUtClassLoader();
         RuntimeSettings.resetStaticState = true;
         ClassResetter.getInstance().setClassLoader(loader);
 

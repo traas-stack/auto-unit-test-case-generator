@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.smartut.annotations.SmartUtTest;
 import org.junit.Test;
-import org.smartut.runtime.instrumentation.EvoClassLoader;
+import org.smartut.runtime.instrumentation.SmartUtClassLoader;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
@@ -39,13 +39,13 @@ import org.slf4j.LoggerFactory;
  * @author arcuri
  *
  */
-public class EvoRunner extends BlockJUnit4ClassRunner {
+public class SmartUtRunner extends BlockJUnit4ClassRunner {
 
 	/*
 	 * We need this class due to some weird behavior of JVM
 	 */
 
-    private static final Logger logger = LoggerFactory.getLogger(EvoRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(SmartUtRunner.class);
 
     /**
      * Dirty hack, to use with care.
@@ -62,7 +62,7 @@ public class EvoRunner extends BlockJUnit4ClassRunner {
      */
     public static boolean useClassLoader = true;
 
-    public EvoRunner(Class<?> klass)
+    public SmartUtRunner(Class<?> klass)
             throws InitializationError {
 		/*
 		 * extremely important that getClass is called _BEFORE_ super is executed.
@@ -79,11 +79,11 @@ public class EvoRunner extends BlockJUnit4ClassRunner {
 
     private static Class<?> getClass(Class<?> klass) throws InitializationError{
 
-        EvoRunnerParameters ep = klass.getAnnotation(EvoRunnerParameters.class);
+        SmartUtRunnerParameters ep = klass.getAnnotation(SmartUtRunnerParameters.class);
 
         if(ep == null){
             throw new IllegalStateException("SmartUt test class "+klass.getName()+
-                    " is not annotated with "+EvoRunnerParameters.class.getName());
+                    " is not annotated with "+SmartUtRunnerParameters.class.getName());
         }
 
         RuntimeSettings.resetStaticState = ep.resetStaticState();
@@ -130,11 +130,11 @@ public class EvoRunner extends BlockJUnit4ClassRunner {
 	    	/*
 	    	 * This approach does throw away all the possible instrumentation done on the input clazz,
 	    	 * eg code coverage of Emma, Cobertura, Javalanche, etc.
-	    	 * Furthermore, if the classloader used to load EvoRunner is not the same as CUT,
+	    	 * Furthermore, if the classloader used to load SmartUtRunner is not the same as CUT,
 	    	 * then loading CUTs will fail (this does happen in "mvn test")
 	    	 */
 
-            EvoClassLoader classLoader = new EvoClassLoader();
+            SmartUtClassLoader classLoader = new SmartUtClassLoader();
             classLoader.skipInstrumentation(clazz.getName());
             Thread.currentThread().setContextClassLoader(classLoader);
             return Class.forName(clazz.getName(), true, classLoader);

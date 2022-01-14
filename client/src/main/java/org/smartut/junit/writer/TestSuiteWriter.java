@@ -438,8 +438,8 @@ public class TestSuiteWriter implements Opcodes {
         }
 
         if (TestSuiteWriterUtils.needToUseAgent() && !Properties.NO_RUNTIME_DEPENDENCY) {
-            imports.add(EvoRunner.class);
-            imports.add(EvoRunnerParameters.class);
+            imports.add(SmartUtRunner.class);
+            imports.add(SmartUtRunnerParameters.class);
             imports.add(RunWith.class);
         }
 
@@ -549,7 +549,7 @@ public class TestSuiteWriter implements Opcodes {
 
     private Object getRunner() {
 
-        String s = "@RunWith(EvoRunner.class) @EvoRunnerParameters(";
+        String s = "@RunWith(SmartUtRunner.class) @SmartUtRunnerParameters(";
         List<String> list = new ArrayList<>();
 
         if (Properties.REPLACE_CALLS) {
