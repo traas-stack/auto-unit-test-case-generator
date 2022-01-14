@@ -1,6 +1,6 @@
 Trying to implement a Gradle plugin in the same way as in Maven,
 but Gradle documentation/forums are very limited.
-Maybe best to just have an embedded EvoSuite in the IDEs (IntelliJ, Eclipse) and
+Maybe best to just have an embedded SmartUt in the IDEs (IntelliJ, Eclipse) and
 do version check for right standalone-runtime in the classpath.
 
 Asked question on:

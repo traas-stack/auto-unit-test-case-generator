@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.junit;
+package org.smartut.junit;
 
 import java.io.PrintStream;
 import java.io.Serializable;
@@ -31,15 +31,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.evosuite.testcase.AbstractStatement;
-import org.evosuite.testcase.AssignmentStatement;
-import org.evosuite.testcase.DefaultTestCase;
-import org.evosuite.testcase.PrimitiveExpression;
-import org.evosuite.testcase.Scope;
-import org.evosuite.testcase.StatementInterface;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.VariableReference;
-import org.evosuite.utils.GenericAccessibleObject;
+import org.smartut.testcase.AbstractStatement;
+import org.smartut.testcase.AssignmentStatement;
+import org.smartut.testcase.DefaultTestCase;
+import org.smartut.testcase.PrimitiveExpression;
+import org.smartut.testcase.Scope;
+import org.smartut.testcase.StatementInterface;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.VariableReference;
+import org.smartut.utils.GenericAccessibleObject;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
 /**
@@ -197,7 +197,7 @@ public class CompoundTestCase implements Serializable {
 	 * @param className
 	 *            a {@link java.lang.String} object.
 	 * @param child
-	 *            a {@link org.evosuite.junit.CompoundTestCase} object.
+	 *            a {@link org.smartut.junit.CompoundTestCase} object.
 	 */
 	public CompoundTestCase(String className, CompoundTestCase child) {
 		child.parent = this;
@@ -230,7 +230,7 @@ public class CompoundTestCase implements Serializable {
 	 * </p>
 	 * 
 	 * @param varRef
-	 *            a {@link org.evosuite.testcase.VariableReference} object.
+	 *            a {@link org.smartut.testcase.VariableReference} object.
 	 */
 	public void addParameter(VariableReference varRef) {
 		currentMethod.getParams().add(varRef);
@@ -242,7 +242,7 @@ public class CompoundTestCase implements Serializable {
 	 * </p>
 	 * 
 	 * @param statement
-	 *            a {@link org.evosuite.testcase.StatementInterface} object.
+	 *            a {@link org.smartut.testcase.StatementInterface} object.
 	 */
 	public void addStatement(StatementInterface statement) {
 		if (currentScope == TestScope.FIELDS) {
@@ -268,7 +268,7 @@ public class CompoundTestCase implements Serializable {
 	 * @param varBinding
 	 *            a {@link org.eclipse.jdt.core.dom.IVariableBinding} object.
 	 * @param varRef
-	 *            a {@link org.evosuite.testcase.VariableReference} object.
+	 *            a {@link org.smartut.testcase.VariableReference} object.
 	 */
 	public void addVariable(IVariableBinding varBinding, VariableReference varRef) {
 		if ((currentScope == TestScope.FIELDS)
@@ -285,12 +285,12 @@ public class CompoundTestCase implements Serializable {
 	 * </p>
 	 * 
 	 * @param methodDef
-	 *            a {@link org.evosuite.junit.CompoundTestCase.MethodDef}
+	 *            a {@link org.smartut.junit.CompoundTestCase.MethodDef}
 	 *            object.
 	 * @param params
 	 *            a {@link java.util.List} object.
 	 * @param retVal
-	 *            a {@link org.evosuite.testcase.VariableReference} object.
+	 *            a {@link org.smartut.testcase.VariableReference} object.
 	 */
 	public void convertMethod(MethodDef methodDef, List<VariableReference> params,
 	        VariableReference retVal) {
@@ -370,7 +370,7 @@ public class CompoundTestCase implements Serializable {
 	 * finalizeTestCase
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.testcase.TestCase} object.
+	 * @return a {@link org.smartut.testcase.TestCase} object.
 	 */
 	public TestCase finalizeTestCase() {
 		Set<String> overridenMethods = Collections.emptySet();
@@ -418,7 +418,7 @@ public class CompoundTestCase implements Serializable {
 	 * Getter for the field <code>currentScope</code>.
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.junit.CompoundTestCase.TestScope} object.
+	 * @return a {@link org.smartut.junit.CompoundTestCase.TestScope} object.
 	 */
 	public TestScope getCurrentScope() {
 		return currentScope;
@@ -429,7 +429,7 @@ public class CompoundTestCase implements Serializable {
 	 * getLastStatement
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.testcase.StatementInterface} object.
+	 * @return a {@link org.smartut.testcase.StatementInterface} object.
 	 */
 	public StatementInterface getLastStatement() {
 		assert currentScope == TestScope.METHOD;
@@ -443,7 +443,7 @@ public class CompoundTestCase implements Serializable {
 	 * 
 	 * @param name
 	 *            a {@link java.lang.String} object.
-	 * @return a {@link org.evosuite.junit.CompoundTestCase.MethodDef} object.
+	 * @return a {@link org.smartut.junit.CompoundTestCase.MethodDef} object.
 	 */
 	public MethodDef getMethod(String name) {
 		if (originalDescendant != this) {
@@ -457,7 +457,7 @@ public class CompoundTestCase implements Serializable {
 	 * Getter for the field <code>parent</code>.
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.junit.CompoundTestCase} object.
+	 * @return a {@link org.smartut.junit.CompoundTestCase} object.
 	 */
 	public CompoundTestCase getParent() {
 		return parent;
@@ -468,7 +468,7 @@ public class CompoundTestCase implements Serializable {
 	 * getReference
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.junit.DelegatingTestCase} object.
+	 * @return a {@link org.smartut.junit.DelegatingTestCase} object.
 	 */
 	public DelegatingTestCase getReference() {
 		return delegate;
@@ -481,7 +481,7 @@ public class CompoundTestCase implements Serializable {
 	 * 
 	 * @param varBinding
 	 *            a {@link org.eclipse.jdt.core.dom.IVariableBinding} object.
-	 * @return a {@link org.evosuite.testcase.VariableReference} object.
+	 * @return a {@link org.smartut.testcase.VariableReference} object.
 	 */
 	public VariableReference getVariableReference(IVariableBinding varBinding) {
 		if (originalDescendant != this) {
@@ -530,7 +530,7 @@ public class CompoundTestCase implements Serializable {
 	 * </p>
 	 * 
 	 * @param scope
-	 *            a {@link org.evosuite.junit.CompoundTestCase.TestScope}
+	 *            a {@link org.smartut.junit.CompoundTestCase.TestScope}
 	 *            object.
 	 */
 	public void setCurrentScope(TestScope scope) {
@@ -549,9 +549,9 @@ public class CompoundTestCase implements Serializable {
 	 * </p>
 	 * 
 	 * @param varRef
-	 *            a {@link org.evosuite.testcase.VariableReference} object.
+	 *            a {@link org.smartut.testcase.VariableReference} object.
 	 * @param newAssignment
-	 *            a {@link org.evosuite.testcase.VariableReference} object.
+	 *            a {@link org.smartut.testcase.VariableReference} object.
 	 */
 	public void variableAssignment(VariableReference varRef,
 	        VariableReference newAssignment) {

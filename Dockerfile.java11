@@ -20,20 +20,20 @@ COPY master ./master/
 # Lastly, make build-artifact naming version-independent
 RUN mvn -e -B package -DskipTests=${SKIP_TESTS} && \
     mkdir -p /build/bin && \
-    mv master/target/evosuite-master-*-tests.jar bin/evosuite-tests.jar && \
-    mv master/target/evosuite-master-*.jar bin/evosuite.jar
+    mv master/target/smartut-master-*-tests.jar bin/smartut-tests.jar && \
+    mv master/target/smartut-master-*.jar bin/smartut.jar
 
-# Slim container image for running EvoSuite
+# Slim container image for running SmartUt
 FROM openjdk:11-jdk-slim
 
-WORKDIR /evosuite
-VOLUME /evosuite
+WORKDIR /smartut
+VOLUME /smartut
 
-# Copy the evosuite jar from the builder to this container
-COPY --from=build /build/bin /evosuite-bin
+# Copy the smartut jar from the builder to this container
+COPY --from=build /build/bin /smartut-bin
 
-# The executable is evosuite
-ENTRYPOINT ["java", "-jar", "/evosuite-bin/evosuite.jar"]
+# The executable is smartut
+ENTRYPOINT ["java", "-jar", "/smartut-bin/smartut.jar"]
 
 # The default argument is the help menu
 # This can be overidden on the command line

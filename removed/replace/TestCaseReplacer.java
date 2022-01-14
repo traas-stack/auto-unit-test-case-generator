@@ -1,24 +1,24 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.eclipse.replace;
+package org.smartut.eclipse.replace;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,22 +26,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.evosuite.Properties;
-import org.evosuite.Properties.Algorithm;
-import org.evosuite.Properties.Strategy;
-import org.evosuite.TestSuiteGenerator;
-import org.evosuite.coverage.TestFitnessFactory;
-import org.evosuite.ga.metaheuristics.GeneticAlgorithm;
-import org.evosuite.strategy.PropertiesSuiteGAFactory;
-import org.evosuite.strategy.PropertiesTestGAFactory;
-// import org.evosuite.junit.JUnitTestReader;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.TestCaseMinimizer;
-import org.evosuite.testcase.TestChromosome;
-import org.evosuite.testcase.TestFitnessFunction;
-import org.evosuite.testcase.execution.ExecutionTracer;
-import org.evosuite.testcase.factories.RandomLengthTestFactory;
-import org.evosuite.testsuite.TestSuiteChromosome;
+import org.smartut.Properties;
+import org.smartut.Properties.Algorithm;
+import org.smartut.Properties.Strategy;
+import org.smartut.TestSuiteGenerator;
+import org.smartut.coverage.TestFitnessFactory;
+import org.smartut.ga.metaheuristics.GeneticAlgorithm;
+import org.smartut.strategy.PropertiesSuiteGAFactory;
+import org.smartut.strategy.PropertiesTestGAFactory;
+// import org.smartut.junit.JUnitTestReader;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.TestCaseMinimizer;
+import org.smartut.testcase.TestChromosome;
+import org.smartut.testcase.TestFitnessFunction;
+import org.smartut.testcase.execution.ExecutionTracer;
+import org.smartut.testcase.factories.RandomLengthTestFactory;
+import org.smartut.testsuite.TestSuiteChromosome;
 
 /**
  * This class is the main entry point for test case replacement
@@ -56,7 +56,7 @@ public class TestCaseReplacer {
 	 */
 	public TestCase replaceTest(String targetClass, List<TestCase> otherTests,
 	        TestCase test) {
-		// Various environmental setup necessary for EvoSuite
+		// Various environmental setup necessary for SmartUt
 		Properties.ALGORITHM = Algorithm.MONOTONICGA;
 		Properties.STRATEGY = Strategy.ONEBRANCH;
 		ExecutionTracer.enableTraceCalls();

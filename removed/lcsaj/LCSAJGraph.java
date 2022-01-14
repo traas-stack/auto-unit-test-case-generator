@@ -1,33 +1,33 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.graphs;
+package org.smartut.graphs;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.evosuite.TestGenerationContext;
-import org.evosuite.coverage.lcsaj.LCSAJ;
-import org.evosuite.graphs.cfg.BytecodeInstruction;
-import org.evosuite.graphs.cfg.ControlFlowEdge;
-import org.evosuite.graphs.cfg.RawControlFlowGraph;
+import org.smartut.TestGenerationContext;
+import org.smartut.coverage.lcsaj.LCSAJ;
+import org.smartut.graphs.cfg.BytecodeInstruction;
+import org.smartut.graphs.cfg.ControlFlowEdge;
+import org.smartut.graphs.cfg.RawControlFlowGraph;
 import org.kohsuke.graphviz.Edge;
 import org.kohsuke.graphviz.Graph;
 import org.kohsuke.graphviz.Node;
@@ -46,7 +46,7 @@ public class LCSAJGraph {
 	 * </p>
 	 * 
 	 * @param lcsaj
-	 *            a {@link org.evosuite.coverage.lcsaj.LCSAJ} object.
+	 *            a {@link org.smartut.coverage.lcsaj.LCSAJ} object.
 	 * @param fitnessGraph
 	 *            a boolean.
 	 */

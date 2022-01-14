@@ -1,34 +1,34 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.instrumentation.coverage;
+package org.smartut.instrumentation.coverage;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.evosuite.coverage.path.PrimePath;
-import org.evosuite.coverage.path.PrimePathPool;
-import org.evosuite.graphs.GraphPool;
-import org.evosuite.graphs.cfg.BytecodeInstruction;
-import org.evosuite.graphs.cfg.ControlFlowEdge;
-import org.evosuite.graphs.cfg.RawControlFlowGraph;
+import org.smartut.coverage.path.PrimePath;
+import org.smartut.coverage.path.PrimePathPool;
+import org.smartut.graphs.GraphPool;
+import org.smartut.graphs.cfg.BytecodeInstruction;
+import org.smartut.graphs.cfg.ControlFlowEdge;
+import org.smartut.graphs.cfg.RawControlFlowGraph;
 import org.objectweb.asm.tree.MethodNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class PrimePathInstrumentation implements MethodInstrumentation {
 	private static final Logger logger = LoggerFactory.getLogger(PrimePathInstrumentation.class);
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.cfg.MethodInstrumentation#analyze(org.objectweb.asm.tree.MethodNode, org.jgrapht.Graph, java.lang.String, java.lang.String, int)
+	 * @see org.smartut.cfg.MethodInstrumentation#analyze(org.objectweb.asm.tree.MethodNode, org.jgrapht.Graph, java.lang.String, java.lang.String, int)
 	 */
 	/** {@inheritDoc} */
 	@Override
@@ -85,7 +85,7 @@ public class PrimePathInstrumentation implements MethodInstrumentation {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.cfg.MethodInstrumentation#executeOnMainMethod()
+	 * @see org.smartut.cfg.MethodInstrumentation#executeOnMainMethod()
 	 */
 	/** {@inheritDoc} */
 	@Override
@@ -95,7 +95,7 @@ public class PrimePathInstrumentation implements MethodInstrumentation {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.cfg.MethodInstrumentation#executeOnExcludedMethods()
+	 * @see org.smartut.cfg.MethodInstrumentation#executeOnExcludedMethods()
 	 */
 	/** {@inheritDoc} */
 	@Override

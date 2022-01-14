@@ -1,37 +1,37 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.eclipse.replace;
+package org.smartut.eclipse.replace;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.evosuite.coverage.TestFitnessFactory;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.TestCaseMinimizer;
-import org.evosuite.testcase.TestChromosome;
-import org.evosuite.testcase.TestCodeVisitor;
-import org.evosuite.testcase.TestFitnessFunction;
-import org.evosuite.testcase.execution.ExecutionResult;
+import org.smartut.coverage.TestFitnessFactory;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.TestCaseMinimizer;
+import org.smartut.testcase.TestChromosome;
+import org.smartut.testcase.TestCodeVisitor;
+import org.smartut.testcase.TestFitnessFunction;
+import org.smartut.testcase.execution.ExecutionResult;
 
 /**
  * This class is the fitness function, which calculates for a given test
@@ -242,7 +242,7 @@ public class DifferenceFitnessFunction extends TestFitnessFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.testcase.TestFitnessFunction#isMaximizationFunction()
+	 * @see org.smartut.testcase.TestFitnessFunction#isMaximizationFunction()
 	 */
 	@Override
 	public boolean isMaximizationFunction() {
@@ -262,7 +262,7 @@ public class DifferenceFitnessFunction extends TestFitnessFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.testcase.TestFitnessFunction#getTargetMethod()
+	 * @see org.smartut.testcase.TestFitnessFunction#getTargetMethod()
 	 */
 	@Override
 	public String getTargetMethod() {

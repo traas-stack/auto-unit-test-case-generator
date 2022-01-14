@@ -1,32 +1,32 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.coverage.path;
+package org.smartut.coverage.path;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.evosuite.TestGenerationContext;
-import org.evosuite.coverage.branch.Branch;
-import org.evosuite.coverage.branch.BranchPool;
-import org.evosuite.graphs.cfg.BytecodeInstruction;
+import org.smartut.TestGenerationContext;
+import org.smartut.coverage.branch.Branch;
+import org.smartut.coverage.branch.BranchPool;
+import org.smartut.graphs.cfg.BytecodeInstruction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class PrimePath {
 	/**
 	 * <p>getLast</p>
 	 *
-	 * @return a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
+	 * @return a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
 	 */
 	public BytecodeInstruction getLast() {
 		return nodes.get(nodes.size() - 1);
@@ -76,7 +76,7 @@ public class PrimePath {
 	/**
 	 * <p>append</p>
 	 *
-	 * @param node a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
+	 * @param node a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
 	 */
 	public void append(BytecodeInstruction node) {
 		nodes.add(node);
@@ -85,8 +85,8 @@ public class PrimePath {
 	/**
 	 * <p>getAppended</p>
 	 *
-	 * @param node a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
-	 * @return a {@link org.evosuite.coverage.path.PrimePath} object.
+	 * @param node a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
+	 * @return a {@link org.smartut.coverage.path.PrimePath} object.
 	 */
 	public PrimePath getAppended(BytecodeInstruction node) {
 		PrimePath copy = new PrimePath(className, methodName);
@@ -98,7 +98,7 @@ public class PrimePath {
 	/**
 	 * <p>contains</p>
 	 *
-	 * @param vertex a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
+	 * @param vertex a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
 	 * @return a boolean.
 	 */
 	public boolean contains(BytecodeInstruction vertex) {
@@ -144,7 +144,7 @@ public class PrimePath {
 	 * <p>get</p>
 	 *
 	 * @param position a int.
-	 * @return a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
+	 * @return a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
 	 */
 	public BytecodeInstruction get(int position) {
 		return nodes.get(position);

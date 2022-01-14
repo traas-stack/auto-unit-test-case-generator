@@ -1,33 +1,33 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.coverage.lcsaj;
+package org.smartut.coverage.lcsaj;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.evosuite.Properties;
-import org.evosuite.TestGenerationContext;
-import org.evosuite.Properties.Strategy;
-import org.evosuite.coverage.branch.Branch;
-import org.evosuite.coverage.branch.BranchPool;
-import org.evosuite.graphs.cfg.BytecodeInstruction;
+import org.smartut.Properties;
+import org.smartut.TestGenerationContext;
+import org.smartut.Properties.Strategy;
+import org.smartut.coverage.branch.Branch;
+import org.smartut.coverage.branch.BranchPool;
+import org.smartut.graphs.cfg.BytecodeInstruction;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 	 * @param methodName
 	 *            a {@link java.lang.String} object.
 	 * @param start
-	 *            a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
+	 *            a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
 	 */
 	public LCSAJ(String className, String methodName, BytecodeInstruction start) {
 		this.className = className;
@@ -69,7 +69,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 			if (methodName.startsWith("<init>") && start.getInstructionId() <= 1) {
 
 			}
-			if (Properties.STRATEGY != Strategy.EVOSUITE) {
+			if (Properties.STRATEGY != Strategy.SmartUt) {
 				start.forceBranch();
 				BranchPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).registerAsBranch(start);
 				logger.info("Registering new branch for start node");
@@ -87,7 +87,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 	 * </p>
 	 * 
 	 * @param l
-	 *            a {@link org.evosuite.coverage.lcsaj.LCSAJ} object.
+	 *            a {@link org.smartut.coverage.lcsaj.LCSAJ} object.
 	 */
 	public LCSAJ(LCSAJ l) {
 		this.className = l.getClassName();
@@ -139,7 +139,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 	 * 
 	 * @param position
 	 *            a int.
-	 * @return a {@link org.evosuite.coverage.branch.Branch} object.
+	 * @return a {@link org.smartut.coverage.branch.Branch} object.
 	 */
 	public Branch getBranch(int position) {
 		return branches.get(position);
@@ -163,7 +163,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 	 * getStartBranch
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.coverage.branch.Branch} object.
+	 * @return a {@link org.smartut.coverage.branch.Branch} object.
 	 */
 	public Branch getStartBranch() {
 		return branches.get(0);
@@ -174,7 +174,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 	 * getLastBranch
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.coverage.branch.Branch} object.
+	 * @return a {@link org.smartut.coverage.branch.Branch} object.
 	 */
 	public Branch getLastBranch() {
 		return branches.get(branches.size() - 1);
@@ -221,7 +221,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 	 * @param id
 	 *            a int.
 	 * @param instruction
-	 *            a {@link org.evosuite.graphs.cfg.BytecodeInstruction} object.
+	 *            a {@link org.smartut.graphs.cfg.BytecodeInstruction} object.
 	 */
 	public void lookupInstruction(int id, BytecodeInstruction instruction) {
 		lastAccessedNode = instruction.getASMNode();
@@ -233,7 +233,7 @@ public class LCSAJ implements Comparable<LCSAJ> {
 		} else if (instruction.isReturn() || instruction.isThrow()
 		        || instruction.isGoto()) {
 
-			if (Properties.STRATEGY != Strategy.EVOSUITE
+			if (Properties.STRATEGY != Strategy.SmartUt
 			        && !BranchPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).isKnownAsBranch(instruction)) {
 				instruction.forceBranch();
 				BranchPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).registerAsBranch(instruction);

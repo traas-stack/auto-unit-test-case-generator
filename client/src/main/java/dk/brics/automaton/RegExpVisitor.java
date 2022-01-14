@@ -1,7 +1,7 @@
 package dk.brics.automaton;
 
 /*
- * This class is not in the org.evosuite package,
+ * This class is not in the org.smartut package,
  * as it has to access package level variables and classes in the
  * dk.brics.automaton package
  *

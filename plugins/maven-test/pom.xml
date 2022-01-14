@@ -4,26 +4,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.evosuite.plugins</groupId>
-        <artifactId>evosuite-plugins</artifactId>
+        <groupId>org.smartut.plugins</groupId>
+        <artifactId>smartut-plugins</artifactId>
         <version>1.1.0</version>
     </parent>
 
     <!-- Module used to test the Maven Plugin. Has to be called _after_ "install" has been executed
         on previous modules -->
 
-    <artifactId>evosuite-maven-plugin-test</artifactId>
+    <artifactId>smartut-maven-plugin-test</artifactId>
     <packaging>jar</packaging>
 
     <properties>
-        <evosuiteVersion>${project.version}</evosuiteVersion>
+        <smartutVersion>${project.version}</smartutVersion>
     </properties>
 
     <dependencies>
         <!-- Force this module to be built after the Maven Plugin-->
         <dependency>
-            <groupId>org.evosuite.plugins</groupId>
-            <artifactId>evosuite-maven-plugin</artifactId>
+            <groupId>org.smartut.plugins</groupId>
+            <artifactId>smartut-maven-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

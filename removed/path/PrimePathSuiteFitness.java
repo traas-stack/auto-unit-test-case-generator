@@ -1,35 +1,35 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.coverage.path;
+package org.smartut.coverage.path;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.evosuite.testcase.ExecutableChromosome;
-import org.evosuite.testcase.ExecutionResult;
-import org.evosuite.testcase.ExecutionTracer;
-import org.evosuite.testcase.TestChromosome;
-import org.evosuite.testcase.TestFitnessFunction;
-import org.evosuite.testsuite.AbstractTestSuiteChromosome;
-import org.evosuite.testsuite.TestSuiteFitnessFunction;
+import org.smartut.testcase.ExecutableChromosome;
+import org.smartut.testcase.ExecutionResult;
+import org.smartut.testcase.ExecutionTracer;
+import org.smartut.testcase.TestChromosome;
+import org.smartut.testcase.TestFitnessFunction;
+import org.smartut.testsuite.AbstractTestSuiteChromosome;
+import org.smartut.testsuite.TestSuiteFitnessFunction;
 
 /**
  * <p>
@@ -56,7 +56,7 @@ public class PrimePathSuiteFitness extends TestSuiteFitnessFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.ga.FitnessFunction#getFitness(org.evosuite.ga.Chromosome)
+	 * @see org.smartut.ga.FitnessFunction#getFitness(org.smartut.ga.Chromosome)
 	 */
 	/** {@inheritDoc} */
 	@Override

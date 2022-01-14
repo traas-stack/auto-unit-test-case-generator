@@ -12,7 +12,7 @@ com.yourkit.
 corina.cross.Single
 daikon.
 de.unisb.cs.st.testcarver.
-de.unisb.cs.st.evosuite.
+de.unisb.cs.st.smartut.
 de.unisl.cs.st.bugex.
 de.unisb.cs.st.specmate.
 dk.brics.automaton.
@@ -51,6 +51,6 @@ org.w3c.
 org.uispec4j.
 mockit.
 sun.
-testing.generation.evosuite.
+testing.generation.smartut.
 org.codehaus.groovy.
 groovy.

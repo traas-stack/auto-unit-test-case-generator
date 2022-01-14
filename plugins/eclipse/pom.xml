@@ -4,12 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.evosuite.plugins</groupId>
-    <artifactId>evosuite-plugins</artifactId>
+    <groupId>org.smartut.plugins</groupId>
+    <artifactId>smartut-plugins</artifactId>
     <version>1.1.0</version>
   </parent>
 
-  <artifactId>evosuite-eclipse-plugin</artifactId>
+  <artifactId>smartut-eclipse-plugin</artifactId>
   <packaging>pom</packaging>
 
   <properties>
@@ -74,9 +74,9 @@
   </build>
 
   <modules>
-    <module>evosuite-eclipse-deps</module> 
-    <module>evosuite-eclipse-core</module> 
-    <module>evosuite-eclipse-feature</module> 
-    <module>evosuite-eclipse-site</module> 
+    <module>smartut-eclipse-deps</module>
+    <module>smartut-eclipse-core</module>
+    <module>smartut-eclipse-feature</module>
+    <module>smartut-eclipse-site</module>
   </modules>
 </project>

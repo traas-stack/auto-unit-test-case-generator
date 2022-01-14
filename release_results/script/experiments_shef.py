@@ -1,34 +1,34 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2010-2016 Gordon Fraser, Andrea Arcuri and EvoSuite
+# Copyright (C) 2010-2016 Gordon Fraser, Andrea Arcuri and SmartUt
 # contributors
 #
-# This file is part of EvoSuite.
+# This file is part of SmartUt.
 #
-# EvoSuite is free software: you can redistribute it and/or modify it
+# SmartUt is free software: you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published
 # by the Free Software Foundation, either version 3.0 of the License, or
 # (at your option) any later version.
 #
-# EvoSuite is distributed in the hope that it will be useful, but
+# SmartUt is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 # Lesser Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+# License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
 #
 
 
-# How to run EvoSuite
-EVOSUITE="java -Xmx400M -jar /fastdata/ac1gf/release_results/evosuite-master-1.0.6-SNAPSHOT.jar"
+# How to run SmartUt
+SmartUt="java -Xmx400M -jar /fastdata/ac1gf/release_results/smartut-master-1.0.6-SNAPSHOT.jar"
 
 # Location of SF110
 CASESTUDY_DIR="/data/ac1gf/sf110"
 
 CONFIG_NAME = "1.0.6"
 
-EXPERIMENT_NAME="EvoSuite"
+EXPERIMENT_NAME="SmartUt"
 
 def getScriptHead():
     s =  "#!/bin/bash\n"

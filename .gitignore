@@ -3,9 +3,9 @@
 *.iml
 *~
 target/
-evosuite-files
-evosuite-report
-evosuite-tests
+smartut-files
+smartut-report
+smartut-tests
 plugins/jenkins/work
 build
 transitionLog.txt

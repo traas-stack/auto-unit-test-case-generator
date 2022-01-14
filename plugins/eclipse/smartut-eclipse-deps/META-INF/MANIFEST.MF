@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SmartUt Eclipse plugin - Dependencies
+Bundle-SymbolicName: org.smartut.plugins.eclipse.deps
+Bundle-Version: 1.1.0
+Bundle-Vendor: Gordon Fraser, José Miguel Rojas and Thomas White - University of Sheffield
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ClassPath: lib/smartut.jar
+Eclipse-BundleShape: dir
+Export-Package: org.smartut,
+ org.smartut.annotations,
+ org.smartut.classpath,
+ org.smartut.coverage,
+ org.smartut.ga,
+ org.smartut.ga.metaheuristics,
+ org.smartut.junit,
+ org.smartut.result,
+ org.smartut.rmi,
+ org.smartut.rmi.service,
+ org.smartut.runtime.agent,
+ org.smartut.setup,
+ org.smartut.strategy,
+ org.smartut.testcase,
+ org.smartut.testcase.execution,
+ org.smartut.testcase.factories,
+ org.smartut.testsuite,
+ org.smartut.utils,
+ org.smartut.shaded.org.apache.commons.lang3

@@ -1,6 +1,6 @@
 NOTES FOR DEVELOPERS
 
-These notes are meant for developers working on EvoSuite.
+These notes are meant for developers working on SmartUt.
 There are several rules of thumb regarding how to write "good code",
 but often rules are either too generic and not tailored for a given particular
 piece of software (e.g., different kinds of architectures).
@@ -16,7 +16,7 @@ to ask for detailed comments on each single method/field and 100% coverage test 
 ---------------------------------------------
 AVOID System.out AND System.err
 
-EvoSuite uses a logging framework, in which client processes do communicate with Master through TCP.
+SmartUt uses a logging framework, in which client processes do communicate with Master through TCP.
 For debugging  and logging errors in a class Foo, create a logger in the following way:
 
 private static Logger logger = LoggerFactory.getLogger(Foo.class);
@@ -24,7 +24,7 @@ private static Logger logger = LoggerFactory.getLogger(Foo.class);
 It is important to keep the same name 'logger' to make things consistent among classes.
 If the logging should be part the actual output for the console user, then rather use: 
 
-LoggingUtils.getEvoLogger()
+LoggingUtils.getSmartUtLogger()
 
 
 ---------------------------------------------
@@ -46,13 +46,13 @@ quite an overhead for trace/debug/info
 
 
 --------------------------------------------
-EvoSuite should be DETERMINISTIC
+SmartUt should be DETERMINISTIC
 
-EvoSuite uses randomized algorithms. However, given the same random seed, the behavior should be
-fully deterministic. This is essential for debugging EvoSuite. Unfortunately, there are few libraries/APIs
+SmartUt uses randomized algorithms. However, given the same random seed, the behavior should be
+fully deterministic. This is essential for debugging SmartUt. Unfortunately, there are few libraries/APIs
 that are non-deterministic, like for example HashMap and HashSet. Rather use equivalent classes that
 are deterministic, ie LinkedHashMap and LinkedHashSet.
-Note: we have system tests to check if EvoSuite remains deterministic, eg see BaseDeterminismSystemTest.
+Note: we have system tests to check if SmartUt remains deterministic, eg see BaseDeterminismSystemTest.
 
 
 
@@ -60,8 +60,8 @@ Note: we have system tests to check if EvoSuite remains deterministic, eg see Ba
 ---------------------------------------------
 DO NOT USE System.exit
 
-Better to throw an exception, as the entry point of EvoSuite does some logging when ends.
-Furthermore, System.exit becomes problematic when unit testing EvoSuite.
+Better to throw an exception, as the entry point of SmartUt does some logging when ends.
+Furthermore, System.exit becomes problematic when unit testing SmartUt.
 
 
 
@@ -70,7 +70,7 @@ STATIC VARIABLES ARE YOUR ENEMY
 
 Static variables should be either constant or representing transient data (eg cache information whose presence/missing
 has only effect on performance, not on functionality).
-Having "classes with states" is usually a poor OO design (an exception to this rule is org.evosuite.Properties).
+Having "classes with states" is usually a poor OO design (an exception to this rule is org.smartut.Properties).
 If those are really needed, then you should rather use a singleton pattern. 
 This is not just to be pedantic, but, really, non-constant static variables make unit testing far much harder
 and lead to code that is more difficult to understand and maintain. 
@@ -80,16 +80,16 @@ and lead to code that is more difficult to understand and maintain.
 ---------------------------------------------
 HOW TO WRITE JUNIT TEST CASES
 
-Until EvoSuite will not be applicable to itself, there is the need to write manual test cases.
-They should be put in the "src/test/java" folder, following the same package structure as EvoSuite code.
-A unit test suite for SUT org.evosuite.somepackage.Foo should be called org.evosuite.somepackage.FooTest.
+Until SmartUt will not be applicable to itself, there is the need to write manual test cases.
+They should be put in the "src/test/java" folder, following the same package structure as SmartUt code.
+A unit test suite for SUT org.smartut.somepackage.Foo should be called org.smartut.somepackage.FooTest.
 This is useful for several reasons:
 - Need to know what class the test case is supposed to unit test by just looking at its name
 - Should be easy to identify if a class has a test suite for it
 - If in same package, then the test suite can access package/protected fields/methods
 - Having "Test" as postfix (instead of a prefix) is useful for when searching for classes by name (eg CTRL-SHIFT-t in Eclipse)
 
-If for testing there is the need to create additional, support classes used as data input for EvoSuite,
+If for testing there is the need to create additional, support classes used as data input for SmartUt,
 then those will need to be put in the com.examples.with.different.packagename package.
 
 ---------------------------------------------
@@ -149,10 +149,10 @@ when writing a new class (or re-factoring a current one), fields should come fir
 HOW TO MAKE A RELEASE
 
 To use the Maven plugin, and to link the "runtime" jar (plus dependencies)
-to a project, EvoSuite needs to be released and deployed on an accessible
+to a project, SmartUt needs to be released and deployed on an accessible
 repository.
 
-Assume current EvoSuite version is x.y.z-SNAPSHOT. You need choose
+Assume current SmartUt version is x.y.z-SNAPSHOT. You need choose
 a new version number (x for major, y for minor, and z for patch).
 
 Once chosen a new version a.b.c (with *no* SNAPSHOT, and it is fine to

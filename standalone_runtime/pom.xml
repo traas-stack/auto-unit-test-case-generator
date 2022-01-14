@@ -3,19 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>evosuite</artifactId>
-        <groupId>org.evosuite</groupId>
+        <artifactId>smartut</artifactId>
+        <groupId>org.smartut</groupId>
         <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>evosuite-standalone-runtime</artifactId>
+    <artifactId>smartut-standalone-runtime</artifactId>
 
     <!-- We just want to make a "copy" of runtime with the right modified dependencies and manifest file -->
     <dependencies>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-runtime</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -74,8 +74,8 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>org.evosuite.runtime.agent.InstrumentingAgent</Premain-Class>
-                            <Agent-Class>org.evosuite.runtime.agent.InstrumentingAgent</Agent-Class>
+                            <Premain-Class>org.smartut.runtime.agent.InstrumentingAgent</Premain-Class>
+                            <Agent-Class>org.smartut.runtime.agent.InstrumentingAgent</Agent-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>
