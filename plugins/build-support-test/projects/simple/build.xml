@@ -1,22 +1,22 @@
 <!--
 
-    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
     contributors
 
-    This file is part of EvoSuite.
+    This file is part of SmartUt.
 
-    EvoSuite is free software: you can redistribute it and/or modify it
+    SmartUt is free software: you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
     by the Free Software Foundation, either version 3.0 of the License, or
     (at your option) any later version.
 
-    EvoSuite is distributed in the hope that it will be useful, but
+    SmartUt is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     Lesser Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public
-    License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+    License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <project name="Simple" default="compile" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
@@ -31,14 +31,14 @@
 
     <!-- this needs to be set with -D. Done automatically from tests.
         Uncomment (and update) if open from IDE  -->
-    <!--<property name="evosuiteVersion" value="1.0.5-SNAPSHOT" />-->
-    <property name="EvoSuiteCompiledTestFolder" value="build/tests" />
+    <!--<property name="smartutVersion" value="1.0.5-SNAPSHOT" />-->
+    <property name="SmartUtCompiledTestFolder" value="build/tests" />
 
 
     <artifact:dependencies pathId="dependency.classpath">
-        <dependency groupId="org.evosuite"
-                    artifactId="evosuite-standalone-runtime"
-                    version="${evosuiteVersion}"
+        <dependency groupId="org.smartut"
+                    artifactId="smartut-standalone-runtime"
+                    version="${smartutVersion}"
                     scope="test"/>
         <dependency groupId="junit" artifactId="junit" version="4.12" scope="test"/>
         <dependency groupId="ch.qos.logback" artifactId="logback-classic" version="1.1.6" />
@@ -140,8 +140,8 @@
 
     <target name="test" depends="compile-tests" description="Run provided tests">
         <junit printsummary="yes" haltonfailure="yes" fork="yes" showoutput="yes" enableTestListenerEvents="true">
-            <sysproperty key="EvoSuiteCompiledTestFolder" value="${EvoSuiteCompiledTestFolder}" />
-            <formatter classname="org.evosuite.runtime.AntInitializingListener" />
+            <sysproperty key="SmartUtCompiledTestFolder" value="${SmartUtCompiledTestFolder}" />
+            <formatter classname="org.smartut.runtime.AntInitializingListener" />
             <formatter type="plain" usefile="false" />
             <classpath>
                 <pathelement path="${build.classes}"/>

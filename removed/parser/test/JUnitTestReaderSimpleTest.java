@@ -1,28 +1,28 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.junit;
+package org.smartut.junit;
 
 import junit.framework.Assert;
 
-import org.evosuite.Properties;
-import org.evosuite.testcase.TestCase;
+import org.smartut.Properties;
+import org.smartut.testcase.TestCase;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class JUnitTestReaderSimpleTest {
 	@Ignore
 	@Test
 	public void testReadComplexJUnitTestCase01() {
-		Properties.PROJECT_PREFIX = "org.evosuite.junit";
+		Properties.PROJECT_PREFIX = "org.smartut.junit";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(SimpleTestExample01.class.getName()
 		        + "#test");
@@ -54,7 +54,7 @@ public class JUnitTestReaderSimpleTest {
 	@Ignore
 	@Test
 	public void testReadComplexJUnitTestCase02() {
-		Properties.PROJECT_PREFIX = "org.evosuite.junit";
+		Properties.PROJECT_PREFIX = "org.smartut.junit";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(SimpleTestExample02.class.getName()
 		        + "#test");
@@ -70,7 +70,7 @@ public class JUnitTestReaderSimpleTest {
 	@Ignore
 	@Test
 	public void testReadComplexJUnitTestCase03() {
-		Properties.PROJECT_PREFIX = "org.evosuite.junit";
+		Properties.PROJECT_PREFIX = "org.smartut.junit";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(SimpleTestExample03.class.getName()
 		        + "#test");
@@ -94,7 +94,7 @@ public class JUnitTestReaderSimpleTest {
 	@Ignore
 	@Test
 	public void testReadComplexJUnitTestCase04() {
-		Properties.PROJECT_PREFIX = "org.evosuite.junit";
+		Properties.PROJECT_PREFIX = "org.smartut.junit";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(SimpleTestExample04.class.getName()
 		        + "#test");

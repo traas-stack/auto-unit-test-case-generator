@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+    contributors
+
+    This file is part of SmartUt.
+
+    SmartUt is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
+
+    SmartUt is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<?eclipse version="3.4"?>
+<plugin>
+<!--
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            objectClass="org.eclipse.jdt.core.IJavaElement"
+            id="org.smartut.contribution">
+         <menu
+               label="SmartUt"
+               path="additions"
+               icon="icons/smartut.gif"
+               id="org.smartut.menu">
+            <separator
+                  name="group1">
+            </separator>
+         </menu> -->
+         <!-- action commented out in White's version -->
+         <!-- 
+         <action
+               label="Extend JUnit Test Suite"
+               class="org.smartut.eclipse.popup.actions.ExtendSuiteAction"
+               menubarPath="org.smartut.menu/group1"
+               state="true"
+               style="push"
+               tooltip="Generate further tests for existing JUnit test class"
+               enablesFor="1"
+               id="org.smartut.SmartUtExtendAction">
+               <visibility>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate> 
+                     <adapt type="org.eclipse.jdt.core.IJavaElement"> 
+                        <test property="org.eclipse.jdt.core.isInJavaProject"/>
+                        <test property="org.eclipse.jdt.core.hasTypeOnClasspath" value="junit.framework.Test"/>
+                        <test property="org.eclipse.jdt.junit.canLaunchAsJUnit" forcePluginActivation="true"/>
+                      </adapt>
+                  </iterate>
+               </with>
+            </visibility>
+         </action>
+         <action
+               label="Generate JUnit Test Suite"
+               class="org.smartut.eclipse.popup.actions.GenerateTestsAction"
+               menubarPath="org.smartut.menu/group1"
+               state="true"
+               style="push"
+               tooltip="Make SmartUt generate JUnit test classes"
+               enablesFor="1"
+               id="org.smartut.SmartUtAction">
+         </action> -->
+         <!--
+         <action
+               label="Clear SmartUt Markers"
+               class="org.smartut.eclipse.popup.actions.ClearMarkersAction"
+               menubarPath="org.smartut.menu/group1"
+               state="true"
+               style="push"
+               tooltip="Clear SmartUt markers"
+               enablesFor="1"
+               id="org.smartut.ClearSmartUtMarkers">
+         </action>
+         --><!--
+      </objectContribution>
+            <objectContribution
+            id="org.smartut.EditorContribution"
+            objectClass="org.eclipse.ui.IEditorInput"
+            nameFilter="*.java">
+            <menu
+                label="SmartUt"
+                path="additions"
+                id="org.smartut.EditorMenu"
+                icon="icons/smartut.gif">
+                <separator
+                    name="group">
+                </separator>
+            </menu> -->
+            <!-- action commented out in White's version --> <!--
+            <action
+                label="Extend JUnit Test Suite"
+                class="org.smartut.eclipse.popup.actions.ExtendSuiteEditorAction"
+                menubarPath="org.smartut.EditorMenu/group"
+                enablesFor="1"
+                id="org.smartut.SmartUtExtendAction2">
+            </action>
+            <action
+                label="Generate JUnit Test Suite"
+                class="org.smartut.eclipse.popup.actions.GenerateTestsEditorAction"
+                menubarPath="org.smartut.EditorMenu/group"
+                enablesFor="1"
+                id="org.smartut.SmartUtAction2">
+            </action>
+            
+        </objectContribution>
+      -->
+      <!--
+      <objectContribution
+            id="org.smartut.EditorContribution"
+            objectClass="org.eclipse.ui.IEditorInput"
+            nameFilter="*.java">
+            <menu
+                label="SmartUt"
+                path="additions"
+                id="org.smartut.EditorMenu"
+                icon="icons/smartut.gif">
+                <separator
+                    name="group">
+                </separator>
+            </menu>
+            <action
+                label="Replace Test"
+                class="org.smartut.eclipse.popup.actions.ReplaceTestAction"
+                menubarPath="org.smartut.EditorMenu/group"
+                enablesFor="1"
+                id="org.smartut.ReplaceTestAction">
+            </action>
+        </objectContribution>
+        --> 
+        <!--
+   </extension> -->
+   <extension point="org.eclipse.ui.propertyPages">
+      <page
+            adaptable="true"
+            class="org.smartut.eclipse.properties.SmartUtPropertyPage"
+            id="org.smartut.eclipse.properties.SmartUtPropertyPage"
+            name="SmartUt"
+            nameFilter="*"
+            objectClass="org.eclipse.jdt.core.IJavaProject">
+      </page>
+   </extension>
+   <extension point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+            class="org.smartut.eclipse.properties.SmartUtClasspathContainerInitializer"
+            id="org.smartut.eclipse.classpathContainerInitializer">
+      </classpathContainerInitializer>
+   </extension>
+   <extension point="org.eclipse.jdt.ui.classpathContainerPage">
+      <classpathContainerPage
+            id="org.smartut.eclipse.classpathContainerPage"
+            class="org.smartut.eclipse.properties.SmartUtClasspathContainerPage"
+            name="SmartUt runtime library">
+      </classpathContainerPage>
+   </extension>
+
+   <!-- Start quickfix plug-in -->
+    <!-- <extension -->
+    <!--         point="org.eclipse.ui.startup"> -->
+    <!--         <startup class="org.smartut.eclipse.junit.JUnitSessionMonitor"/> -->
+    <!--   </extension>-->
+   <extension
+         id="id1"
+         point="org.eclipse.core.resources.builders">
+      <builder></builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.smartut.eclipse.Activator"></startup>
+   </extension>
+   <extension
+   		point="org.eclipse.core.resources.markers"
+   		id="newtestmarker"
+   		name="New Test">
+   		<super type="org.eclipse.core.resources.textmarker" />
+   		<persistent value="true" />
+   </extension>
+   <extension
+   		point="org.eclipse.core.resources.markers"
+   		id="notcoveredmarker"
+   		name="Uncovered Branch">
+   		<super type="org.eclipse.core.resources.textmarker" />
+   		<persistent value="true" />
+   	</extension>
+   	<extension
+   		point="org.eclipse.core.resources.markers"
+   		id="uncoveredlinemarker"
+   		name="Uncovered Line">
+   		<super type="org.eclipse.core.resources.textmarker" />
+   		<persistent value="true" />
+   	</extension>
+   	<extension
+   		point="org.eclipse.core.resources.markers"
+   		id="exceptionmarker"
+   		name="Uncaught Exception">
+   		<super type="org.eclipse.core.resources.textmarker" />
+   		<persistent value="true" />
+   	</extension>
+   	<extension
+   		point="org.eclipse.core.resources.markers"
+   		id="lineremovedmarker"
+   		name="Line Removed Marker">
+   		<super type="org.eclipse.core.resources.textmarker" />
+   		<persistent value="true" />
+   	</extension>
+   	<extension
+   		point="org.eclipse.ui.editors.annotationTypes">
+   		<type
+   			markerType="SmartUtQuickFixes.newtestmarker"
+   			name="SmartUtQuickFixes.newtestmarker" />
+   		<type
+   			markerType="SmartUtQuickFixes.notcoveredmarker"
+   			name="SmartUtQuickFixes.notcoveredmarker" />
+   		<type
+   			markerType="SmartUtQuickFixes.uncoveredlinemarker"
+   			name="SmartUtQuickFixes.uncoveredlinemarker" />
+      	<type
+   			markerType="SmartUtQuickFixes.exceptionmarker"
+   			name="SmartUtQuickFixes.exceptionmarker" />
+   		<type
+   			markerType="SmartUtQuickFixes.lineremovedmarker"
+   			name="SmartUtQuickFixes.lineremovedmarker" />
+   	</extension>
+   	<extension
+   		point="org.eclipse.ui.editors.markerAnnotationSpecification">
+   		<specification
+   			annotationType="SmartUtQuickFixes.newtestmarker"
+   			colorPreferenceKey="SmartUtQuickFixes.newtestmarker.color"
+   			colorPreferenceValue="120,100,100"
+   			contributesToHeader="false"
+   			highlightPreferenceKey="SmartUtQuickFixes.newtestmarker.highlight"
+   			highlightPreferenceValue="false"
+   			includeOnPreferencePage="true"
+   			label="New Test"
+   			overviewRulerPreferenceKey="SmartUtQuickFixes.newtestmarker.overview"
+   			overviewRulerPreferenceValue="true"
+   			presentationLayer="0"
+   			textPreferenceKey="SmartUtQuickFixes.newtestmarker.text"
+   			textPreferenceValue="true"
+   			textStylePreferenceValue="UNDERLINE"
+   			verticalRulerPreferenceKey="SmartUtQuickFixes.newtestmarker.vertical"
+   			verticalRulerPreferenceValue="true"
+   			icon="icons/smartut.gif"
+   			quickFixIcon="icons/smartut.gif">
+   		</specification>
+   		<specification
+   			annotationType="SmartUtQuickFixes.notcoveredmarker"
+   			colorPreferenceKey="SmartUtQuickFixes.notcoveredmarker.color"
+   			colorPreferenceValue="120,100,100"
+   			contributesToHeader="false"
+   			highlightPreferenceKey="SmartUtQuickFixes.notcoveredmarker.highlight"
+   			highlightPreferenceValue="false"
+   			includeOnPreferencePage="true"
+   			label="Uncovered Branch"
+   			overviewRulerPreferenceKey="SmartUtQuickFixes.notcoveredmarker.overview"
+   			overviewRulerPreferenceValue="true"
+   			presentationLayer="0"
+   			textPreferenceKey="SmartUtQuickFixes.notcoveredmarker.text"
+   			textPreferenceValue="true"
+   			textStylePreferenceValue="UNDERLINE"
+   			verticalRulerPreferenceKey="SmartUtQuickFixes.notcoveredmarker.vertical"
+   			verticalRulerPreferenceValue="true"
+   			icon="icons/unreachable.png"
+   			quickFixIcon="icons/unreachable.png">
+   		</specification>
+   		<specification
+   			annotationType="SmartUtQuickFixes.uncoveredlinemarker"
+   			colorPreferenceKey="SmartUtQuickFixes.uncoveredmarker.color"
+   			colorPreferenceValue="255,100,100"
+   			contributesToHeader="false"
+   			highlightPreferenceKey="SmartUtQuickFixes.uncoveredmarker.highlight"
+   			highlightPreferenceValue="true"
+   			includeOnPreferencePage="true"
+   			label="Uncovered Line"
+   			overviewRulerPreferenceKey="SmartUtQuickFixes.uncoveredmarker.overview"
+   			overviewRulerPreferenceValue="true"
+   			presentationLayer="0"
+   			textPreferenceKey="SmartUtQuickFixes.uncoveredmarker.text"
+   			textPreferenceValue="true"
+   			textStylePreferenceValue="UNDERLINE"
+   			verticalRulerPreferenceKey="SmartUtQuickFixes.uncoveredmarker.vertical"
+   			verticalRulerPreferenceValue="true">
+   		</specification>
+   		<specification
+   			annotationType="SmartUtQuickFixes.exceptionmarker"
+   			colorPreferenceKey="SmartUtQuickFixes.exceptionmarker.color"
+   			colorPreferenceValue="100,190,100"
+   			contributesToHeader="false"
+   			highlightPreferenceKey="SmartUtQuickFixes.exceptionmarker.highlight"
+   			highlightPreferenceValue="true"
+   			includeOnPreferencePage="true"
+   			label="Uncaught Exception"
+   			overviewRulerPreferenceKey="SmartUtQuickFixes.exceptionmarker.overview"
+   			overviewRulerPreferenceValue="true"
+   			presentationLayer="0"
+   			textPreferenceKey="SmartUtQuickFixes.exceptionmarker.text"
+   			textPreferenceValue="true"
+   			textStylePreferenceValue="UNDERLINE"
+   			verticalRulerPreferenceKey="SmartUtQuickFixes.exceptionmarker.vertical"
+   			verticalRulerPreferenceValue="true"
+   			icon="icons/exception.png"
+   			quickFixIcon="icons/exception.png">
+   		</specification>
+   		<specification
+   			annotationType="SmartUtQuickFixes.lineremovedmarker"
+   			colorPreferenceKey="SmartUtQuickFixes.lineremovedmarker.color"
+   			colorPreferenceValue="190,190,90"
+   			contributesToHeader="false"
+   			highlightPreferenceKey="SmartUtQuickFixes.lineremovedmarker.highlight"
+   			highlightPreferenceValue="true"
+   			includeOnPreferencePage="true"
+   			label="Line removed by compiler"
+   			overviewRulerPreferenceKey="SmartUtQuickFixes.lineremovednmarker.overview"
+   			overviewRulerPreferenceValue="true"
+   			presentationLayer="0"
+   			textPreferenceKey="SmartUtQuickFixes.lineremovedmarker.text"
+   			textPreferenceValue="true"
+   			textStylePreferenceValue="UNDERLINE"
+   			verticalRulerPreferenceKey="SmartUtQuickFixes.lineremovedmarker.vertical"
+   			verticalRulerPreferenceValue="true"
+   			icon="icons/removed.jpg"
+   			quickFixIcon="icons/removed.jpg">
+   		</specification>
+   	</extension>
+   	
+   	<extension
+   		point="org.eclipse.ui.ide.markerResolution">
+   		<markerResolutionGenerator
+   			markerType="SmartUtQuickFixes.newtestmarker"
+   			class="org.smartut.eclipse.quickfixes.ResolutionGeneratorNewTest" />
+   		<markerResolutionGenerator
+   			markerType="SmartUtQuickFixes.notcoveredmarker"
+   			class="org.smartut.eclipse.quickfixes.ResolutionGeneratorNotCovered" />
+   		<markerResolutionGenerator
+   			markerType="SmartUtQuickFixes.exceptionmarker"
+   			class="org.smartut.eclipse.quickfixes.ResolutionGeneratorException" />
+   	</extension>
+   	
+   	
+	<extension point="org.eclipse.ui.preferencePages">
+		<page 
+			id="org.smartut.eclipse.properties.SmartUtPreferencePage"
+			name="SmartUt"
+			class="org.smartut.eclipse.properties.SmartUtPreferencePage" >
+		</page>
+	</extension>
+	
+ <extension point="org.eclipse.ui.commands">
+ 	<command
+      description="Generate JUnit test suite with SmartUt"
+      id="org.smartut.SmartUtAction"
+      name="Generate tests with SmartUt">
+  	</command>
+ 	<command
+      description="Extend JUnit test suite with SmartUt"
+      id="org.smartut.SmartUtExtendAction"
+      name="Extend test suite with SmartUt">
+  	</command>
+ </extension>
+ <extension
+    point="org.eclipse.ui.commandImages">
+  <image
+      commandId="org.smartut.SmartUtAction"
+      icon="icons/smartut.gif">
+  </image>
+  <image
+      commandId="org.smartut.SmartUtExtendAction"
+      icon="icons/smartut.gif">
+  </image>
+</extension>
+<extension
+    point="org.eclipse.ui.handlers">
+  <handler
+      class="org.smartut.eclipse.popup.actions.GenerateTestsEditorAction"
+      commandId="org.smartut.SmartUtAction">
+  </handler>
+  <handler
+      class="org.smartut.eclipse.popup.actions.ExtendSuiteEditorAction"
+      commandId="org.smartut.SmartUtExtendAction">
+  </handler>
+</extension>
+
+<extension point="org.eclipse.ui.menus">
+  	<menuContribution locationURI="popup:org.eclipse.ui.popup.any">
+    	<command commandId="org.smartut.SmartUtAction">
+		    <visibleWhen>
+      			<with variable="activeMenuSelection">
+      			  <and>
+      				<count value="1"></count>
+        			<iterate ifEmpty="false" operator="and">
+						<and>
+							<instanceof value="org.eclipse.jdt.core.IJavaElement"/>
+       						<adapt type="org.eclipse.core.resources.IResource">
+          						<test property="org.eclipse.core.resources.name" 
+                					value="*.java"/>
+       						</adapt>
+							<not>
+								<test property="org.eclipse.jdt.junit.isTest"/>
+							</not>
+						</and>
+        			</iterate>
+        		  </and>
+      			</with>
+    		</visibleWhen>
+		</command>
+	</menuContribution>
+  	<menuContribution locationURI="popup:org.eclipse.ui.popup.any">
+    	<command commandId="org.smartut.SmartUtExtendAction">
+		    <visibleWhen>
+      			<with variable="activeMenuSelection">
+      			  <and>
+      				<count value="1"></count>
+        			<iterate ifEmpty="false" operator="and">
+						<and>
+							<instanceof value="org.eclipse.jdt.core.IJavaElement"/>
+       						<adapt type="org.eclipse.core.resources.IResource">
+          						<test property="org.eclipse.core.resources.name" 
+                					value="*.java"/>
+       						</adapt>
+							<test property="org.eclipse.jdt.junit.isTest"/>
+						</and>
+        			</iterate>
+        		  </and>
+      			</with>
+    		</visibleWhen>
+		</command>
+	</menuContribution>
+	
+</extension>
+
+	<!--<extension
+	       id="CATSGeneration"
+	       point="org.eclipse.core.runtime.products">
+	    <product
+	          application="org.eclipse.ant.core.antRunner"
+	          name="CATS Generation Quickfixes">
+	    </product>
+	</extension>-->
+</plugin>

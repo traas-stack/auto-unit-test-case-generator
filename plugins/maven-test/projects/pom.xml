@@ -29,7 +29,7 @@
 
         <!-- this needs to be set with -D. Done automatically from tests.
         Uncomment (and update) if open from IDE  -->
-        <!--<evosuiteVersion>1.0.5-SNAPSHOT</evosuiteVersion>-->
+        <!--<smartutVersion>1.0.5-SNAPSHOT</smartutVersion>-->
     </properties>
 
 
@@ -41,9 +41,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-standalone-runtime</artifactId>
-            <version>${evosuiteVersion}</version>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-standalone-runtime</artifactId>
+            <version>${smartutVersion}</version>
         </dependency>
 
         <!-- Both PowerMock and JMockit ship with tools.jar code from OpenJDK, and
@@ -57,8 +57,8 @@
         <plugins>
 
             <plugin>
-                <groupId>org.evosuite.plugins</groupId>
-                <artifactId>evosuite-maven-plugin</artifactId>
+                <groupId>org.smartut.plugins</groupId>
+                <artifactId>smartut-maven-plugin</artifactId>
             </plugin>
 
             <plugin>
@@ -70,7 +70,7 @@
                     <properties>
                         <property>
                             <name>listener</name>
-                            <value>org.evosuite.runtime.InitializingListener</value>
+                            <value>org.smartut.runtime.InitializingListener</value>
                         </property>
                     </properties>
                 </configuration>
@@ -115,7 +115,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/evo</source>
+                                <source>src/smartut</source>
                                 <source>foo</source>
                             </sources>
                         </configuration>
@@ -130,9 +130,9 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.evosuite.plugins</groupId>
-                    <artifactId>evosuite-maven-plugin</artifactId>
-                    <version>${evosuiteVersion}</version>
+                    <groupId>org.smartut.plugins</groupId>
+                    <artifactId>smartut-maven-plugin</artifactId>
+                    <version>${smartutVersion}</version>
                     <executions>
                         <execution>
                             <goals>

@@ -18,8 +18,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
-            groupId 'org.evosuite.plugins'
-            artifactId 'evosuite-gradle-plugin'
+            groupId 'org.smartut.plugins'
+            artifactId 'smartut-gradle-plugin'
             version '0.1.2-SNAPSHOT'
 
         }

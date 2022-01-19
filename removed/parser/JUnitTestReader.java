@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.junit;
+package org.smartut.junit;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,11 +41,11 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.evosuite.Properties;
-import org.evosuite.junit.TestExtractingVisitor.TestReader;
-import org.evosuite.testcase.ExecutionTracer;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.utils.LoggingUtils;
+import org.smartut.Properties;
+import org.smartut.junit.TestExtractingVisitor.TestReader;
+import org.smartut.testcase.ExecutionTracer;
+import org.smartut.testcase.TestCase;
+import org.smartut.utils.LoggingUtils;
 
 public class JUnitTestReader implements TestReader {
 
@@ -148,7 +148,7 @@ public class JUnitTestReader implements TestReader {
 	public JUnitTestReader() {
 		super();
 		this.classpath = Properties.CP.split(File.pathSeparator);
-		LoggingUtils.getEvoLogger().info("Using classpath: "
+		LoggingUtils.getSmartUtLogger().info("Using classpath: "
 		                                         + Arrays.asList(this.classpath));
 		this.sources = new String[0];
 	}
@@ -166,7 +166,7 @@ public class JUnitTestReader implements TestReader {
 	 * 
 	 * @param qualifiedTestMethod
 	 *            a {@link java.lang.String} object.
-	 * @return a {@link org.evosuite.testcase.TestCase} object.
+	 * @return a {@link org.smartut.testcase.TestCase} object.
 	 */
 	public TestCase readJUnitTestCase(String qualifiedTestMethod) {
 		String clazz = qualifiedTestMethod.substring(0, qualifiedTestMethod.indexOf("#"));
@@ -193,7 +193,7 @@ public class JUnitTestReader implements TestReader {
 	 *            a {@link java.lang.String} object.
 	 * @param cu
 	 *            a {@link org.eclipse.jdt.core.dom.CompilationUnit} object.
-	 * @return a {@link org.evosuite.testcase.TestCase} object.
+	 * @return a {@link org.smartut.testcase.TestCase} object.
 	 */
 	public TestCase readJUnitTestCase(String className, final String methodName,
 	        final CompilationUnit cu) {

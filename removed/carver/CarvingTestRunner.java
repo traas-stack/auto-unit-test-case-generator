@@ -1,29 +1,29 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.testcarver.extraction;
+package org.smartut.testcarver.extraction;
 
-import org.evosuite.testcarver.capture.CaptureLog;
-import org.evosuite.testcarver.capture.Capturer;
-import org.evosuite.testcarver.codegen.CaptureLogAnalyzer;
-import org.evosuite.testcarver.testcase.EvoTestCaseCodeGenerator;
-import org.evosuite.testcase.TestCase;
+import org.smartut.testcarver.capture.CaptureLog;
+import org.smartut.testcarver.capture.Capturer;
+import org.smartut.testcarver.codegen.CaptureLogAnalyzer;
+import org.smartut.testcarver.testcase.EvoTestCaseCodeGenerator;
+import org.smartut.testcase.TestCase;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;

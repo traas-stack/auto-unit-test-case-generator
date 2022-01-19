@@ -1,24 +1,24 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.instrumentation.coverage;
+package org.smartut.instrumentation.coverage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,17 +28,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.evosuite.Properties;
-import org.evosuite.Properties.Strategy;
-import org.evosuite.classpath.ResourceList;
-import org.evosuite.coverage.branch.BranchPool;
-import org.evosuite.coverage.lcsaj.LCSAJ;
-import org.evosuite.coverage.lcsaj.LCSAJPool;
-import org.evosuite.graphs.GraphPool;
-import org.evosuite.graphs.cfg.BytecodeInstruction;
-import org.evosuite.graphs.cfg.BytecodeInstructionPool;
-import org.evosuite.graphs.cfg.RawControlFlowGraph;
-import org.evosuite.setup.DependencyAnalysis;
+import org.smartut.Properties;
+import org.smartut.Properties.Strategy;
+import org.smartut.classpath.ResourceList;
+import org.smartut.coverage.branch.BranchPool;
+import org.smartut.coverage.lcsaj.LCSAJ;
+import org.smartut.coverage.lcsaj.LCSAJPool;
+import org.smartut.graphs.GraphPool;
+import org.smartut.graphs.cfg.BytecodeInstruction;
+import org.smartut.graphs.cfg.BytecodeInstructionPool;
+import org.smartut.graphs.cfg.RawControlFlowGraph;
+import org.smartut.setup.DependencyAnalysis;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -61,7 +61,7 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
 public class LCSAJsInstrumentation implements MethodInstrumentation {
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.cfg.MethodInstrumentation#analyze(org.objectweb.asm.tree.MethodNode, org.jgrapht.Graph, java.lang.String, java.lang.String)
+	 * @see org.smartut.cfg.MethodInstrumentation#analyze(org.objectweb.asm.tree.MethodNode, org.jgrapht.Graph, java.lang.String, java.lang.String)
 	 */
 	/** {@inheritDoc} */
 	@SuppressWarnings("unchecked")
@@ -223,13 +223,13 @@ public class LCSAJsInstrumentation implements MethodInstrumentation {
 				lcsaj_queue.add(currentLCSAJ);
 		}
 
-		if (Properties.STRATEGY != Strategy.EVOSUITE)
+		if (Properties.STRATEGY != Strategy.SmartUt)
 			addInstrumentation(classLoader, mn, className, methodName);
 
 		//		if (Properties.WRITE_CFG)
 		//			for (LCSAJ l : LCSAJPool.getLCSAJs(className, methodName)) {
 		//				LCSAJGraph graph = new LCSAJGraph(l, false);
-		//				String graphDestination = "evosuite-graphs/LCSAJGraphs/" + className
+		//				String graphDestination = "smartut-graphs/LCSAJGraphs/" + className
 		//				        + "/" + methodName;
 		//				File dir = new File(graphDestination);
 		//				if (dir.mkdirs())
@@ -262,7 +262,7 @@ public class LCSAJsInstrumentation implements MethodInstrumentation {
 						instrumentation.add(new LdcInsnNode(branchId));
 						instrumentation.add(new LdcInsnNode(v.getInstructionId()));
 						instrumentation.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
-						        "org/evosuite/testcase/ExecutionTracer",
+						        "org/smartut/testcase/ExecutionTracer",
 						        "passedUnconditionalBranch", "(III)V"));
 						if (v.isLabel())
 							mn.instructions.insert(v.getASMNode(), instrumentation);
@@ -275,7 +275,7 @@ public class LCSAJsInstrumentation implements MethodInstrumentation {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.cfg.MethodInstrumentation#executeOnExcludedMethods()
+	 * @see org.smartut.cfg.MethodInstrumentation#executeOnExcludedMethods()
 	 */
 	/** {@inheritDoc} */
 	@Override
@@ -284,7 +284,7 @@ public class LCSAJsInstrumentation implements MethodInstrumentation {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.cfg.MethodInstrumentation#executeOnMainMethod()
+	 * @see org.smartut.cfg.MethodInstrumentation#executeOnMainMethod()
 	 */
 	/** {@inheritDoc} */
 	@Override

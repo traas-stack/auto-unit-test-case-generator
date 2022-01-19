@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.testsuite;
+package org.smartut.testsuite;
 
 import java.io.File;
 import java.io.Serializable;
@@ -32,32 +32,32 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.evosuite.Properties;
-import org.evosuite.TestSuiteGenerator;
-import org.evosuite.coverage.branch.Branch;
-import org.evosuite.coverage.branch.BranchCoverageFactory;
-import org.evosuite.coverage.branch.BranchCoverageTestFitness;
-import org.evosuite.coverage.branch.BranchPool;
-import org.evosuite.coverage.dataflow.DefUseCoverageFactory;
-import org.evosuite.coverage.dataflow.DefUseCoverageTestFitness;
-import org.evosuite.coverage.dataflow.DefUsePool;
-import org.evosuite.ga.Chromosome;
-import org.evosuite.ga.metaheuristics.GeneticAlgorithm;
-import org.evosuite.ga.stoppingconditions.MaxFitnessEvaluationsStoppingCondition;
-import org.evosuite.ga.stoppingconditions.MaxStatementsStoppingCondition;
-import org.evosuite.ga.stoppingconditions.MaxTestsStoppingCondition;
-import org.evosuite.graphs.cfg.CFGMethodAdapter;
-import org.evosuite.testcase.ConstructorStatement;
-import org.evosuite.testcase.ExecutionResult;
-import org.evosuite.testcase.ExecutionTrace;
-import org.evosuite.testcase.MethodStatement;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.TestCaseExecutor;
-import org.evosuite.testcase.TestChromosome;
-import org.evosuite.testcase.TestFitnessFunction;
-import org.evosuite.utils.ArrayUtil;
-import org.evosuite.utils.ReportGenerator;
-import org.evosuite.utils.Utils;
+import org.smartut.Properties;
+import org.smartut.TestSuiteGenerator;
+import org.smartut.coverage.branch.Branch;
+import org.smartut.coverage.branch.BranchCoverageFactory;
+import org.smartut.coverage.branch.BranchCoverageTestFitness;
+import org.smartut.coverage.branch.BranchPool;
+import org.smartut.coverage.dataflow.DefUseCoverageFactory;
+import org.smartut.coverage.dataflow.DefUseCoverageTestFitness;
+import org.smartut.coverage.dataflow.DefUsePool;
+import org.smartut.ga.Chromosome;
+import org.smartut.ga.metaheuristics.GeneticAlgorithm;
+import org.smartut.ga.stoppingconditions.MaxFitnessEvaluationsStoppingCondition;
+import org.smartut.ga.stoppingconditions.MaxStatementsStoppingCondition;
+import org.smartut.ga.stoppingconditions.MaxTestsStoppingCondition;
+import org.smartut.graphs.cfg.CFGMethodAdapter;
+import org.smartut.testcase.ConstructorStatement;
+import org.smartut.testcase.ExecutionResult;
+import org.smartut.testcase.ExecutionTrace;
+import org.smartut.testcase.MethodStatement;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.TestCaseExecutor;
+import org.smartut.testcase.TestChromosome;
+import org.smartut.testcase.TestFitnessFunction;
+import org.smartut.utils.ArrayUtil;
+import org.smartut.utils.ReportGenerator;
+import org.smartut.utils.Utils;
 import org.objectweb.asm.Type;
 
 /**
@@ -83,7 +83,7 @@ public class SearchStatistics extends ReportGenerator implements Serializable {
 	 * Getter for the field <code>instance</code>.
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.testsuite.SearchStatistics} object.
+	 * @return a {@link org.smartut.testsuite.SearchStatistics} object.
 	 */
 	public static SearchStatistics getInstance() {
 		if (instance == null) {
@@ -98,7 +98,7 @@ public class SearchStatistics extends ReportGenerator implements Serializable {
 	 * </p>
 	 * 
 	 * @param statistics
-	 *            a {@link org.evosuite.testsuite.SearchStatistics} object.
+	 *            a {@link org.smartut.testsuite.SearchStatistics} object.
 	 */
 	public static void setInstance(SearchStatistics statistics) {
 		instance = statistics;

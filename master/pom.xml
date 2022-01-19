@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.evosuite</groupId>
-        <artifactId>evosuite</artifactId>
+        <groupId>org.smartut</groupId>
+        <artifactId>smartut</artifactId>
         <version>1.1.0</version>
     </parent>
 
-    <artifactId>evosuite-master</artifactId>
+    <artifactId>smartut-master</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
@@ -34,7 +34,7 @@
                         </executions>
                         <configuration>
                             <schemaDirectory>${project.basedir}/src/main/resources/xsd</schemaDirectory>
-                            <packageName>org.evosuite.xsd</packageName>
+                            <packageName>org.smartut.xsd</packageName>
                         </configuration>
                         <dependencies>
                             <dependency>
@@ -68,7 +68,7 @@
                         </executions>
                         <configuration>
                             <schemaDirectory>${project.basedir}/src/main/resources/xsd</schemaDirectory>
-                            <packageName>org.evosuite.xsd</packageName>
+                            <packageName>org.smartut.xsd</packageName>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -79,32 +79,32 @@
     <!-- dependency versions are inherited from parent pom -->
     <dependencies>
 
-        <!-- EvoSuite Modules -->
+        <!-- SmartUt Modules -->
 
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-runtime</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
 
 <!--        <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-standalone-runtime</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-standalone-runtime</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         -->
         <dependency> <!--  FIXME this is temporary -->
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-client</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-client</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-client</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency> <!--TODO: this is added in parent pom too -->
@@ -200,9 +200,9 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Main-Class>org.evosuite.EvoSuite</Main-Class>
-                            <Premain-Class>org.evosuite.runtime.agent.InstrumentingAgent</Premain-Class>
-                            <Agent-Class>org.evosuite.runtime.agent.InstrumentingAgent</Agent-Class>
+                            <Main-Class>org.smartut.SmartUt</Main-Class>
+                            <Premain-Class>org.smartut.runtime.agent.InstrumentingAgent</Premain-Class>
+                            <Agent-Class>org.smartut.runtime.agent.InstrumentingAgent</Agent-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>
@@ -262,11 +262,11 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.evosuite.EvoSuite</mainClass>
+                            <mainClass>org.smartut.SmartUt</mainClass>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>org.evosuite.runtime.agent.InstrumentingAgent</Premain-Class>
-                            <Agent-Class>org.evosuite.runtime.agent.InstrumentingAgent</Agent-Class>
+                            <Premain-Class>org.smartut.runtime.agent.InstrumentingAgent</Premain-Class>
+                            <Agent-Class>org.smartut.runtime.agent.InstrumentingAgent</Agent-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>

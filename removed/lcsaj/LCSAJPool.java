@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.coverage.lcsaj;
+package org.smartut.coverage.lcsaj;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.evosuite.coverage.branch.Branch;
+import org.smartut.coverage.branch.Branch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class LCSAJPool {
@@ -42,7 +42,7 @@ public class LCSAJPool {
 	 *
 	 * @param className a {@link java.lang.String} object.
 	 * @param methodName a {@link java.lang.String} object.
-	 * @param lcsaj a {@link org.evosuite.coverage.lcsaj.LCSAJ} object.
+	 * @param lcsaj a {@link org.smartut.coverage.lcsaj.LCSAJ} object.
 	 */
 	public static void add_lcsaj(String className, String methodName, LCSAJ lcsaj) {
 
@@ -64,7 +64,7 @@ public class LCSAJPool {
 	/**
 	 * <p>addLCSAJBranch</p>
 	 *
-	 * @param b a {@link org.evosuite.coverage.branch.Branch} object.
+	 * @param b a {@link org.smartut.coverage.branch.Branch} object.
 	 */
 	public static void addLCSAJBranch(Branch b) {
 		lcsaj_branches.add(b);
@@ -73,7 +73,7 @@ public class LCSAJPool {
 	/**
 	 * <p>isLCSAJBranch</p>
 	 *
-	 * @param b a {@link org.evosuite.coverage.branch.Branch} object.
+	 * @param b a {@link org.smartut.coverage.branch.Branch} object.
 	 * @return a boolean.
 	 */
 	public static boolean isLCSAJBranch(Branch b) {

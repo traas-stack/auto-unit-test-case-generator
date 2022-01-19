@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.testcarver.testcase;
+package org.smartut.testcarver.testcase;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -29,22 +29,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
-import org.evosuite.TestGenerationContext;
-import org.evosuite.testcarver.capture.CaptureLog;
-import org.evosuite.testcarver.capture.CaptureUtil;
-import org.evosuite.testcase.AssignmentStatement;
-import org.evosuite.testcase.ConstructorStatement;
-import org.evosuite.testcase.DefaultTestCase;
-import org.evosuite.testcase.FieldReference;
-import org.evosuite.testcase.MethodStatement;
-import org.evosuite.testcase.NullStatement;
-import org.evosuite.testcase.PrimitiveStatement;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.VariableReference;
-import org.evosuite.testcase.VariableReferenceImpl;
-import org.evosuite.utils.GenericConstructor;
-import org.evosuite.utils.GenericField;
-import org.evosuite.utils.GenericMethod;
+import org.smartut.TestGenerationContext;
+import org.smartut.testcarver.capture.CaptureLog;
+import org.smartut.testcarver.capture.CaptureUtil;
+import org.smartut.testcase.AssignmentStatement;
+import org.smartut.testcase.ConstructorStatement;
+import org.smartut.testcase.DefaultTestCase;
+import org.smartut.testcase.FieldReference;
+import org.smartut.testcase.MethodStatement;
+import org.smartut.testcase.NullStatement;
+import org.smartut.testcase.PrimitiveStatement;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.VariableReference;
+import org.smartut.testcase.VariableReferenceImpl;
+import org.smartut.utils.GenericConstructor;
+import org.smartut.utils.GenericField;
+import org.smartut.utils.GenericMethod;
 
 @Deprecated
 public class TestCaseCodeGenerator {

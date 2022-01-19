@@ -1,22 +1,22 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2010-2016 Gordon Fraser, Andrea Arcuri and EvoSuite
+# Copyright (C) 2010-2016 Gordon Fraser, Andrea Arcuri and SmartUt
 # contributors
 #
-# This file is part of EvoSuite.
+# This file is part of SmartUt.
 #
-# EvoSuite is free software: you can redistribute it and/or modify it
+# SmartUt is free software: you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published
 # by the Free Software Foundation, either version 3.0 of the License, or
 # (at your option) any later version.
 #
-# EvoSuite is distributed in the hope that it will be useful, but
+# SmartUt is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 # Lesser Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+# License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
 #
 
 
@@ -91,12 +91,12 @@ CONFIG_ID=0
 SEARCH_BUDGET=0
 
 
-# Creates a single call to EvoSuite
-def getEvoSuiteCall(seed, configId, config, project, clazz, id, strategy, coreIndex):
+# Creates a single call to SmartUt
+def getSmartUtCall(seed, configId, config, project, clazz, id, strategy, coreIndex):
   global SCRIPTDIR
   global CASESTUDY_DIR
   global JOB_ID
-  global EVOSUITE
+  global SmartUt
   global REPORTS
   global SEARCH_BUDGET
   global FIXED
@@ -115,11 +115,11 @@ def getEvoSuiteCall(seed, configId, config, project, clazz, id, strategy, coreIn
   if CORES != 1 :
       result += "timeout -k " + TIMEOUT + " " + TIMEOUT + "  "
 
-  result += ""+EVOSUITE+" "+strategy+" -class "+ clazz +" -seed "+str(seed)
+  result += ""+SmartUt+" "+strategy+" -class "+ clazz +" -seed "+str(seed)
   result += " -Dconfiguration_id="+configId+ " -Dgroup_id="+project
   result += " "+config+" "+FIXED
   result += " -Dreport_dir="+reportfile
-  result += " -Dtest_dir=" +TESTDIR + "/s" + str(seed) + "/" + project +"/evosuite-tests"
+  result += " -Dtest_dir=" +TESTDIR + "/s" + str(seed) + "/" + project +"/smartut-tests"
   result += " 2>&1 | tee -a "+logfile
 
   if CORES != 1 :
@@ -141,7 +141,7 @@ def createJobs(minSeed, maxSeed, configId, config, startNum, strategy="-generate
   global CONFIG_ID
   global TIMEOUT
 
-  path_1 = "%s/%s_EvoSuite_%d.sh" %(SCRIPTDIR, USERNAME, JOB_ID)
+  path_1 = "%s/%s_SmartUt_%d.sh" %(SCRIPTDIR, USERNAME, JOB_ID)
   script=open(path_1, "a")
   script.write(getScriptHead())
 
@@ -165,7 +165,7 @@ def createJobs(minSeed, maxSeed, configId, config, startNum, strategy="-generate
         JOB_ID +=1
         num = 1
 
-        path_2 = "%s/%s_EvoSuite_%d.sh" %(SCRIPTDIR, USERNAME, JOB_ID)
+        path_2 = "%s/%s_SmartUt_%d.sh" %(SCRIPTDIR, USERNAME, JOB_ID)
         script=open(path_2, "a")
         script.write(getScriptHead())
       else:
@@ -175,7 +175,7 @@ def createJobs(minSeed, maxSeed, configId, config, startNum, strategy="-generate
         #first call
         script.write("pids=() \n\n")
 
-      script.write(getEvoSuiteCall(seed, configId, config, entry[0], entry[1], JOB_ID, strategy, coreIndex))
+      script.write(getSmartUtCall(seed, configId, config, entry[0], entry[1], JOB_ID, strategy, coreIndex))
 
       if(CORES > 1):
         coreIndex += 1
@@ -201,7 +201,7 @@ FIXED = " -mem 2500 \
   -Dplot=false \
   -Dtest_comments=false \
   -Dshow_progress=false \
-  -Denable_asserts_for_evosuite=true \
+  -Denable_asserts_for_smartut=true \
   -Dsearch_budget=120 \
   -Dinitialization_timeout=120 \
   -Dglobal_timeout=120 \
@@ -213,7 +213,7 @@ FIXED = " -mem 2500 \
  "
 
 
-# How many calls to EvoSuite should go in one script
+# How many calls to SmartUt should go in one script
 N_CONF = 1  #(depends on number of configurations)
 ENTRIES_PER_JOB= math.ceil( (N_CONF * (NUM_CLASSES * (MAXSEED - MINSEED)) / float(MAX_JOBS) ) )
 
@@ -224,5 +224,5 @@ createJobs(MINSEED, MAXSEED, CONFIG_NAME , " " , 0, "-generateSuite")
 
 print "Seeds: %d, projects: %d, configs: %d" % ((MAXSEED - MINSEED), NUM_CLASSES, CONFIG_ID)
 print "Total number of jobs created: %d" % (JOB_ID+1)
-print "Total number of calls to EvoSuite: %d" % CALL_ID
+print "Total number of calls to SmartUt: %d" % CALL_ID
 print "Calls per job: %d" % ENTRIES_PER_JOB

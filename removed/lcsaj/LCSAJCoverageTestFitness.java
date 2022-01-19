@@ -1,34 +1,34 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.coverage.lcsaj;
+package org.smartut.coverage.lcsaj;
 
-import org.evosuite.Properties;
-import org.evosuite.TestGenerationContext;
-import org.evosuite.Properties.Strategy;
-import org.evosuite.coverage.branch.BranchCoverageGoal;
-import org.evosuite.coverage.branch.BranchCoverageTestFitness;
-import org.evosuite.coverage.branch.BranchPool;
-import org.evosuite.testcase.ExecutionResult;
-import org.evosuite.testcase.MethodCall;
-import org.evosuite.testcase.TestChromosome;
-import org.evosuite.testcase.TestFitnessFunction;
+import org.smartut.Properties;
+import org.smartut.TestGenerationContext;
+import org.smartut.Properties.Strategy;
+import org.smartut.coverage.branch.BranchCoverageGoal;
+import org.smartut.coverage.branch.BranchCoverageTestFitness;
+import org.smartut.coverage.branch.BranchPool;
+import org.smartut.testcase.ExecutionResult;
+import org.smartut.testcase.MethodCall;
+import org.smartut.testcase.TestChromosome;
+import org.smartut.testcase.TestFitnessFunction;
 
 /**
  * Evaluate fitness of a single test case with respect to a single LCSAJ
@@ -52,7 +52,7 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 	 * @param methodName
 	 *            a {@link java.lang.String} object.
 	 * @param lcsaj
-	 *            a {@link org.evosuite.coverage.lcsaj.LCSAJ} object.
+	 *            a {@link org.smartut.coverage.lcsaj.LCSAJ} object.
 	 */
 	public LCSAJCoverageTestFitness(String className, String methodName, LCSAJ lcsaj) {
 		this.lcsaj = lcsaj;
@@ -65,7 +65,7 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 	 * </p>
 	 * 
 	 * @param lcsaj
-	 *            a {@link org.evosuite.coverage.lcsaj.LCSAJ} object.
+	 *            a {@link org.smartut.coverage.lcsaj.LCSAJ} object.
 	 */
 	public LCSAJCoverageTestFitness(LCSAJ lcsaj) {
 		this.lcsaj = lcsaj;
@@ -76,9 +76,9 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.evosuite.testcase.TestFitnessFunction#getFitness(de.unisb
-	 * .cs.st.evosuite.testcase.TestChromosome,
-	 * org.evosuite.testcase.ExecutionResult)
+	 * org.smartut.testcase.TestFitnessFunction#getFitness(de.unisb
+	 * .cs.st.smartut.testcase.TestChromosome,
+	 * org.smartut.testcase.ExecutionResult)
 	 */
 	/** {@inheritDoc} */
 	@Override
@@ -156,7 +156,7 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 					}
 					//}
 				}
-				if (Properties.STRATEGY != Strategy.EVOSUITE) {
+				if (Properties.STRATEGY != Strategy.SmartUt) {
 					if (!found) {
 						logger.debug("Looking for approach to initial branch: "
 						        + lcsaj.getStartBranch() + " with ID "
@@ -196,7 +196,7 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.testcase.TestFitnessFunction#compareTo(org.evosuite.testcase.TestFitnessFunction)
+	 * @see org.smartut.testcase.TestFitnessFunction#compareTo(org.smartut.testcase.TestFitnessFunction)
 	 */
 	@Override
 	public int compareTo(TestFitnessFunction other) {
@@ -211,14 +211,14 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 	 * Getter for the field <code>lcsaj</code>.
 	 * </p>
 	 * 
-	 * @return a {@link org.evosuite.coverage.lcsaj.LCSAJ} object.
+	 * @return a {@link org.smartut.coverage.lcsaj.LCSAJ} object.
 	 */
 	public LCSAJ getLcsaj() {
 		return this.lcsaj;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.testcase.TestFitnessFunction#getTargetClass()
+	 * @see org.smartut.testcase.TestFitnessFunction#getTargetClass()
 	 */
 	@Override
 	public String getTargetClass() {
@@ -226,7 +226,7 @@ public class LCSAJCoverageTestFitness extends TestFitnessFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.testcase.TestFitnessFunction#getTargetMethod()
+	 * @see org.smartut.testcase.TestFitnessFunction#getTargetMethod()
 	 */
 	@Override
 	public String getTargetMethod() {

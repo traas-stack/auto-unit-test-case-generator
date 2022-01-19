@@ -1,24 +1,24 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.testcase;
+package org.smartut.testcase;
 
 import java.io.File;
 import java.util.Collection;
@@ -28,14 +28,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.evosuite.Properties;
-import org.evosuite.coverage.branch.BranchCoverageSuiteFitness;
-import org.evosuite.ga.ChromosomeFactory;
-import org.evosuite.junit.JUnitTestReader;
-import org.evosuite.setup.TestCluster;
-import org.evosuite.testsuite.TestSuiteChromosome;
-import org.evosuite.utils.LoggingUtils;
-import org.evosuite.utils.Randomness;
+import org.smartut.Properties;
+import org.smartut.coverage.branch.BranchCoverageSuiteFitness;
+import org.smartut.ga.ChromosomeFactory;
+import org.smartut.junit.JUnitTestReader;
+import org.smartut.setup.TestCluster;
+import org.smartut.testsuite.TestSuiteChromosome;
+import org.smartut.utils.LoggingUtils;
+import org.smartut.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +60,13 @@ public class JUnitTestParsedChromosomeFactory implements ChromosomeFactory<TestC
 	 * Attempt to read the test case
 	 * 
 	 * @param defaultFactory
-	 *            a {@link org.evosuite.ga.ChromosomeFactory} object.
+	 *            a {@link org.smartut.ga.ChromosomeFactory} object.
 	 */
 	public JUnitTestParsedChromosomeFactory(ChromosomeFactory<TestChromosome> defaultFactory) {
 		this.defaultFactory = defaultFactory;
 		if (userTests.isEmpty())
 			userTests.addAll(filter(readTestCases()));
-		LoggingUtils.getEvoLogger().info("* Found " + userTests.size()
+		LoggingUtils.getSmartUtLogger().info("* Found " + userTests.size()
 		                                         + " relevant tests");
 		// getManualCoverage();
 
@@ -106,7 +106,7 @@ public class JUnitTestParsedChromosomeFactory implements ChromosomeFactory<TestC
 			tests.addAll(readTestCase(testFile));
 		}
 
-		LoggingUtils.getEvoLogger().info("* Parsed " + tests.size() + " JUnit test cases");
+		LoggingUtils.getSmartUtLogger().info("* Parsed " + tests.size() + " JUnit test cases");
 		return tests;
 	}
 
@@ -215,7 +215,7 @@ public class JUnitTestParsedChromosomeFactory implements ChromosomeFactory<TestC
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.ga.ChromosomeFactory#getChromosome()
+	 * @see org.smartut.ga.ChromosomeFactory#getChromosome()
 	 */
 	/** {@inheritDoc} */
 	@Override

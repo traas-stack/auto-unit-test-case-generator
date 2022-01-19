@@ -1,40 +1,39 @@
 <!--
 
-    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
     contributors
 
-    This file is part of EvoSuite.
+    This file is part of SmartUt.
 
-    EvoSuite is free software: you can redistribute it and/or modify it
+    SmartUt is free software: you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
     by the Free Software Foundation, either version 3.0 of the License, or
     (at your option) any later version.
 
-    EvoSuite is distributed in the hope that it will be useful, but
+    SmartUt is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     Lesser Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public
-    License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+    License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <idea-plugin version="2">
-  <id>org.evosuite.plugin.intellij</id>
-  <name>EvoSuite Plugin</name>
+  <id>org.smartut.plugin.intellij</id>
+  <name>SmartUt Plugin</name>
   <version>1.0.5-SNAPSHOT</version>
-  <vendor email="arcuri82@gmail.com" url="http://www.evosuite.org">EvoSuite</vendor>
 
   <description><![CDATA[
       <p>
-        IntelliJ plugin for the EvoSuite tool, which is used to automatically generate high coverage JUnit tests.
-        To generate test cases, EvoSuite uses advanced evolutionary algorithms enhanced by static analysis of
+        IntelliJ plugin for the SmartUt tool, which is used to automatically generate high coverage JUnit tests.
+        To generate test cases, SmartUt uses advanced evolutionary algorithms enhanced by static analysis of
         the bytecode of the tested classes.
       </p>
 
        <p>
-        <b>Note</b>: this plugin is just used to call EvoSuite from inside IntelliJ IDEA, and so you still need to
-        configure and install EvoSuite separately.
+        <b>Note</b>: this plugin is just used to call SmartUt from inside IntelliJ IDEA, and so you still need to
+        configure and install SmartUt separately.
         You can do it automatically via its Maven plugin, or add the executable jar directly into your project.
       </p>
 
@@ -51,7 +50,7 @@
         </ul>
 
       <p>
-        For more information, see the documentation on www.evosuite.org
+        For more information, see the documentation on www.smartut.org
       </p>
     ]]></description>
 
@@ -75,14 +74,14 @@
   <application-components>
     <!-- Add your application components here -->
       <component>
-          <implementation-class>org.evosuite.intellij.ApplicationRegistration</implementation-class>
+          <implementation-class>org.smartut.intellij.ApplicationRegistration</implementation-class>
       </component>
   </application-components>
 
   <project-components>
     <!-- Add your project components here -->
       <component>
-          <implementation-class>org.evosuite.intellij.ProjectRegistration</implementation-class>
+          <implementation-class>org.smartut.intellij.ProjectRegistration</implementation-class>
       </component>
   </project-components>
 

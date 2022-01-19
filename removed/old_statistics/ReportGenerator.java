@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.utils;
+package org.smartut.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,30 +42,30 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.evosuite.Properties;
-import org.evosuite.Properties.NoSuchParameterException;
-import org.evosuite.contracts.AssertionErrorContract;
-import org.evosuite.contracts.EqualsContract;
-import org.evosuite.contracts.EqualsHashcodeContract;
-import org.evosuite.contracts.EqualsNullContract;
-import org.evosuite.contracts.EqualsSymmetricContract;
-import org.evosuite.contracts.FailingTestSet;
-import org.evosuite.contracts.HashCodeReturnsNormallyContract;
-import org.evosuite.contracts.JCrasherExceptionContract;
-import org.evosuite.contracts.NullPointerExceptionContract;
-import org.evosuite.contracts.ToStringReturnsNormallyContract;
-import org.evosuite.contracts.UndeclaredExceptionContract;
-import org.evosuite.ga.Chromosome;
-import org.evosuite.ga.metaheuristics.GeneticAlgorithm;
-import org.evosuite.ga.metaheuristics.SearchListener;
-import org.evosuite.runtime.sandbox.PermissionStatistics;
-import org.evosuite.testcase.ExecutionResult;
-import org.evosuite.testcase.ExecutionTrace;
-import org.evosuite.testcase.ExecutionTracer;
-import org.evosuite.testcase.JUnitTestCarvedChromosomeFactory;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.TestCaseExecutor;
-import org.evosuite.testcase.TestChromosome;
+import org.smartut.Properties;
+import org.smartut.Properties.NoSuchParameterException;
+import org.smartut.contracts.AssertionErrorContract;
+import org.smartut.contracts.EqualsContract;
+import org.smartut.contracts.EqualsHashcodeContract;
+import org.smartut.contracts.EqualsNullContract;
+import org.smartut.contracts.EqualsSymmetricContract;
+import org.smartut.contracts.FailingTestSet;
+import org.smartut.contracts.HashCodeReturnsNormallyContract;
+import org.smartut.contracts.JCrasherExceptionContract;
+import org.smartut.contracts.NullPointerExceptionContract;
+import org.smartut.contracts.ToStringReturnsNormallyContract;
+import org.smartut.contracts.UndeclaredExceptionContract;
+import org.smartut.ga.Chromosome;
+import org.smartut.ga.metaheuristics.GeneticAlgorithm;
+import org.smartut.ga.metaheuristics.SearchListener;
+import org.smartut.runtime.sandbox.PermissionStatistics;
+import org.smartut.testcase.ExecutionResult;
+import org.smartut.testcase.ExecutionTrace;
+import org.smartut.testcase.ExecutionTracer;
+import org.smartut.testcase.JUnitTestCarvedChromosomeFactory;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.TestCaseExecutor;
+import org.smartut.testcase.TestChromosome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +156,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 		BranchCoverage,
 		NumberOfGeneratedTestCases,
 		/**
-		 * The number of serialized objects that EvoSuite is
+		 * The number of serialized objects that SmartUt is
 		 * going to use for seeding strategies
 		 */
 		NumberOfInputPoolObjects,
@@ -507,14 +507,14 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 		}
 
 		/**
-		 * Return value of a parameter, based on whether it is a EvoSuite
+		 * Return value of a parameter, based on whether it is a SmartUt
 		 * property (e.g., population size), or something calculated at runtime
 		 * (e.g. coverage)
 		 * 
 		 * @return
 		 */
 		private String getValueOfOutputVariable(String name) {
-			//first check if it is an EvoSuite parameter (e.g. population size)
+			//first check if it is an SmartUt parameter (e.g. population size)
 			if (Properties.hasParameter(name)) {
 				try {
 					return Properties.getStringValue(name);
@@ -525,7 +525,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 					 */
 					logger.error("Error in getting value of parameter " + name, e);
 					throw new Error(
-					        "If this method inside EvoSuite is called, then it should never happen that the following exception is raised: "
+					        "If this method inside SmartUt is called, then it should never happen that the following exception is raised: "
 					                + e.getMessage());
 				}
 			}
@@ -543,7 +543,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 				throw new Error("Parameter " + name + " does not exist");
 			}
 
-			//if it is not an EvoSuite property, it has to be a runtime one
+			//if it is not an SmartUt property, it has to be a runtime one
 			return getCSVvalue(var);
 		}
 
@@ -911,7 +911,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 			}
 
 			/*
-			 * note, this should never happen. If it does, then it is a bug in EvoSuite. But instead of throwing an exception,
+			 * note, this should never happen. If it does, then it is a bug in SmartUt. But instead of throwing an exception,
 			 * we just log it. In this way, we still get the CSV file for debugging 
 			 */
 			logger.error("No mapping defined for variable " + var.toString());
@@ -1080,7 +1080,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 		buffer.append("</head>\n");
 		buffer.append("<body onload=\"prettyPrint()\">\n");
 		buffer.append("<div id=\"wrapper\">\n");
-		buffer.append("<img src=\"files/evosuite.png\" height=\"40\"/>\n");
+		buffer.append("<img src=\"files/smartut.png\" height=\"40\"/>\n");
 	}
 
 	/**
@@ -1200,7 +1200,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * Write a file for a particular run
 	 * 
 	 * @param run
-	 *            a {@link org.evosuite.utils.ReportGenerator.StatisticEntry}
+	 *            a {@link org.smartut.utils.ReportGenerator.StatisticEntry}
 	 *            object.
 	 * @return a {@link java.lang.String} object.
 	 */
@@ -1390,11 +1390,11 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * @param buffer
 	 *            a {@link java.lang.StringBuffer} object.
 	 * @param entry
-	 *            a {@link org.evosuite.utils.ReportGenerator.StatisticEntry}
+	 *            a {@link org.smartut.utils.ReportGenerator.StatisticEntry}
 	 *            object.
 	 */
 	protected void writeParameterTable(StringBuffer buffer, StatisticEntry entry) {
-		buffer.append("<h2 id=parameters>EvoSuite Parameters</h2>\n");
+		buffer.append("<h2 id=parameters>SmartUt Parameters</h2>\n");
 		buffer.append("<div class=statistics><ul>\n");
 		for (String key : Properties.getParameters()) {
 			try {
@@ -1417,7 +1417,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * @param buffer
 	 *            a {@link java.lang.StringBuffer} object.
 	 * @param entry
-	 *            a {@link org.evosuite.utils.ReportGenerator.StatisticEntry}
+	 *            a {@link org.smartut.utils.ReportGenerator.StatisticEntry}
 	 *            object.
 	 */
 	protected void writeResultTable(StringBuffer buffer, StatisticEntry entry) {
@@ -1495,7 +1495,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 			buffer.append("</tr>\n");
 		}
 		//  
-		buffer.append("<!-- EVOSUITE INSERTION POINT -->\n");
+		buffer.append("<!-- SmartUt INSERTION POINT -->\n");
 		buffer.append("<tr class=\"top\"><td colspan=\"3\">&nbsp;<td></tr>\n");
 		buffer.append("</table>");
 	}
@@ -1607,14 +1607,14 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 		copyFile("img02.jpg");
 		copyFile("img03.jpg");
 		copyFile("img04.png");
-		copyFile("evosuite.png");
+		copyFile("smartut.png");
 		File file = new File(getReportDir(), "report-generation.html");
 		StringBuffer report = new StringBuffer();
 
 		if (file.exists()) {
 			List<String> lines = Utils.readFile(file);
 			for (String line : lines) {
-				if (line.contains("<!-- EVOSUITE INSERTION POINT -->")) {
+				if (line.contains("<!-- SmartUt INSERTION POINT -->")) {
 					break;
 				}
 				report.append(line);
@@ -1625,7 +1625,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 			report.append("<div id=\"header\"><div id=\"logo\">");
 			/*
 			if (!Properties.PROJECT_PREFIX.isEmpty()) {
-				report.append("<h1 class=title>EvoSuite: " + Properties.PROJECT_PREFIX
+				report.append("<h1 class=title>SmartUt: " + Properties.PROJECT_PREFIX
 				        + "</h1>\n");
 			}
 			*/
@@ -1664,7 +1664,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * </p>
 	 * 
 	 * @param trace
-	 *            a {@link org.evosuite.testcase.ExecutionTrace} object.
+	 *            a {@link org.smartut.testcase.ExecutionTrace} object.
 	 * @param className
 	 *            a {@link java.lang.String} object.
 	 * @return a {@link java.util.Set} object.
@@ -1679,10 +1679,10 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * </p>
 	 * 
 	 * @param testChromosome
-	 *            a {@link org.evosuite.testcase.TestChromosome} object.
+	 *            a {@link org.smartut.testcase.TestChromosome} object.
 	 * @param className
 	 *            a {@link java.lang.String} object.
-	 * @return a {@link org.evosuite.testcase.ExecutionResult} object.
+	 * @return a {@link org.smartut.testcase.ExecutionResult} object.
 	 */
 	public ExecutionResult executeTest(TestChromosome testChromosome, String className) {
 		ExecutionResult result = testChromosome.getLastExecutionResult();
@@ -1721,7 +1721,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * </p>
 	 * 
 	 * @param result
-	 *            a {@link org.evosuite.ga.Chromosome} object.
+	 *            a {@link org.smartut.ga.Chromosome} object.
 	 */
 	public abstract void minimized(Chromosome result);
 
@@ -1785,7 +1785,7 @@ public abstract class ReportGenerator implements SearchListener, Serializable {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.evosuite.ga.SearchListener#mutation(org.evosuite
+	 * org.smartut.ga.SearchListener#mutation(org.smartut
 	 * .ga.Chromosome)
 	 */
 	/** {@inheritDoc} */

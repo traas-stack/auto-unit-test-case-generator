@@ -1,15 +1,15 @@
-# Apache Ant + EvoSuite
+# Apache Ant + SmartUt
 
 The project example in this directory demonstrates how one could easily
-integrate EvoSuite into an Ant build. Although there is not yet a native
-EvoSuite task for the Apache Ant build system, this project examples uses the
-[Java task](https://ant.apache.org/manual/Tasks/java.html) to invoke EvoSuite.
+integrate SmartUt into an Ant build. Although there is not yet a native
+SmartUt task for the Apache Ant build system, this project examples uses the
+[Java task](https://ant.apache.org/manual/Tasks/java.html) to invoke SmartUt.
 
 First, run `ant -f build.xml install.deps` to download all required
-dependencies, i.e, latest version of JUnit, EvoSuite, and JaCoCo (for code
+dependencies, i.e, latest version of JUnit, SmartUt, and JaCoCo (for code
 coverage), and then compile the project with `ant -f build.xml compile`.
 
-Second, run `ant -f build.xml generate.tests` to invoke EvoSuite on the single
+Second, run `ant -f build.xml generate.tests` to invoke SmartUt on the single
 class in this project `org.ant_project_example.CharacterCounter`. The
 `generate.tests` target in the `build.xml` file is configured to write the
 generated test cases to `test`.

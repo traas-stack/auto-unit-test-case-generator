@@ -12,8 +12,8 @@
 2.
 3.
 
-### EvoSuite Arguments
-*Please provide the whole EvoSuite commmand you executed (if relevant)*
+### SmartUt Arguments
+*Please provide the whole SmartUt commmand you executed (if relevant)*
 
 
 
