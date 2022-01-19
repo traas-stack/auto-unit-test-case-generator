@@ -26,7 +26,7 @@
     <contextName>ContextForTests</contextName>
 
     <root level="WARN">
-        <appender  class="ch.qos.logback.core.ConsoleAppender">
+        <appender  class="org.smartut.shaded.ch.qos.logback.core.ConsoleAppender">
             <target>System.out</target>
             <encoder>
                 <pattern>%-5level %logger - %msg%n</pattern>
