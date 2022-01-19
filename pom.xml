@@ -314,7 +314,7 @@
                 <!-- Common Public License Version 1.0 -->
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13</version>
+                <version>4.13.1</version>
             </dependency>
             <dependency>
                 <!-- Adhoc license, copyright holder is INRIA -->
@@ -363,7 +363,7 @@
                 <!-- BSD -->
                 <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
-                <version>1.4.13</version>
+                <version>1.4.15</version>
             </dependency>
             <dependency>
                 <!-- Apache 2 -->
@@ -416,6 +416,11 @@
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-rules</artifactId>
                 <version>1.19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>2.11.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -787,14 +792,22 @@
                                         <pattern>org.objenesis</pattern>
                                         <shadedPattern>org.smartut.shaded.org.objenesis</shadedPattern>
                                     </relocation>
-                                    <!--<relocation>-->
-                                        <!--<pattern>org.slf4j</pattern>-->
-                                        <!--<shadedPattern>org.smartut.shaded.org.slf4j</shadedPattern>-->
-                                    <!--</relocation>-->
-                                    <!--<relocation>-->
-                                        <!--<pattern>ch.qos.logback</pattern>-->
-                                        <!--<shadedPattern>org.smartut.shaded.ch.qos.logback</shadedPattern>-->
-                                    <!--</relocation>-->
+                                    <relocation>
+                                        <pattern>org.slf4j</pattern>
+                                        <shadedPattern>org.smartut.shaded.org.slf4j</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>ch.qos.logback</pattern>
+                                        <shadedPattern>org.smartut.shaded.ch.qos.logback</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.thoughtworks.xstream</pattern>
+                                        <shadedPattern>org.smartut.shaded.com.thoughtworks.xstream</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.jgrapht</pattern>
+                                        <shadedPattern>org.smartut.shaded.org.jgrapht</shadedPattern>
+                                    </relocation>
                                 </relocations>
                             </configuration>
                         </execution>
