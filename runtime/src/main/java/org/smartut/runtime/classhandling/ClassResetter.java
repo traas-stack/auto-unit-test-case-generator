@@ -77,6 +77,11 @@ public class ClassResetter {
 		this.loader = loader;
 	}
 
+	//新增获取classloader方法，ClassStateSupport中需要使用
+	public ClassLoader getClassLoader(){
+		return this.loader;
+	}
+
 
 	/**
 	 * Only log once for a class

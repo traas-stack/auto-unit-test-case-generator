@@ -22,11 +22,21 @@ package org.smartut.runtime.classhandling;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.smartut.runtime.LoopCounter;
 import org.smartut.runtime.RuntimeSettings;
 import org.smartut.runtime.agent.InstrumentingAgent;
+import org.smartut.runtime.instrumentation.ExcludedClasses;
 import org.smartut.runtime.instrumentation.InstrumentedClass;
 import org.smartut.runtime.sandbox.Sandbox;
 import org.smartut.runtime.util.AtMostOnceLogger;
@@ -44,6 +54,15 @@ import org.slf4j.LoggerFactory;
 public class ClassStateSupport {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClassStateSupport.class);
+
+	//新增resetClasses的时间控制
+	private static final long INIT_CLASS_TIME_OUT = 3L;
+
+	//初始化的class进行缓存，reset时使用
+	private static final List<String> initializedClasses = new ArrayList<>();
+
+	//包含这些的class不进行reset
+	private static final List<String> notResetClassContains = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "_SSTest", "scaffolding", "LoggerUtil");
 
 	private static final String[] externalInitMethods = new String[] {"$jacocoInit", "$gzoltarInit"};
 
@@ -130,13 +149,83 @@ public class ClassStateSupport {
 	 * <p>
 	 *     This method will be usually called after a test is executed, ie in a @After
 	 * </p>
-	 *
-	 * @param classNames
+	 * resetClasses缓存至needResetClasses
 	 */
-	public static void resetClasses(String... classNames) {
-		for (String classNameToReset : classNames) {
-			ClassResetter.getInstance().reset(classNameToReset);
+	public static void resetClasses() {
+//		有可能卡住一样，reset classes增加超时控制
+		final ExecutorService exec = Executors.newFixedThreadPool(1);
+		Callable call = () -> {
+			// 把initClasses的类进行reset
+				for(String initializedClassName : getLoadedClassesNeedReset()) {
+					if(initializedClassName.isEmpty()) {
+						continue;
+					}
+					ClassResetter.getInstance().reset(initializedClassName);
+				}
+			return null;
+		};
+
+		try {
+			Future result = exec.submit(call);
+			// 设定超时时间 3s超时
+			result.get(INIT_CLASS_TIME_OUT, TimeUnit.SECONDS);
+		} catch (TimeoutException e) {
+			logger.warn("reset classes are timeout, time out seconds is {}", INIT_CLASS_TIME_OUT);
+		} catch (Exception e) {
+			logger.warn("reset classes meet exception {}", e.getMessage());
 		}
+		exec.shutdown();
+	}
+
+	/**
+	 * 使用ClassResetter.classloader load的class list
+	 * @return load classes
+	 */
+	private static Vector<Class<?>> getClassloaderLoadClasses(){
+		Vector<Class<?>> classes = new Vector<>();
+		try {
+			ClassLoader classLoader = ClassResetter.getInstance().getClassLoader();
+			Class<?> clazz = classLoader.getClass();
+			while (clazz != java.lang.ClassLoader.class) {
+				clazz = clazz.getSuperclass();
+			}
+
+			java.lang.reflect.Field ClassLoader_classes_field = clazz
+					.getDeclaredField("classes");
+
+			ClassLoader_classes_field.setAccessible(true);
+			 classes = (Vector<Class<?>>) ClassLoader_classes_field.get(classLoader);
+
+		}catch (Exception e){
+
+		}
+		return classes;
+	}
+
+	/**
+	 * 需要进行reset的class
+	 * 1.initializeClasses传人的class，在separateClassloader版本中initializeClasses传人的class为空
+	 * 2.使用ClassResetter.classloader的class(过滤掉excluded.class中的class)
+	 * @return
+	 */
+	private static List<String> getLoadedClassesNeedReset(){
+		List<String> needResetClasses = new ArrayList<>();
+		needResetClasses.addAll(initializedClasses);
+		try {
+			//获取使用ClassResetter.classloader的class
+			needResetClasses.addAll(getClassloaderLoadClasses()
+					.stream()
+					//(过滤掉接口)
+					.filter(Class::isInterface)
+					.map(Class::getName)
+					//根据class名字，过滤掉名字中包含notResetClassContains
+					.filter(oneClassName->notResetClassContains.stream().anyMatch(oneClassName::contains)
+							//根据class名字，过滤excluded.class中的class
+							|| ExcludedClasses.getPackagesShouldNotBeInstrumented().stream().anyMatch(oneClassName::startsWith))
+					.collect(Collectors.toList()));
+		} catch (Exception e) {
+		}
+		return needResetClasses;
 	}
 
 	/**

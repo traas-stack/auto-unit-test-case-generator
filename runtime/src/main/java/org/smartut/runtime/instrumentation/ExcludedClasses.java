@@ -69,7 +69,7 @@ public class ExcludedClasses {
      *
      * @return the names of class packages SmartUt is not going to instrument
      */
-    static List<String> getPackagesShouldNotBeInstrumented() {
+    public static List<String> getPackagesShouldNotBeInstrumented() {
         //explicitly blocking client projects such as specmate is only a
         //temporary solution, TODO allow the user to specify
         //packages that should not be instrumented
