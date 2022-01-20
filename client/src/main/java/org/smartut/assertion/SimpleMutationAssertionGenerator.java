@@ -36,6 +36,7 @@ import org.smartut.coverage.mutation.MutationTimeoutStoppingCondition;
 import org.smartut.rmi.ClientServices;
 import org.smartut.rmi.service.ClientState;
 import org.smartut.rmi.service.ClientStateInformation;
+import org.smartut.runtime.classhandling.ClassStateSupport;
 import org.smartut.testcase.TestCase;
 import org.smartut.testcase.variable.VariableReference;
 import org.smartut.testcase.execution.ExecutionResult;
@@ -88,6 +89,9 @@ public class SimpleMutationAssertionGenerator extends MutationAssertionGenerator
 			} else {
 				// Set<Integer> killed = new HashSet<Integer>();
 				addAssertions(test, tkilled);
+				//为了防止用例间影响assert不准确问题，所以针对于每个用例运行之后进行resetCut
+				ClassStateSupport.resetCUT();
+
 				//progressMonitor.updateStatus((100 * numTest++) / tests.size());
 				ClientState state = ClientState.ASSERTION_GENERATION;
 				ClientStateInformation information = new ClientStateInformation(state);

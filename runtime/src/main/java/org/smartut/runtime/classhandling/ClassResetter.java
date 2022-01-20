@@ -127,57 +127,60 @@ public class ClassResetter {
 	 *  
 	 * @param classNameWithDots the class for invoking the duplicated version of class initializer <clinit>
 	 */
-	public void reset(String classNameWithDots) throws IllegalArgumentException, IllegalStateException{
-		if(classNameWithDots==null || classNameWithDots.isEmpty()){
+	public void reset(String classNameWithDots) throws IllegalArgumentException, IllegalStateException {
+		if (classNameWithDots == null || classNameWithDots.isEmpty()) {
 			throw new IllegalArgumentException("Empty class name in input");
 		}
-		
-		if(loader == null){					
+
+		if (loader == null) {
 			throw new IllegalStateException("No specified loader");
 		}
-		
+
 		Method m = getResetMethod(classNameWithDots);
-		if(m == null) {
-            return;
-        }
-
-		boolean safe = Sandbox.isSafeToExecuteSUTCode();
-
-		assert !Sandbox.isSecurityManagerInitialized() || Sandbox.isOnAndExecutingSUTCode();
-
-		InstrumentingAgent.activate();
-		org.smartut.runtime.Runtime.getInstance().resetRuntime();
-		boolean wasLoopCheckOn = LoopCounter.getInstance().isActivated();
-
-		try {
-			if(!safe){
-				Sandbox.goingToExecuteUnsafeCodeOnSameThread();
-			}
-			LoopCounter.getInstance().setActive(false);
-			m.invoke(null, (Object[]) null);
-		} catch (IllegalAccessException | IllegalArgumentException e) {
-            logger.error(""+e,e);
-        } catch (NoClassDefFoundError e){
-			AtMostOnceLogger.error(logger,e.toString());
-        } catch(InvocationTargetException e){
-
-			Throwable cause = e.getCause();
-			if(cause instanceof TooManyResourcesException || cause instanceof NoClassDefFoundError){
-				logWarn(classNameWithDots, e.toString() + ", caused by: "+cause.toString());
-			} else {
-				StringWriter errors = new StringWriter();
-				cause.printStackTrace(new PrintWriter(errors));
-				logWarn(classNameWithDots, e.toString() + ", caused by: "+cause.toString()+"\n"+errors.toString());
-				// we are only interested in the stack trace of the cause
-			}
-        } finally {
-			if(!safe){
-				Sandbox.doneWithExecutingUnsafeCodeOnSameThread();
-			}
-			LoopCounter.getInstance().setActive(wasLoopCheckOn);
+		if (m == null) {
+			return;
 		}
 
-		InstrumentingAgent.deactivate();
+		boolean safe = Sandbox.isSafeToExecuteSUTCode();
+		//beforeClass【initializeSecurityManagerForSUT】时会初始化manage，在AfterClass ResetClass之后【resetDefaultSecurityManager】会把manage设置为空
+		//所以ResetClass时manage应该不为null
+		//ExecutingTestCase在Before【goingToExecuteSUTCode】设置为true，在After【doneWithExecutingSUTCode】设置为false
+		//由于每次After时进行resetCut，最后AfterClass才进行resetClass，所以最后resetClass时并没有executeTestCase，取消对应校验
+		if (Sandbox.isSecurityManagerInitialized()) {
+			InstrumentingAgent.activate();
+			org.smartut.runtime.Runtime.getInstance().resetRuntime();
+			boolean wasLoopCheckOn = LoopCounter.getInstance().isActivated();
+
+			try {
+				if (!safe) {
+					Sandbox.goingToExecuteUnsafeCodeOnSameThread();
+				}
+				LoopCounter.getInstance().setActive(false);
+				m.invoke(null, (Object[]) null);
+			} catch (IllegalAccessException | IllegalArgumentException e) {
+				logger.error("" + e, e);
+			} catch (NoClassDefFoundError e) {
+				AtMostOnceLogger.error(logger, e.toString());
+			} catch (InvocationTargetException e) {
+
+				Throwable cause = e.getCause();
+				if (cause instanceof TooManyResourcesException || cause instanceof NoClassDefFoundError) {
+					logWarn(classNameWithDots, e.toString() + ", caused by: " + cause.toString());
+				} else {
+					StringWriter errors = new StringWriter();
+					cause.printStackTrace(new PrintWriter(errors));
+					logWarn(classNameWithDots, e.toString() + ", caused by: " + cause.toString() + "\n" + errors.toString());
+					// we are only interested in the stack trace of the cause
+				}
+			} finally {
+				if (!safe) {
+					Sandbox.doneWithExecutingUnsafeCodeOnSameThread();
+				}
+				LoopCounter.getInstance().setActive(wasLoopCheckOn);
+			}
+
+			InstrumentingAgent.deactivate();
+		}
 	}
 
 }

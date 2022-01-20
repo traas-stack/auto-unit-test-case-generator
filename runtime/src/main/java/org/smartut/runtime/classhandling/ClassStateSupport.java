@@ -139,6 +139,13 @@ public class ClassStateSupport {
 		}
 	}
 
+	/**
+	 * 针对当前被测class进行reset
+	 */
+	public static void resetCUT() {
+		ClassResetter.getInstance().reset(RuntimeSettings.className);
+	}
+
 
 	private static List<Class<?>> loadClasses(ClassLoader classLoader, String... classNames) {
 

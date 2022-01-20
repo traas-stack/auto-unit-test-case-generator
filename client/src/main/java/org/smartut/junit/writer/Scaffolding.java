@@ -487,8 +487,12 @@ public class Scaffolding {
 		if (Properties.RESET_STATIC_FIELDS) {
 			bd.append(BLOCK_SPACE);
 			bd.append(JDKClassResetter.class.getName() + ".reset(); \n");
+
+			//增加resetCUT方法，每个用例执行完后reset被测类static reset方法
+			//不reset所有的class 减少执行时间
 			bd.append(BLOCK_SPACE);
-			bd.append("resetClasses(); \n");
+			bd.append(ClassStateSupport.class.getName()).append(".resetCUT(); \n");
+//			bd.append("resetClasses(); \n");
 		}
 
 		if (Properties.RESET_STATIC_FIELDS || wasSecurityException) {
@@ -619,6 +623,10 @@ public class Scaffolding {
 			bd.append("@AfterClass \n");
 			bd.append(METHOD_SPACE);
 			bd.append("public static void clearSmartUtFramework(){ \n");
+
+			//在所有用例执行完毕，才针对于所有class进行reset
+			bd.append(BLOCK_SPACE);
+			bd.append("resetClasses(); \n");
 
 			if (Properties.RESET_STATIC_FIELDS || wasSecurityException) {
 				bd.append(BLOCK_SPACE);
