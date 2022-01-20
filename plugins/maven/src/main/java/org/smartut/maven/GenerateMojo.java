@@ -52,7 +52,7 @@ public class GenerateMojo extends AbstractMojo {
 	/**
 	 * Total Memory (in MB) that CTG will use
 	 */
-	@Parameter( property = "memoryInMB", defaultValue = "800" )
+	@Parameter( property = "memoryInMB", defaultValue = "2000" )
 	private int memoryInMB;
 
 	/**
