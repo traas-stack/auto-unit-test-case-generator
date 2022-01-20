@@ -344,9 +344,10 @@ public class Scaffolding {
 
 		if (classesToReset.size() != 0) {
 
-			bd.append(BLOCK_SPACE);
-			bd.append(ClassResetter.class.getName() + ".getInstance().setClassLoader(");
-			bd.append(testClassName + ".class.getClassLoader()); \n\n");
+			//为了resetCUT，所以在initializeClasses时会将ClassLoader进行set，生成的用例不必在resetClasses里再进行set
+//			bd.append(BLOCK_SPACE);
+//			bd.append(ClassResetter.class.getName() + ".getInstance().setClassLoader(");
+//			bd.append(testClassName + ".class.getClassLoader()); \n\n");
 
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName() + ".resetClasses(");

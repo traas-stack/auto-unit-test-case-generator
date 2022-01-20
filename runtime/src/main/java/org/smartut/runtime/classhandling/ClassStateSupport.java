@@ -62,7 +62,10 @@ public class ClassStateSupport {
 	private static final List<String> initializedClasses = new ArrayList<>();
 
 	//包含这些的class不进行reset
-	private static final List<String> notResetClassContains = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "_SSTest", "scaffolding", "LoggerUtil");
+	private static final List<String> notResetClassContains = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil");
+
+	//以这些String结尾的class不进行reset
+	private static final List<String> notResetClassSuffix = Arrays.asList("_SSTest", "scaffolding");
 
 	private static final String[] externalInitMethods = new String[] {"$jacocoInit", "$gzoltarInit"};
 
@@ -80,7 +83,7 @@ public class ClassStateSupport {
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
 
 		boolean problem = false;
-
+		ClassResetter.getInstance().setClassLoader(classLoader);
 		List<Class<?>> classes = loadClasses(classLoader, classNames);
 		if(classes.size() != classNames.length) {
 			problem = true;
@@ -220,6 +223,8 @@ public class ClassStateSupport {
 					.map(Class::getName)
 					//根据class名字，过滤掉名字中包含notResetClassContains
 					.filter(oneClassName->notResetClassContains.stream().anyMatch(oneClassName::contains)
+							//根据class名字，过滤掉名字中以notResetClassSuffix结尾的class
+							||notResetClassSuffix.stream().anyMatch(oneClassName::endsWith)
 							//根据class名字，过滤excluded.class中的class
 							|| ExcludedClasses.getPackagesShouldNotBeInstrumented().stream().anyMatch(oneClassName::startsWith))
 					.collect(Collectors.toList()));
