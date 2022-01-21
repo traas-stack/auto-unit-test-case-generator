@@ -304,6 +304,12 @@ public class Properties {
 	@Parameter(key = "migrants_communication_rate", group = "Test Creation", description = "Determines amount of migrants per communication step")
 	public static int MIGRANTS_COMMUNICATION_RATE = 3;
 
+	@Parameter(key = "master_remote_debug", group = "Test Creation", description = "master process debug")
+	public static boolean MASTER_REMOTE_DEBUG = false;
+
+	@Parameter(key = "client_remote_debug", group = "Test Creation", description = "client process debug")
+	public static boolean CLIENT_REMOTE_DEBUG = false;
+
 	// ---------------------------------------------------------------
 	// Search algorithm
 	public enum Algorithm {
@@ -1387,9 +1393,9 @@ public class Properties {
 	@Parameter(key = "profile", group = "Debugging", description = "Enables profiler support in the client VM")
 	public static String PROFILE = "";
 
-	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 1044")
+	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 8015")
 	@IntValue(min = 1024, max = 65535)
-	public static int PORT = 1044;
+	public static int PORT = 8015;
 
 	@Parameter(key = "jmc", group = "Debugging", description = "Experimental: activate Flight Recorder in spawn client process for Java Mission Control")
 	public static boolean JMC = false;

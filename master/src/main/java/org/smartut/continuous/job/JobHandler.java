@@ -208,6 +208,13 @@ public class JobHandler extends Thread {
 		List<String> commands = new ArrayList<>();
 		commands.add(JavaExecCmdUtil.getJavaBinExecutablePath()/*"java"*/);
 
+		if(Properties.MASTER_REMOTE_DEBUG) {
+			int debugPort = Properties.PORT;
+			debugPort += 1;
+			String debugStr = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + debugPort;
+			commands.add(debugStr);
+		}
+
 		commands.add("-cp");
 		commands.add(configureAndGetClasspath());
 
@@ -238,7 +245,10 @@ public class JobHandler extends Thread {
 		/*
 		 * TODO: this will likely need better handling
 		 */
-		int masterMB = 250;
+		int masterMB = 350;
+		if(Properties.CLIENT_ON_THREAD) {
+			masterMB = job.memoryInMB;
+		}
 		int clientMB = job.memoryInMB - masterMB;
 
 		commands.add("-Xmx" + masterMB + "m");
@@ -382,6 +392,18 @@ public class JobHandler extends Thread {
 
 		if (Properties.CTG_HISTORY_FILE != null) {
 			commands.add("-Dctg_history_file=" + Properties.CTG_HISTORY_FILE);
+		}
+
+		if(Properties.MASTER_REMOTE_DEBUG) {
+			commands.add("-Dmaster_remote_debug=true");
+		}
+		if(Properties.CLIENT_REMOTE_DEBUG) {
+			commands.add("-Dclient_remote_debug=true");
+		}
+
+		//add command parameter control CLIENT_ON_THREAD
+		if(Properties.CLIENT_ON_THREAD) {
+			commands.add("-Dclient_on_thread=true");
 		}
 
 		return commands;

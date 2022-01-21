@@ -100,6 +100,18 @@ public class GenerateMojo extends AbstractMojo {
 	@Parameter( property = "extraArgs" , defaultValue = "")
 	private String extraArgs;
 
+	@Parameter( property = "masterRemoteDebug", defaultValue = "false")
+	private Boolean masterRemoteDebug;
+
+	@Parameter( property = "clientRemoteDebug", defaultValue = "false")
+	private Boolean clientRemoteDebug;
+
+	/**
+	 * start client by thread or process mode
+	 */
+	@Parameter( property = "client_on_thread", defaultValue = "false" )
+	private Boolean clientOnThread;
+
 	/**
 	 * Schedule used to run CTG (SIMPLE, BUDGET, SEEDING, BUDGET_AND_SEEDING, HISTORY)
 	 */
@@ -243,6 +255,12 @@ public class GenerateMojo extends AbstractMojo {
 		params.add(target);
 		params.add("-Dcriterion=" + criterion);
 		params.add("-Dctg_schedule=" + schedule);
+		//remote debug model
+		params.add("-Dmaster_remote_debug=" + masterRemoteDebug);
+		params.add("-Dclient_remote_debug=" + clientRemoteDebug);
+		if(clientOnThread) {
+			params.add("-Dclient_on_thread=" + clientOnThread);
+		}
 		if (schedule.toUpperCase().equals(Properties.AvailableSchedule.HISTORY.toString())) {
 			try {
 				List<File> files = FileUtils.scan(this.project.getCompileSourceRoots(), this.includes, this.excludes);

@@ -203,6 +203,24 @@ public class SmartUt {
                 }
             }
 
+            //jvm debug
+            if(line.hasOption("master_remote_debug")) {
+                javaOpts.add("-Dmaster_remote_debug=" + line.getOptionValue("master_remote_debug"));
+                try {
+                    Properties.getInstance().setValue("master_remote_debug", line.getOptionValue("master_remote_debug"));
+                } catch (Exception e) {
+                    throw new Error("Invalid value for master_remote_debug: " + e.getMessage());
+                }
+            }
+            if(line.hasOption("client_remote_debug")) {
+                javaOpts.add("-Dclient_remote_debug=" + line.getOptionValue("client_remote_debug"));
+                try {
+                    Properties.getInstance().setValue("client_remote_debug", line.getOptionValue("client_remote_debug"));
+                } catch (Exception e) {
+                    throw new Error("Invalid value for client_remote_debug: " + e.getMessage());
+                }
+            }
+
             if (line.hasOption("parallel")) {
                 String[] values = line.getOptionValues("parallel");
 

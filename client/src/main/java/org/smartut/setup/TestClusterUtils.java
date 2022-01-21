@@ -317,6 +317,10 @@ public class TestClusterUtils {
 		} catch (NoClassDefFoundError e) {
 			// an ExceptionInInitializationError might have happened during class initialization.
 			return null;
+		}  catch (NoSuchFieldError e) {
+			return null;
+		} catch (Exception e) {
+			return null;
 		}
 	}
 }

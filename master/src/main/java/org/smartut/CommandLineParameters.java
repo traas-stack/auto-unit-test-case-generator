@@ -122,7 +122,10 @@ public class CommandLineParameters {
 		Option inheritance = new Option("inheritanceTree","Cache inheritance tree during setup");
 		Option heapDump = new Option("heapdump", "Create heap dump on client VM out of memory error");
 		Option base_dir = new Option("base_dir", true, "Working directory in which tests and reports will be placed");
-		
+
+		Option master_remote_debug = new Option("master_remote_debug", true, "master process debug");
+		Option client_remote_debug = new Option("client_remote_debug", true, "client process debug");
+
 		Option parallel = new Option("parallel", true, "Start parallel run with n clients, communicate every i " 
                 + "iteration x individuals (rate), expects #num_parallel_clients #migrants_iteration_frequency #migrants_communication_rate");
 		parallel.setArgs(3);
@@ -160,6 +163,9 @@ public class CommandLineParameters {
 		options.addOption(heapDump);
 		options.addOption(startedByCtg);
 		options.addOption(parallel);
+
+		options.addOption(master_remote_debug);
+		options.addOption(client_remote_debug);
 
 		return options;
 	}
