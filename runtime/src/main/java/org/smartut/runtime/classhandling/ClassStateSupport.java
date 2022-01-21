@@ -152,10 +152,10 @@ public class ClassStateSupport {
 	 * <p>
 	 *     This method will be usually called after a test is executed, ie in a @After
 	 * </p>
-	 * resetClasses缓存至needResetClasses
+	 *
 	 */
 	public static void resetClasses() {
-//		有可能卡住一样，reset classes增加超时控制
+//		有可能卡住，reset classes增加超时控制
 		final ExecutorService exec = Executors.newFixedThreadPool(1);
 		Callable call = () -> {
 			// 把initClasses的类进行reset

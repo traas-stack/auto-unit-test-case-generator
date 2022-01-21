@@ -352,7 +352,7 @@ public class Scaffolding {
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName() + ".resetClasses(");
 
-			//需要reset的class不列在resetClasses里，将在ClassStateSupport中缓存needResetClass
+			//需要reset的class不列在Scaffolding-resetClasses里
 //			for (int i = 0; i < classesToReset.size(); i++) {
 //				String className = classesToReset.get(i);
 //				bd.append("\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
