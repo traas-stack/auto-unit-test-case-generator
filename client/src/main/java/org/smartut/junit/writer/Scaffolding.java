@@ -344,7 +344,7 @@ public class Scaffolding {
 
 		if (classesToReset.size() != 0) {
 
-			//为了resetCUT，所以在initializeClasses时会将ClassLoader进行set，生成的用例不必在resetClasses里再进行set
+			//修改为在beforeClass-initializeClasses时setClassLoader
 //			bd.append(BLOCK_SPACE);
 //			bd.append(ClassResetter.class.getName() + ".getInstance().setClassLoader(");
 //			bd.append(testClassName + ".class.getClassLoader()); \n\n");
@@ -352,7 +352,7 @@ public class Scaffolding {
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName() + ".resetClasses(");
 
-			//需要reset的class不列在resetClasses里，新增将在ClassStateSupport中缓存needResetClass
+			//需要reset的class不列在resetClasses里，将在ClassStateSupport中缓存needResetClass
 //			for (int i = 0; i < classesToReset.size(); i++) {
 //				String className = classesToReset.get(i);
 //				bd.append("\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
