@@ -247,7 +247,7 @@ public class JobHandler extends Thread {
 		 */
 		int masterMB = 350;
 		if(Properties.CLIENT_ON_THREAD) {
-			masterMB = job.memoryInMB - 250;
+			masterMB = job.memoryInMB;
 		}
 		int clientMB = job.memoryInMB - masterMB;
 
