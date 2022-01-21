@@ -304,8 +304,8 @@ public class Properties {
 	@Parameter(key = "migrants_communication_rate", group = "Test Creation", description = "Determines amount of migrants per communication step")
 	public static int MIGRANTS_COMMUNICATION_RATE = 3;
 
-	@Parameter(key = "jvm_debug", group = "Test Creation", description = "local jvm debug")
-	public static boolean JVM_DEBUG = false;
+	@Parameter(key = "master_remote_debug", group = "Test Creation", description = "master process debug")
+	public static boolean MASTER_REMOTE_DEBUG = false;
 
 	@Parameter(key = "client_remote_debug", group = "Test Creation", description = "client process debug")
 	public static boolean CLIENT_REMOTE_DEBUG = false;

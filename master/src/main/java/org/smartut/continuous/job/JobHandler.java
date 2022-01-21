@@ -208,7 +208,7 @@ public class JobHandler extends Thread {
 		List<String> commands = new ArrayList<>();
 		commands.add(JavaExecCmdUtil.getJavaBinExecutablePath()/*"java"*/);
 
-		if(Properties.JVM_DEBUG) {
+		if(Properties.MASTER_REMOTE_DEBUG) {
 			int debugPort = Properties.PORT;
 			debugPort += 1;
 			String debugStr = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + debugPort;
@@ -394,8 +394,8 @@ public class JobHandler extends Thread {
 			commands.add("-Dctg_history_file=" + Properties.CTG_HISTORY_FILE);
 		}
 
-		if(Properties.JVM_DEBUG) {
-			commands.add("-Djvm_debug=true");
+		if(Properties.MASTER_REMOTE_DEBUG) {
+			commands.add("-Dmaster_remote_debug=true");
 		}
 		if(Properties.CLIENT_REMOTE_DEBUG) {
 			commands.add("-Dclient_remote_debug=true");

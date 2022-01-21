@@ -100,8 +100,8 @@ public class GenerateMojo extends AbstractMojo {
 	@Parameter( property = "extraArgs" , defaultValue = "")
 	private String extraArgs;
 
-	@Parameter( property = "jvmDebug", defaultValue = "false")
-	private Boolean jvmDebug;
+	@Parameter( property = "masterRemoteDebug", defaultValue = "false")
+	private Boolean masterRemoteDebug;
 
 	@Parameter( property = "clientRemoteDebug", defaultValue = "false")
 	private Boolean clientRemoteDebug;
@@ -256,7 +256,7 @@ public class GenerateMojo extends AbstractMojo {
 		params.add("-Dcriterion=" + criterion);
 		params.add("-Dctg_schedule=" + schedule);
 		//remote debug model
-		params.add("-Djvm_debug=" + jvmDebug);
+		params.add("-Dmaster_remote_debug=" + masterRemoteDebug);
 		params.add("-Dclient_remote_debug=" + clientRemoteDebug);
 		if(clientOnThread) {
 			params.add("-Dclient_on_thread=" + clientOnThread);
