@@ -235,6 +235,11 @@ public class TestGeneration {
 		cmdLine.add(JavaExecCmdUtil.getJavaBinExecutablePath(true)/*SmartUt.JAVA_CMD*/);
         List<String[]> processArgs = new ArrayList<>();
 
+		if(Properties.CLIENT_REMOTE_DEBUG) {
+			String debugStr = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + Properties.PORT;
+			cmdLine.add(debugStr);
+		}
+
 		handleClassPath(cmdLine);
 
 		if(Properties.SPAWN_PROCESS_MANAGER_PORT != null){

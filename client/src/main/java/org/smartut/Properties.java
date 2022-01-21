@@ -304,6 +304,12 @@ public class Properties {
 	@Parameter(key = "migrants_communication_rate", group = "Test Creation", description = "Determines amount of migrants per communication step")
 	public static int MIGRANTS_COMMUNICATION_RATE = 3;
 
+	@Parameter(key = "jvm_debug", group = "Test Creation", description = "local jvm debug")
+	public static boolean JVM_DEBUG = false;
+
+	@Parameter(key = "client_remote_debug", group = "Test Creation", description = "client process debug")
+	public static boolean CLIENT_REMOTE_DEBUG = false;
+
 	// ---------------------------------------------------------------
 	// Search algorithm
 	public enum Algorithm {
@@ -1389,7 +1395,7 @@ public class Properties {
 
 	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 1044")
 	@IntValue(min = 1024, max = 65535)
-	public static int PORT = 1044;
+	public static int PORT = 8015;
 
 	@Parameter(key = "jmc", group = "Debugging", description = "Experimental: activate Flight Recorder in spawn client process for Java Mission Control")
 	public static boolean JMC = false;
@@ -1520,7 +1526,7 @@ public class Properties {
 
 
 	@Parameter(key = "client_on_thread", group = "Runtime", description = "Run client process on same JVM of master in separate thread. To be used only for debugging purposes")
-	public static volatile boolean CLIENT_ON_THREAD = false;
+	public static volatile boolean CLIENT_ON_THREAD = true;
 
 
 	@Parameter(key = "is_running_a_system_test", group = "Runtime", description = "Specify that a system test is running. To be used only for debugging purposes")
