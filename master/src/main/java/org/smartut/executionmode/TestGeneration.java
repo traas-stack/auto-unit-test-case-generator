@@ -59,7 +59,10 @@ public class TestGeneration {
 
 		if (strategy == null) {
 			strategy = Strategy.MOSUITE;
-		} 
+		}
+
+		/** Updating properties strategy */
+		Properties.STRATEGY = strategy;
 
         List<List<TestGenerationResult>> results = new ArrayList<>();
 
