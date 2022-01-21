@@ -1393,7 +1393,7 @@ public class Properties {
 	@Parameter(key = "profile", group = "Debugging", description = "Enables profiler support in the client VM")
 	public static String PROFILE = "";
 
-	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 8051")
+	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 8015")
 	@IntValue(min = 1024, max = 65535)
 	public static int PORT = 8015;
 
