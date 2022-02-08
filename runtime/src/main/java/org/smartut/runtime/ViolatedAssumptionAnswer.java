@@ -32,13 +32,7 @@ public class ViolatedAssumptionAnswer implements Answer<Object> {
 
     @Override
     public Object answer(InvocationOnMock invocation) throws Throwable {
-
-        if(invocation.getMethod().getReturnType().equals(Void.TYPE)) {
-            //no need of exception, as no return value will be used in the CUT anyway which could affect the test
-            return null;
-        } else {
-            throw new FalsePositiveException("Mock call to "+invocation.getMethod().getName()+
-                    " which was not presented when the test was generated");
-        }
+        // default answer is null
+        return null;
     }
 }
