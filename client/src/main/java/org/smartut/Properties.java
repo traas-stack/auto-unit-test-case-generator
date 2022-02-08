@@ -274,22 +274,22 @@ public class Properties {
 
     @Parameter(key = "p_reflection_on_private", group = "Test Creation", description = "Probability [0,1] of using reflection to set private fields or call private methods")
     @DoubleValue(min = 0.0, max = 1.0)
-    public static double P_REFLECTION_ON_PRIVATE = 0.0; // Optimal value: 0.5
+    public static double P_REFLECTION_ON_PRIVATE = 0.65; // Optimal value: 0.5
 
     @Parameter(key = "reflection_start_percent", group = "Test Creation", description = "Percentage [0,1] of search budget after which reflection fields/methods handling is activated")
     @DoubleValue(min = 0.0, max = 1.0)
-    public static double REFLECTION_START_PERCENT = 0.8;
+    public static double REFLECTION_START_PERCENT = 0.0;
 
 	@Parameter(key = "p_functional_mocking", group = "Test Creation", description = "Probability [0,1] of using functional mocking (eg Mockito) when creating object instances")
 	@DoubleValue(min = 0.0, max = 1.0)
-	public static double P_FUNCTIONAL_MOCKING = 0.0; // Optimal value: 0.8
+	public static double P_FUNCTIONAL_MOCKING = 1.0; // Optimal value: 0.8
 
 	@Parameter(key = "mock_if_no_generator", group = "Test Creation", description = "Allow mock objects if there are no generators")
 	public static boolean MOCK_IF_NO_GENERATOR = true;
 
 	@Parameter(key = "functional_mocking_percent", group = "Test Creation", description = "Percentage [0,1] of search budget after which functional mocking can be activated. Mocking of missing concrete classes will be activated immediately regardless of this parameter")
 	@DoubleValue(min = 0.0, max = 1.0)
-	public static double FUNCTIONAL_MOCKING_PERCENT = 0.5;
+	public static double FUNCTIONAL_MOCKING_PERCENT = 0.0;
 
 	@Parameter(key = "functional_mocking_input_limit", group = "Test Creation", description = "When mocking a method, define max number of mocked return values for that method. Calls after the last will just re-use the last specified value")
 	@DoubleValue(min = 1)
