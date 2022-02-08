@@ -286,7 +286,7 @@ public class TestFactory {
 					                                               Arrays.asList(constructor.getConstructor().getParameters()),
 					                                               position,
 					                                               recursionDepth + 1,
-					                                               true, false, true);
+					                                               Properties.ALLOW_NULL, false, true);
 			int newLength = test.size();
 			position += (newLength - length);
 
@@ -501,7 +501,7 @@ public class TestFactory {
 			parameters = satisfyParameters(test, callee,
 					                       Arrays.asList(method.getParameterTypes()),
 					                       Arrays.asList(method.getMethod().getParameters()),
-					                       position, recursionDepth + 1, true, false, true);
+					                       position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 
 		} catch (ConstructionFailedException e) {
 			// TODO: Re-insert in new test cluster
@@ -548,13 +548,11 @@ public class TestFactory {
 		currentRecursion.clear();
 		int length = test.size();
 
-		boolean allowNull = true;
-
 		// Added 'null' as additional parameter - fix for @NotNull annotations issue on smartut mailing list
 		List<VariableReference> parameters = satisfyParameters(
 				test, callee,
 				Arrays.asList(method.getParameterTypes()),
-				Arrays.asList(method.getMethod().getParameters()), position, 1, allowNull, false, true);
+				Arrays.asList(method.getMethod().getParameters()), position, 1, Properties.ALLOW_NULL, false, true);
 
 		int newLength = test.size();
 		position += (newLength - length);
@@ -743,7 +741,8 @@ public class TestFactory {
 
 		} else if (clazz.isString()) {
 
-			if (allowNull && Randomness.nextDouble() <= Properties.NULL_PROBABILITY) {
+			// change <= to < because we want to control null parameter
+			if (allowNull && Randomness.nextDouble() < Properties.NULL_PROBABILITY) {
 				logger.debug("Using a null reference to satisfy the type: {}", type);
 				return createNull(test, type, position, recursionDepth);
 			} else {
@@ -752,7 +751,7 @@ public class TestFactory {
 
 		} else if (clazz.isArray()) {
 
-			if (allowNull && Randomness.nextDouble() <= Properties.NULL_PROBABILITY) {
+			if (allowNull && Randomness.nextDouble() < Properties.NULL_PROBABILITY) {
 				logger.debug("Using a null reference to satisfy the type: {}", type);
 				return createNull(test, type, position, recursionDepth);
 			} else {
@@ -761,7 +760,7 @@ public class TestFactory {
 
 		} else {
 
-			if (allowNull && Randomness.nextDouble() <= Properties.NULL_PROBABILITY) {
+			if (allowNull && Randomness.nextDouble() < Properties.NULL_PROBABILITY) {
 				logger.debug("Using a null reference to satisfy the type: {}", type);
 				return createNull(test, type, position, recursionDepth);
 			}
@@ -821,7 +820,8 @@ public class TestFactory {
 	protected VariableReference attemptObjectGeneration(TestCase test, int position,
 	        int recursionDepth, boolean allowNull) throws ConstructionFailedException {
 
-		if (allowNull && Randomness.nextDouble() <= Properties.NULL_PROBABILITY) {
+		// change <= to < because we want to control null parameter
+		if (allowNull && Randomness.nextDouble() < Properties.NULL_PROBABILITY) {
 			logger.debug("Using a null reference to satisfy the type: {}", Object.class);
 			return createNull(test, Object.class, position, recursionDepth);
 		}
@@ -1422,11 +1422,7 @@ public class TestFactory {
 
 		//could not create, so go back in trying to re-use an existing variable
 		if (objects.isEmpty()) {
-			if (allowNull) {
-				return createNull(test, parameterType, position, recursionDepth);
-			} else {
-				throw new ConstructionFailedException("No objects and generators for type " + parameterType);
-			}
+			return createNull(test, parameterType, position, recursionDepth);
 		}
 
 		if (logger.isDebugEnabled()) {
@@ -1502,7 +1498,6 @@ public class TestFactory {
 					position, recursionDepth,
 					allowNull, generatorRefToExclude, canUseMocks, canReuseExistingVariables);
 
-			assert !(!allowNull && ConstraintHelper.isNull(reference, test));
 			assert canUseMocks || !(test.getStatement(reference.getStPosition()) instanceof FunctionalMockStatement);
 
 			return reference;
@@ -2013,7 +2008,7 @@ public class TestFactory {
             parameters = satisfyParameters(test, null,
                     //we need a reference to the SUT, and one to a variable of same type of chosen field
                     Arrays.asList(reflectionFactory.getReflectedClass(), field.getType()), null,
-                    position, recursionDepth + 1, true, false, true);
+                    position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 
             try {
                 st = new PrivateFieldStatement(test,reflectionFactory.getReflectedClass(),field.getName(),
@@ -2030,7 +2025,7 @@ public class TestFactory {
             list.addAll(Arrays.asList(method.getGenericParameterTypes()));
 
 			// Added 'null' as additional parameter - fix for @NotNull annotations issue on smartut mailing list
-			parameters = satisfyParameters(test, null, list, null, position, recursionDepth + 1, true, false, true);
+			parameters = satisfyParameters(test, null, list, null, position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 			VariableReference callee = parameters.remove(0);
 
 			st = new PrivateMethodStatement(test, reflectionFactory.getReflectedClass(), method,
@@ -2065,18 +2060,10 @@ public class TestFactory {
 		if(reflectionFactory.nextUseField()){
 			Field field = reflectionFactory.nextField();
 
-			/*
-				In theory, there might be cases in which using null in PA might help increasing
-				coverage. However, likely most of the time we ll end up in useless tests throwing
-				NPE on the private fields. As we maximize the number of methods throwing exceptions,
-				we could end up with a lot of useless tests
-			 */
-			boolean allowNull = false;
-
 			// Added 'null' as additional parameter - fix for @NotNull annotations issue on smartut mailing list
 			parameters = satisfyParameters(test, callee,
 					//we need a reference to the SUT, and one to a variable of same type of chosen field
-					Collections.singletonList(field.getType()), null, position, recursionDepth + 1, allowNull, false, true);
+					Collections.singletonList(field.getType()), null, position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 
 			try {
 				st = new PrivateFieldStatement(test,reflectionFactory.getReflectedClass(),field.getName(),
@@ -2090,7 +2077,7 @@ public class TestFactory {
 			Method method = reflectionFactory.nextMethod();
 			List<Type> list = new ArrayList<>(Arrays.asList(method.getParameterTypes()));
 			// Added 'null' as additional parameter - fix for @NotNull annotations issue on smartut mailing list
-			parameters = satisfyParameters(test, callee, list, null, position, recursionDepth + 1, true, false, true);
+			parameters = satisfyParameters(test, callee, list, null, position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 
 			st = new PrivateMethodStatement(test, reflectionFactory.getReflectedClass(), method,
 					callee, parameters, Modifier.isStatic(method.getModifiers()));
@@ -2352,7 +2339,7 @@ public class TestFactory {
 	 * have to specify the position of the last valid statement of {@code test} by supplying an
 	 * appropriate index {@code lastPosition}. After a successful insertion, returns the updated
 	 * position of the last valid statement (which is always non-negative), or if there was an error
-	 * the constant {@link org.smartut.testcase.mutation.InsertionStrategy#INSERTION_ERROR
+	 * the constant {@link org.smartut.testcase.mutation.InsertionStrategy#
 	 * INSERTION_ERROR}.
 	 *
 	 * @param test the test case in which to insert
@@ -2432,8 +2419,6 @@ public class TestFactory {
 							"Failed to create variable for type " + parameterType + " at position " + position);
 				}
 			}
-
-			assert !(!allowNullForParameter && ConstraintHelper.isNull(var, test));
 
 			// Generics instantiation may lead to invalid types, so better
 			// double check

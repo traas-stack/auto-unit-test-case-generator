@@ -139,9 +139,12 @@ public class Properties {
 	@Parameter(key = "chop_carved_exceptions", group = "Test Creation", description = "If a carved test throws an exception, either chop it off, or drop it")
 	public static boolean CHOP_CARVED_EXCEPTIONS = true;
 
+	@Parameter(key = "allow null", group = "Test Creation", description = "If allow null when create object")
+	public static boolean ALLOW_NULL = false;
+
 	@Parameter(key = "null_probability", group = "Test Creation", description = "Probability to use null instead of constructing an object")
 	@DoubleValue(min = 0.0, max = 1.0)
-	public static double NULL_PROBABILITY = 0.1;
+	public static double NULL_PROBABILITY = 0.0;
 
 	@Parameter(key = "object_reuse_probability", group = "Test Creation", description = "Probability to reuse an existing reference, if available")
 	@DoubleValue(min = 0.0, max = 1.0)

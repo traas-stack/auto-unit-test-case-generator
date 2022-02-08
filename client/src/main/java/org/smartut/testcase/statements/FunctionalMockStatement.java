@@ -30,6 +30,7 @@ import org.smartut.runtime.instrumentation.InstrumentedClass;
 import org.smartut.runtime.mock.SmartUtMock;
 import org.smartut.runtime.mock.MockList;
 import org.smartut.runtime.util.AtMostOnceLogger;
+import org.smartut.testcase.TestFactory;
 import org.smartut.testcase.fm.EvoInvocationListener;
 import org.smartut.testcase.fm.MethodDescriptor;
 import org.smartut.runtime.util.Inputs;
@@ -432,7 +433,13 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
                     logger.debug("Return type: "+returnType +" for retval "+retval.getGenericClass());
                     list.add(returnType);
 
-                    super.parameters.add(null); //important place holder for following updates
+                    // satisfy return value immediately instead of calling these methods after updateMockedMethods
+                    List<Type> needSatisfyType = new ArrayList<>();
+                    needSatisfyType.add(returnType);
+                    TestCase test = getTestCase();
+                    int pos = getPosition();
+                    List<VariableReference> references = TestFactory.getInstance().satisfyParameters(test, null,needSatisfyType ,null, pos, 0, Properties.ALLOW_NULL, false,true);
+                    super.parameters.add(references.get(0)); //important place holder for following updates
                     added++;
                 }
             }
