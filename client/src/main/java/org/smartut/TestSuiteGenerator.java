@@ -346,7 +346,8 @@ public class TestSuiteGenerator {
 	protected void postProcessTests(TestSuiteChromosome testSuite) {
 
 
-		//FINAL MOCK CHECK FOR TESTCASES
+		// last check for update mock methods, we have done this in TestCodeVisitor before, however, before minimize &
+		// assertion generation will be better. So move st.doesNeedToUpdateInputs() in TestCodeVisitor here
 		for(TestChromosome testChromosome : testSuite.getTestChromosomes()){
 			testChromosome.mockChange();
 		}
