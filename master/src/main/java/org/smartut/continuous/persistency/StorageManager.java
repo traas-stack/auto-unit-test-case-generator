@@ -290,7 +290,10 @@ public class StorageManager {
 		// identify for which CUTs we failed to generate tests
 		Set<String> missingCUTs = new LinkedHashSet<>();
 
-		db.setTotalNumberOfTestableClasses(BigInteger.valueOf(current.getTotalNumberOfTestableCUTs()));
+		// project_info maybe generate fail and return null
+		if(db != null) {
+			db.setTotalNumberOfTestableClasses(BigInteger.valueOf(current.getTotalNumberOfTestableCUTs()));
+		}
 		for (String cut : current.getClassNames()) {
 		    if (!current.getClassInfo(cut).isTestable()) {
 		        // if a class is not testable, we don't need to update any database
@@ -450,6 +453,11 @@ public class StorageManager {
 	
 	private void commitDatabase(Project db) {
 
+		// project_info maybe generate fail and return null
+		if(db == null) {
+			return;
+		}
+
 		StringWriter writer = null;
 		try{
 			writer = new StringWriter();
@@ -490,15 +498,21 @@ public class StorageManager {
   	    String testName = targetClass + Properties.JUNIT_SUFFIX; //extractClassName(tmpTests, ondisk.testSuite);
 
 		// CUT data
+		CUT cut = null;
+		// project_info maybe generate fail and return null
+		if(db != null) {
+			ProjectUtil.getCUT(db, targetClass);
+		}
 
-		CUT cut = ProjectUtil.getCUT(db, targetClass);
 		if (cut == null) {
 		    // first generation
 			cut = new CUT();
 			cut.setFullNameOfTargetClass(targetClass);
 			cut.setFullNameOfTestSuite(testName);
 
-			db.getCut().add(cut);
+			if(db != null) {
+				db.getCut().add(cut);
+			}
 		}
 
 		// Generation data
@@ -800,6 +814,11 @@ public class StorageManager {
             return false; 
         }
 
+		// project_info maybe generate fail and return null
+		if(db == null) {
+			return false;
+		}
+
         // first check if the class under test has been changed or if
         // is a new class. if yes, accept the generated TestSuite
         // (even without checking if the coverage has increased/decreased)
@@ -893,6 +912,11 @@ public class StorageManager {
 	 */
 	private String removeNoMoreExistentData(Project db,
 			ProjectStaticData current) {
+
+		// project_info maybe generate fail and return null
+		if(db == null) {
+			return "Removed test suites: 0";
+		}
 
 		int removed = 0;
 		Iterator<CUT> iter = db.getCut().iterator();
@@ -994,9 +1018,11 @@ public class StorageManager {
 			jaxbUnmarshaller.setSchema(schema);
 			return (Project) jaxbUnmarshaller.unmarshal(stream);
 		} catch(Exception e){
-			String msg = "Error in reading "+current.getAbsolutePath()+" , "+e;
-			logger.error(msg,e);
-			throw new RuntimeException(msg);
+			// will not print error log and throw exception when failed to generate project_info.xml
+			// project_info maybe generate fail because of xercesImpl jar conflict
+			logger.warn("\nWARN: XmlStream cannot be handler\n");
+			current.delete();
+			return null;
 		}
 	}
 

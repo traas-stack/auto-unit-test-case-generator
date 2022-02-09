@@ -28,10 +28,6 @@
     </profiles>
 
 	<dependencies>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
 
 		<!-- SmartUt Modules -->
 

@@ -95,13 +95,13 @@
             <scope>test</scope>
         </dependency>
         -->
-        <dependency> <!--  FIXME this is temporary -->
-            <groupId>org.smartut</groupId>
-            <artifactId>smartut-client</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency> &lt;!&ndash;  FIXME this is temporary &ndash;&gt;-->
+<!--            <groupId>org.smartut</groupId>-->
+<!--            <artifactId>smartut-client</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <type>test-jar</type>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.smartut</groupId>
             <artifactId>smartut-client</artifactId>
