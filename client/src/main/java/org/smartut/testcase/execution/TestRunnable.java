@@ -207,7 +207,8 @@ public class TestRunnable implements InterfaceTestRunnable {
 		} catch (Throwable e) {
 			if (e instanceof SmartUtError) {
 				logger.info("SmartUt Error!", e);
-				throw (SmartUtError) e;
+				// not throw smartut error when execute test
+				// throw (SmartUtError) e;
 			}
 			if (e instanceof VMError) {
 				logger.info("VM Error!", e);
