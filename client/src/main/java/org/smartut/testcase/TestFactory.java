@@ -1395,14 +1395,17 @@ public class TestFactory {
 		List<VariableReference> objects = getCandidatesForReuse(test, parameterType, position, exclude, allowNull, canUseMocks);
 
 		GenericClass clazz = new GenericClass(parameterType);
-		boolean isPrimitiveOrSimilar = clazz.isPrimitive() || clazz.isWrapperType() || clazz.isEnum() || clazz.isClass() || clazz.isString();
 
-		if (isPrimitiveOrSimilar && !objects.isEmpty() && reuse <= Properties.PRIMITIVE_REUSE_PROBABILITY) {
+		// separate Primitive and PrimitiveSimilar, avoid generate null value for String or Primitive type
+		boolean isPrimitive = clazz.isPrimitive() || clazz.isString() || clazz.isWrapperType();
+		boolean isPrimitiveSimilar = clazz.isEnum() || clazz.isClass();
+
+		if (isPrimitiveSimilar && !objects.isEmpty() && reuse <= Properties.PRIMITIVE_REUSE_PROBABILITY) {
 			logger.debug(" Looking for existing object of type {}", parameterType);
 			VariableReference reference = Randomness.choice(objects);
 			return reference;
 
-		} else if (!isPrimitiveOrSimilar && !objects.isEmpty() && (reuse <= Properties.OBJECT_REUSE_PROBABILITY)) {
+		} else if (!isPrimitive && !isPrimitiveSimilar && !objects.isEmpty() && (reuse <= Properties.OBJECT_REUSE_PROBABILITY)) {
 
 			if (logger.isDebugEnabled()) {
 				logger.debug(" Choosing from {} existing objects: {}", objects.size(), Arrays.toString(objects.toArray()));
