@@ -1252,10 +1252,24 @@ public class TestCodeVisitor extends TestVisitor {
 			result += "mock(" + rawClassName + ".class, new " + ViolatedAssumptionAnswer.class.getSimpleName() + "());" + NEWLINE;
 		}
 
+		Set<String> idPrefixSet = new HashSet<>();
 		//when(...).thenReturn(...)
 		for(MethodDescriptor md : st.getMockedMethods()){
 			if(!md.shouldBeMocked()){
 				continue;
+			}
+
+			// for type class not null situation, id is constructed by method#param#actualType#index,
+			// should get params with same method#param prefix
+			String originId = md.getID();
+			String[] idParts = originId.split("#");
+			if(idParts.length >= 3) {
+				String idQuery = idParts[0] + "#" + idParts[1] + "#";
+				// if has been queried, pass
+				if(idPrefixSet.contains(idQuery)) {
+					continue;
+				}
+				idPrefixSet.add(idQuery);
 			}
 
 			List<VariableReference> params = st.getParameters(md.getID());

@@ -51,6 +51,10 @@ public class GenericMethod extends GenericAccessibleObject<GenericMethod> {
 	private static final long serialVersionUID = 6091851133071150237L;
 
 	private transient Method method;
+	/**
+	 *  actual type runtime
+	 */
+	private transient Type typeClass;
 
 	public GenericMethod(Method method, GenericClass type) {
 		super(new GenericClass(type));
@@ -70,10 +74,33 @@ public class GenericMethod extends GenericAccessibleObject<GenericMethod> {
 		Inputs.checkNull(method, type);
 	}
 
+	/**
+	 * init with particular type
+	 * @param method        function
+	 * @param type          genericClass
+	 * @param typeClass     actual
+	 */
+	public GenericMethod(Method method, GenericClass type, Type typeClass) {
+		super(new GenericClass(type));
+		this.method = method;
+		this.typeClass = typeClass;
+		Inputs.checkNull(method, type);
+	}
+
+	public void setTypeClass(Type typeClass) {
+		this.typeClass = typeClass;
+	}
+	public Type getTypeClass() {
+		return typeClass;
+	}
+
 	@Override
 	public GenericMethod copyWithNewOwner(GenericClass newOwner) {
 		GenericMethod copy = new GenericMethod(method, newOwner);
 		copyTypeVariables(copy);
+		if(getTypeClass() != null) {
+			copy.setTypeClass(getTypeClass());
+		}
 		return copy;
 	}
 
@@ -83,6 +110,9 @@ public class GenericMethod extends GenericAccessibleObject<GenericMethod> {
 		GenericClass newOwner = getOwnerClass().getGenericInstantiation(returnType.getTypeVariableMap());
 		GenericMethod copy = new GenericMethod(method, newOwner);
 		copyTypeVariables(copy);
+		if(getTypeClass() != null) {
+			copy.setTypeClass(getTypeClass());
+		}
 		return copy;
 	}
 
@@ -90,6 +120,9 @@ public class GenericMethod extends GenericAccessibleObject<GenericMethod> {
 	public GenericMethod copy() {
 		GenericMethod copy = new GenericMethod(method, new GenericClass(owner));
 		copyTypeVariables(copy);
+		if(getTypeClass() != null) {
+			copy.setTypeClass(getTypeClass());
+		}
 		return copy;
 	}
 
@@ -141,6 +174,10 @@ public class GenericMethod extends GenericAccessibleObject<GenericMethod> {
 	}
 
 	public Type getReturnType() {
+		// if having actual type, return directly
+		if(typeClass != null) {
+			return typeClass;
+		}
 		Type returnType = getExactReturnType(method, owner.getType());
 		if (returnType == null) {
 			LoggingUtils.getSmartUtLogger().info("Exact return type is null for {} with owner {}",method, owner);
