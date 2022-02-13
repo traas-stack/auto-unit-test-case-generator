@@ -393,6 +393,8 @@ public class TestClusterGenerator {
 		Set<Class<?>> tmp_targetClasses = new LinkedHashSet<>(targetClasses);
 		for (Class<?> _targetClass : tmp_targetClasses) {
 			ClassNode targetClassNode = DependencyAnalysis.getClassNode(_targetClass.getName());
+			// analyze type variable
+			DependencyAnalysis.initVariableClass(targetClassNode, _targetClass.getName());
 			Queue<InnerClassNode> innerClasses = new LinkedList<>(targetClassNode.innerClasses);
 			while (!innerClasses.isEmpty()) {
 				InnerClassNode icn = innerClasses.poll();

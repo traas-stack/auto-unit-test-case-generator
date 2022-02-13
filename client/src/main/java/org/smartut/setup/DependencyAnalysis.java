@@ -20,6 +20,11 @@
 
 package org.smartut.setup;
 
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.smartut.PackageInfo;
 import org.smartut.Properties;
 import org.smartut.Properties.Criterion;
@@ -43,7 +48,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class performs static analysis before everything else initializes
@@ -62,6 +69,16 @@ public class DependencyAnalysis {
 	private static InheritanceTree inheritanceTree = null;
 
 	private static Set<String> targetClasses = null;
+
+	/**
+	 *  record VariableClass, key: VariableClass, value: appear count
+	 */
+	private static Map<Class<?>,Integer>  targetVariableClasses = new ConcurrentHashMap<>();
+
+	/**
+	 *  record type line number, key: source code line number, value: type
+	 */
+	private static Map<Integer, Class<?>> LineToTypeMap = new ConcurrentHashMap<>();
 
 	/**
 	 * @return the inheritanceTree
@@ -315,6 +332,93 @@ public class DependencyAnalysis {
 
 		return classCache.get(className);
 
+	}
+
+	/**
+	 * init variable class by fill targetVariableClasses and LineToTypeMap data structure
+	 * @param classNode                class node to analyze
+	 * @param targetClassName          class under test
+	 */
+	public static void initVariableClass(ClassNode classNode, String targetClassName){
+		if(classNode.methods == null) {
+			return;
+		}
+		for(MethodNode methodNode: classNode.methods){
+			if(methodNode.localVariables == null) {
+				continue;
+			}
+			for(LocalVariableNode localVariableNode : methodNode.localVariables){
+				String variableClassName = localVariableNode.desc;
+				if(variableClassName.startsWith("L")){
+					variableClassName = variableClassName.replaceFirst("L","");
+				}
+				variableClassName = variableClassName.replace("/",".").replace(";","");
+				if(!variableClassName.equals(targetClassName)) {
+					// load other variables except for current class
+					try {
+						Class<?> clazz = TestGenerationContext.getInstance().getClassLoaderForSUT()
+							.loadClass(variableClassName);
+						int clazzModifiers = clazz.getModifiers();
+						if(!Modifier.isInterface(clazzModifiers)){
+							// initial count is always 1
+							targetVariableClasses.put(clazz,1);
+						}
+					} catch (Exception e) {
+					}
+				}
+			}
+
+			//add line->type
+			ListIterator<AbstractInsnNode> insnNodeIter  = methodNode.instructions.iterator();
+			int currentLine = 0;
+			int typeCount = 0;
+			while(insnNodeIter.hasNext()){
+				AbstractInsnNode insnNode = insnNodeIter.next();
+				// record line number
+				if(insnNode instanceof LineNumberNode){
+					currentLine = ((LineNumberNode) insnNode).line;
+					typeCount = 0;
+				}
+				// record type
+				if(insnNode instanceof TypeInsnNode){
+					typeCount++;
+					if(typeCount > 1) {
+						LineToTypeMap.remove(currentLine);
+					}else{
+						String type = ((TypeInsnNode) insnNode).desc;
+						type = type.replace("/", ".");
+						try {
+							Class<?> clazz = TestGenerationContext.getInstance().getClassLoaderForSUT()
+								.loadClass(type);
+							LineToTypeMap.put(currentLine, clazz);
+						} catch (Exception e) {
+						}
+					}
+				}
+			}
+
+		}
+
+		logger.warn("DependencyAnalysis targetVaribaleClasses {} ", targetVariableClasses);
+	}
+
+	public static void updateVariableClass(String className){
+		if(!targetVariableClasses.isEmpty()) {
+			Integer maxCount = targetVariableClasses.values().stream().max(Integer::compare).get();
+			for (Class<?> variableClass : targetVariableClasses.keySet()) {
+				if (variableClass.getName().equals(className)) {
+					targetVariableClasses.computeIfPresent(variableClass, (key, value) -> maxCount + 2);
+				}
+			}
+		}
+	}
+
+	public static Map<Class<?>,Integer> getVariableClasses(){
+		return targetVariableClasses;
+	}
+
+	public static Map<Integer, Class<?>> getLineToTypeMap(){
+		return LineToTypeMap;
 	}
 
 	public static Collection<ClassNode> getAllClassNodes() {

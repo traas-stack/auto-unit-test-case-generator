@@ -175,7 +175,128 @@ public class EvoInvocationListener implements InvocationListener, Serializable {
         }
 
         // 2. Handle cast case
+        return resolveReturnCastType(di);
+    }
+
+    /**
+     * get actual type when method return value has been cast explicitly
+     * @param di DescribedInvocation
+     * @return   cast type, return null if not belong to special cases
+     */
+    private Type resolveReturnCastType(DescribedInvocation di){
+        InterceptedInvocation interceptedInvocation = (InterceptedInvocation) di;
+        InvocationOnMock impl = (InvocationOnMock) di;
+        Method method = impl.getMethod();
+
+        //cast needs target_class and line
+        Pattern pattern = Pattern.compile("-> at (.*?)\\(.*:(\\d+)\\)");
+        Matcher matcher = pattern.matcher(interceptedInvocation.getLocation().toString());
+
+        Type returnType = getActualType(method);
+        if(returnType != null){
+            try {
+                if (returnType instanceof Class) {
+                    Class oldClazz = (Class) returnType;
+
+                    // do Not handle primitive cast type
+                    if(oldClazz.isPrimitive()) {
+                        return null;
+                    }
+
+                    int oldClazzModifiers = oldClazz.getModifiers();
+
+                    // locate location
+                    Integer location = null;
+                    if(matcher.find()) {
+                        String matcherClassName = matcher.group(1).substring(0,matcher.group(1).lastIndexOf("."));
+                        if(Properties.TARGET_CLASS.equals(matcherClassName)){
+                            location = Integer.valueOf(matcher.group(2));
+                        }
+                    }
+
+                    // hit location
+                    if(location!= null && DependencyAnalysis.getLineToTypeMap().containsKey(location)){
+                        // handle : 1. method is interface or abstract 2. returnType is Object
+                        if (Modifier.isInterface(oldClazzModifiers) || Modifier.isAbstract(oldClazzModifiers)
+                            || returnType.getTypeName().equals("java.lang.Object")
+                        ){
+                            Class<?> clazz = DependencyAnalysis.getLineToTypeMap().get(location);
+                            if(oldClazz.isAssignableFrom(clazz)){
+                                return clazz;
+                            }
+                        }
+                    }
+                    else {
+                        // if not hit location, random choose a value from typePool for search
+                        if (Modifier.isInterface(oldClazzModifiers) || Modifier.isAbstract(oldClazzModifiers)) {
+                            // choose from typePool
+                            Map<Type, Integer> typeChoicePool = new HashMap<>();
+                            Map<Class<?>, Integer> variableTypes = DependencyAnalysis.getVariableClasses();
+                            for (Class variableType : variableTypes.keySet()) {
+                                if (oldClazz.isAssignableFrom(variableType)) {
+                                    typeChoicePool.put(variableType, variableTypes.get(variableType));
+                                }
+                            }
+                            // add Abstract class as well
+                            if (Modifier.isAbstract(oldClazzModifiers)) {
+                                typeChoicePool.put(returnType, 1);
+                            }
+                            // random choice one
+                            if (typeChoicePool.size() > 0) {
+                                Random random = new Random();
+                                int randomIndex = random.nextInt(typeChoicePool.values().stream().reduce(0, Integer::sum)) + 1;
+                                int searchIndex = 0;
+                                for (Type type : typeChoicePool.keySet()) {
+                                    searchIndex += typeChoicePool.get(type);
+                                    if (searchIndex >= randomIndex) {
+                                        return type;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } catch (Exception ignore){
+                LoggingUtils.getSmartUtLogger().debug("ignore exception for cast resolve");
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * get runtime return value
+     * only when return value is Type Variable
+     * @param method   method to be invoked
+     * @return         runtime value
+     */
+    private Type getActualType(Method method) {
+        Type genericReturnType = method.getGenericReturnType();
+        Type actualReturnType = genericReturnType;
+        if(genericReturnType instanceof TypeVariable) {
+            Type exactType = GenericTypeReflector.getExactSuperType(GenericTypeReflector.capture(retvalType.getType()),
+                method.getDeclaringClass());
+            if(exactType != null) {
+                Map<TypeVariable<?>, Type> map = new LinkedHashMap<>();
+
+                Type tmp = exactType;
+                while (tmp instanceof ParameterizedType) {
+                    ParameterizedType paramType = (ParameterizedType) tmp;
+                    Class<?> clazz = (Class<?>) paramType.getRawType(); // getRawType should always be Class
+                    TypeVariable[] clazzRawTypeVariables = clazz.getTypeParameters();
+                    Type[] actualTypes = paramType.getActualTypeArguments();
+                    for(int i = 0; i < clazzRawTypeVariables.length; ++i) {
+                        map.put(clazzRawTypeVariables[i], actualTypes[i]);
+                    }
+                    tmp = paramType.getOwnerType();
+                }
+                actualReturnType = map.get(genericReturnType);
+            } else {
+                actualReturnType = method.getReturnType();
+            }
+        }
+        return actualReturnType;
     }
 
     /**
