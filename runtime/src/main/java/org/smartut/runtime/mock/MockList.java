@@ -108,7 +108,7 @@ public class MockList {
 			list.add(MockSimpleDateFormat.class);
 			list.add(MockSpinnerDateModel.class);
 			list.add(MockSecureRandom.class);
-			list.add(MockUUID.class);
+//			list.add(MockUUID.class);
 			// MockTimeZone, MockLocale are not actual mocks
 
 			// java.time
