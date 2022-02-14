@@ -60,7 +60,8 @@ public class ClassStateSupport {
      * @param classNames
      */
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
-		SmartUtRunner.initSmartUtClassLoader();
+		//Only smartut case uses smartutclassloader, which is set in before class
+		SmartUtRunner.useSmartUtClassLoader();
 		boolean problem = false;
 
 		List<Class<?>> classes = loadClasses(classLoader, classNames);

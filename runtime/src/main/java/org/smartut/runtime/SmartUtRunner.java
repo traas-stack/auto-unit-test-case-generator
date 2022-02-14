@@ -65,13 +65,13 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
     public static boolean useClassLoader = true;
 
     /**
-     * key:加载的case name
-     * value:对应的case生成的smartUtClassloader
+     * key:loaded case name
+     * value:case build smartutclassloader object
      */
     public static final Map<String,SmartUtClassLoader> smartUtClassLoaderMap = new HashMap<>();
     /**
-     * key:线程id
-     * value:线程对应的contextClassloader
+     * key:Thread id
+     * value:contextClassloader corresponding to thread
      */
     public static final Map<Long,ClassLoader> resetClassLoaderMap = new HashMap<>();
 
@@ -149,7 +149,7 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
 
             SmartUtClassLoader classLoader = new SmartUtClassLoader();
             classLoader.skipInstrumentation(clazz.getName());
-            //记录对应的SmartUtClassLoader
+            //Record the corresponding SmartUtClassLoader
             smartUtClassLoaderMap.put(clazz.getName(), classLoader);
             RuntimeSettings.caseName = clazz.getName();
             if (!resetClassLoaderMap.containsKey(Thread.currentThread().getId()))
@@ -161,12 +161,18 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
         }
     }
 
-    public static void initSmartUtClassLoader(){
+    /**
+     * use smartut classloader
+     */
+    public static void useSmartUtClassLoader(){
         if(RuntimeSettings.useSeparateClassLoader && useClassLoader) {
            Thread.currentThread().setContextClassLoader(smartUtClassLoaderMap.get(RuntimeSettings.caseName));
         }
     }
 
+    /**
+     * reset thread classloader
+     */
     public static void resetSmartUtClassLoader(){
         if(RuntimeSettings.useSeparateClassLoader && useClassLoader) {
             Thread.currentThread().setContextClassLoader(resetClassLoaderMap.get(Thread.currentThread().getId()));
