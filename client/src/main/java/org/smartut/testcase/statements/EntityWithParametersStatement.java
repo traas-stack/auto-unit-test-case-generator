@@ -106,9 +106,9 @@ public abstract class EntityWithParametersStatement extends AbstractStatement{
     }
 
     /**
-     * Dangerous! 直接修改parameters非常危险，尽量不使用
-     * 如果仅仅是遍历，从getParameterReferences方法获取
-     * 修改需要注意数据对齐
+     * Dangerous! modify parameters directly is very dangerous，do NOT use this unless necessarily
+     * If iterator only，get from ParameterReferences method
+     * Take care of data inline when modified
      * @return parameters list
      */
     public List<VariableReference> getParameterReferencesModifier() {
