@@ -108,7 +108,7 @@ public class RuntimeInstrumentation {
 		return false;
 	}
 
-	public byte[] transformBytes(ClassLoader classLoader, String className,
+	public byte[] transformBytes(String className,
 			ClassReader reader, boolean skipInstrumentation) {
 
 		String classNameWithDots = className.replace('/', '.');
@@ -157,6 +157,35 @@ public class RuntimeInstrumentation {
 			cn.accept(cv);
 		} catch (Throwable ex) {
 			logger.error("Error while instrumenting class "+className+": "+ex.getMessage(),ex);
+		}
+
+		return writer.toByteArray();
+	}
+
+	public byte[] transformJsonBytes(String className,
+									 ClassReader reader) {
+		int asmFlags = ClassWriter.COMPUTE_FRAMES;
+		ClassWriter writer = new ComputeClassWriter(asmFlags);
+
+		ClassVisitor cv = writer;
+
+		if (RuntimeSettings.jsonInstrumentationClass && !retransformingMode) {
+			CreateClassResetClassAdapter resetClassAdapter = new CreateClassResetClassAdapter(cv, className, true);
+			cv = resetClassAdapter;
+		}
+
+		ClassNode cn = new AnnotatedClassNode();
+
+		int readFlags = ClassReader.SKIP_FRAMES;
+		reader.accept(cn, readFlags);
+
+
+		cv = new JSRInlinerClassVisitor(cv);
+
+		try {
+			cn.accept(cv);
+		} catch (Throwable ex) {
+			logger.error("Error while instrumenting class {} : {}",className,ex.getMessage(),ex);
 		}
 
 		return writer.toByteArray();

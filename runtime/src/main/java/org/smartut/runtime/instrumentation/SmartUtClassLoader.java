@@ -24,8 +24,12 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import org.smartut.runtime.RuntimeSettings;
+import org.smartut.runtime.SmartUtRunner;
+import org.smartut.runtime.constants.InstrumentType;
 import org.smartut.runtime.util.Inputs;
 import org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
@@ -41,6 +45,7 @@ public class SmartUtClassLoader extends ClassLoader {
 	private final ClassLoader classLoader;
 	private final Map<String, Class<?>> classes = new HashMap<>();
 	private final Set<String> skipInstrumentationForPrefix = new HashSet<>();
+	private final String JSON_PREFIX="com.alibaba.fastjson.";
 
 	public SmartUtClassLoader() {
 		this(new RuntimeInstrumentation());
@@ -73,61 +78,70 @@ public class SmartUtClassLoader extends ClassLoader {
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		if ("<smartut>".equals(name))
 			throw new ClassNotFoundException();
-
-		//first check if already loaded
-		if (!RuntimeInstrumentation.checkIfCanInstrument(name)) {
-			Class<?> result = findLoadedClass(name);
-			if (result != null) {
-				return result;
-			}
-			result = classLoader.loadClass(name);
-			return result;
-		}
-		
 		Class<?> result = classes.get(name);
-		if (result != null) {
+		if (Objects.nonNull(result)) {
 			return result;
-		} else {
-			logger.info("Seeing class for first time: " + name);
-			Class<?> instrumentedClass = instrumentClass(name);
-			return instrumentedClass;
+		} else if (RuntimeInstrumentation.checkIfCanInstrument(name)) {
+			return normalInstrumentClass(name);
+		} else if (RuntimeSettings.jsonInstrumentationClass && name.startsWith(JSON_PREFIX)) {
+			return instrumentClass(name,InstrumentType.JSON);
 		}
-
+		result = findLoadedClass(name);
+		if (Objects.nonNull(result)) {
+			return result;
+		}
+		result = classLoader.loadClass(name);
+		return result;
 	}
 
+	private Class<?> normalInstrumentClass(String name) throws ClassNotFoundException{
+		if (Thread.currentThread().getContextClassLoader() == null)
+			Thread.currentThread().setContextClassLoader(SmartUtRunner.smartUtClassLoaderMap.get(RuntimeSettings.caseName));
+		logger.info("Seeing class for first time: " + name);
+		return instrumentClass(name,InstrumentType.NORMAL);
+	}
 
-	private Class<?> instrumentClass(String fullyQualifiedTargetClass)
+	private Class<?> instrumentClass(String fullyQualifiedTargetClass, InstrumentType type)
 	        throws ClassNotFoundException {
-		logger.info("Instrumenting class '" + fullyQualifiedTargetClass + "'.");
-		
+		logger.info("Instrumenting class '{}'", fullyQualifiedTargetClass);
 		InputStream is = null;
 		try {
 			String className = fullyQualifiedTargetClass.replace('.', '/');
 			is = classLoader.getResourceAsStream(className + ".class");
-			
-			if (is == null) {
+			if (Objects.isNull(is)) {
 				throw new ClassNotFoundException("Class '" + className + ".class"
 						+ "' should be in target project, but could not be found!");
 			}
-			boolean shouldSkip = skipInstrumentationForPrefix.stream().anyMatch(s -> fullyQualifiedTargetClass.startsWith(s));
-			byte[] byteBuffer = instrumentation.transformBytes(this, className,
-			                                                   new ClassReader(is), shouldSkip);
 			createPackageDefinition(fullyQualifiedTargetClass);
+			byte[] byteBuffer = instrumentByte(fullyQualifiedTargetClass, className, type, is);
 			Class<?> result = defineClass(fullyQualifiedTargetClass, byteBuffer, 0,
-			                              byteBuffer.length);
+					byteBuffer.length);
 			classes.put(fullyQualifiedTargetClass, result);
-			logger.info("Keeping class: " + fullyQualifiedTargetClass);
+			logger.info("Keeping class: {}", fullyQualifiedTargetClass);
 			return result;
 		} catch (Throwable t) {
-			logger.info("Error while loading class: "+t);
+			logger.info("Error while loading class: " + t);
 			throw new ClassNotFoundException(t.getMessage(), t);
 		} finally {
-			if(is != null)
+			if (is != null)
 				try {
 					is.close();
 				} catch (IOException e) {
 					throw new Error(e);
 				}
+		}
+	}
+
+	private byte[] instrumentByte(String fullyQualifiedTargetClass,String className,InstrumentType type,InputStream is) throws Exception{
+		switch (type) {
+			case JSON:
+				return instrumentation.transformJsonBytes(className, new ClassReader(is));
+			case NORMAL:
+				boolean shouldSkip = skipInstrumentationForPrefix.stream().anyMatch(fullyQualifiedTargetClass::startsWith);
+				return instrumentation.transformBytes(className, new ClassReader(is), shouldSkip);
+			default:
+				throw new ClassNotFoundException("Class '" + className + ".class"
+						+ "' should be in target project, but could not be found!");
 		}
 	}
 

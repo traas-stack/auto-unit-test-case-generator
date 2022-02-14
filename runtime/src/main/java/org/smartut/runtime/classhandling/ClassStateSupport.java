@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.smartut.runtime.LoopCounter;
 import org.smartut.runtime.RuntimeSettings;
+import org.smartut.runtime.SmartUtRunner;
 import org.smartut.runtime.agent.InstrumentingAgent;
 import org.smartut.runtime.instrumentation.InstrumentedClass;
 import org.smartut.runtime.sandbox.Sandbox;
@@ -59,7 +60,7 @@ public class ClassStateSupport {
      * @param classNames
      */
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
-
+		SmartUtRunner.initSmartUtClassLoader();
 		boolean problem = false;
 
 		List<Class<?>> classes = loadClasses(classLoader, classNames);
@@ -137,6 +138,7 @@ public class ClassStateSupport {
 		for (String classNameToReset : classNames) {
 			ClassResetter.getInstance().reset(classNameToReset);
 		}
+		SmartUtRunner.resetSmartUtClassLoader();
 	}
 
 

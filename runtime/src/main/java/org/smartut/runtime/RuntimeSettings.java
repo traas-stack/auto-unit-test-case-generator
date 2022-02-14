@@ -38,6 +38,11 @@ public class RuntimeSettings {
      */
     public static String className = "unknown";
 
+    public static String caseName = "unknown";
+
+    public static boolean jsonInstrumentationClass = true;
+
+
     /**
      * Shall the test cases use the mocking framework to remove non-determinism like
      * CPU clock?

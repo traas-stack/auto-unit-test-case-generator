@@ -20,8 +20,10 @@
 package org.smartut.runtime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.smartut.annotations.SmartUtTest;
@@ -61,6 +63,17 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
      * work together with -measureCoverage
      */
     public static boolean useClassLoader = true;
+
+    /**
+     * key:加载的case name
+     * value:对应的case生成的smartUtClassloader
+     */
+    public static final Map<String,SmartUtClassLoader> smartUtClassLoaderMap = new HashMap<>();
+    /**
+     * key:线程id
+     * value:线程对应的contextClassloader
+     */
+    public static final Map<Long,ClassLoader> resetClassLoaderMap = new HashMap<>();
 
     public SmartUtRunner(Class<?> klass)
             throws InitializationError {
@@ -136,10 +149,27 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
 
             SmartUtClassLoader classLoader = new SmartUtClassLoader();
             classLoader.skipInstrumentation(clazz.getName());
-            Thread.currentThread().setContextClassLoader(classLoader);
+            //记录对应的SmartUtClassLoader
+            smartUtClassLoaderMap.put(clazz.getName(), classLoader);
+            RuntimeSettings.caseName = clazz.getName();
+            if (!resetClassLoaderMap.containsKey(Thread.currentThread().getId()))
+                resetClassLoaderMap.put(Thread.currentThread().getId(), Thread.currentThread().getContextClassLoader());
+//            Thread.currentThread().setContextClassLoader(classLoader);
             return Class.forName(clazz.getName(), true, classLoader);
         } catch (ClassNotFoundException e) {
             throw new InitializationError(e);
+        }
+    }
+
+    public static void initSmartUtClassLoader(){
+        if(RuntimeSettings.useSeparateClassLoader && useClassLoader) {
+           Thread.currentThread().setContextClassLoader(smartUtClassLoaderMap.get(RuntimeSettings.caseName));
+        }
+    }
+
+    public static void resetSmartUtClassLoader(){
+        if(RuntimeSettings.useSeparateClassLoader && useClassLoader) {
+            Thread.currentThread().setContextClassLoader(resetClassLoaderMap.get(Thread.currentThread().getId()));
         }
     }
 
