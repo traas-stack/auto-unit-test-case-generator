@@ -111,6 +111,14 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
     protected final List<MethodDescriptor> mockedMethods;
 
     /**
+     * return mock method parameter map related to this statement
+     * @return
+     */
+    public Map<String, int[]> getMethodParameters() {
+        return methodParameters;
+    }
+
+    /**
      * key -> MethodDescriptor id,
      * Value -> min,max  inclusive of indices on super.parameters
      */

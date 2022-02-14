@@ -105,6 +105,16 @@ public abstract class EntityWithParametersStatement extends AbstractStatement{
         return Collections.unmodifiableList(parameters);
     }
 
+    /**
+     * Dangerous! 直接修改parameters非常危险，尽量不使用
+     * 如果仅仅是遍历，从getParameterReferences方法获取
+     * 修改需要注意数据对齐
+     * @return parameters list
+     */
+    public List<VariableReference> getParameterReferencesModifier() {
+        return parameters;
+    }
+
     /* (non-Javadoc)
 	 * @see org.smartut.testcase.StatementInterface#replace(org.smartut.testcase.VariableReference, org.smartut.testcase.VariableReference)
 	 */
