@@ -72,10 +72,10 @@ public class ClassStateSupport {
      */
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
 
-		// initializeClasses有可能卡住，使用线程池且增加超时控制
-		// 兼容：最开始设置classloader，reset时不需要显式调用
+		// initializeClasses may block, use thread pool and increase timeout control
+		// Compatibility: set classloader at the beginning, and no explicit call is required during reset
 		ClassResetter.getInstance().setClassLoader(classLoader);
-		//被测类加入需要init的数组中
+		// Add the tested class to the array that needs init
 		String[] classNamesWithCUT = addCutName(classNames);
 
 		Callable<Boolean> call = () -> {
