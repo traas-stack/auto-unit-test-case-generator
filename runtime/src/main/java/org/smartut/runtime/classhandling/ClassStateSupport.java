@@ -57,9 +57,7 @@ public class ClassStateSupport {
 	private static final long INIT_CLASS_TIME_OUT = 3L;
 
 	private static final ExecutorService exec = Executors.newFixedThreadPool(3);
-	/**
-	 * 记录被初始化的classes, 用于reset classes使用
-	 */
+
 	private static final List<String> initializedClasses = new ArrayList<>();
     /**
      * Load all the classes with given name with the provided input classloader.
@@ -81,7 +79,7 @@ public class ClassStateSupport {
 		String[] classNamesWithCUT = addCutName(classNames);
 
 		Callable<Boolean> call = () -> {
-			//开始执行init操作
+			//Start init
 			boolean problem = false;
 
 			List<Class<?>> classes = loadClasses(classLoader, classNamesWithCUT);
@@ -90,7 +88,7 @@ public class ClassStateSupport {
 			if(RuntimeSettings.isUsingAnyMocking()) {
 				problem =classes.stream().filter(Class::isInterface).anyMatch(clazz->!InstrumentedClass.class.isAssignableFrom(clazz));
 			}
-			// 在最后记录initializedClasses
+			// Record initializedClasses at the end
 			initializedClasses.addAll(Arrays.asList(classNames));
 
 			return problem;
@@ -98,7 +96,7 @@ public class ClassStateSupport {
 
 		try {
 			Future<Boolean> result = exec.submit(call);
-			// 设定超时时间
+			// Set timeout
 			Boolean obj = result.get(INIT_CLASS_TIME_OUT, TimeUnit.SECONDS);
 			return obj;
 		} catch (TimeoutException e) {

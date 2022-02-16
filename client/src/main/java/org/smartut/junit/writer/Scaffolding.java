@@ -384,7 +384,7 @@ public class Scaffolding {
 					&& (name.endsWith(Properties.JUNIT_SUFFIX) || name.endsWith(Properties.SCAFFOLDING_SUFFIX))) {
 				continue;
 			}
-  	// todo 使用separateClassloader还是否需要记录init mock class
+  	// todo Do you also need to record init mock class when using separateclassloader
 
 			classes.add(name);
 
@@ -401,7 +401,7 @@ public class Scaffolding {
 
 //		List<String> allInstrumentedClasses = TestGenerationContext.getInstance().getClassLoaderForSUT()
 //				.getViewOfInstrumentedClasses();
-		//todo 使用separateClassloader initializeClasses数组为空
+		// initializeClasses array using separateclassloader is empty
 //		List<String> classesToInit = getClassesToInit(allInstrumentedClasses);
 
 		bd.append("\n");
