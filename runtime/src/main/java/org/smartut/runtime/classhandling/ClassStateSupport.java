@@ -59,15 +59,15 @@ public class ClassStateSupport {
 	private static final long INIT_CLASS_TIME_OUT = 3L;
 
 	//The initialized class is cached and used when reset
-	private static final List<String> initializedClasses = new ArrayList<>();
+	private static final List<String> INITIALIZED_CLASSES = new ArrayList<>();
 
 	//Classes containing these are not reset
-	private static final List<String> notResetClassContains = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil");
+	private static final List<String> NOT_RESET_CLASS_CONTAINS = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil");
 
 	//Classes ending with these Strings are not reset
-	private static final List<String> notResetClassSuffix = Arrays.asList("_SSTest", "scaffolding");
+	private static final List<String> NOT_RESET_CLASS_SUFFIX = Arrays.asList("_SSTest", "scaffolding");
 
-	private static final String[] externalInitMethods = new String[] {"$jacocoInit", "$gzoltarInit"};
+	private static final String[] EXTERNAL_INIT_METHODS = new String[] {"$jacocoInit", "$gzoltarInit"};
 
     /**
      * Load all the classes with given name with the provided input classloader.
@@ -127,7 +127,7 @@ public class ClassStateSupport {
 	 */
 	private static void initialiseExternalTools(ClassLoader classLoader, List<Class<?>> classes) {
 
-		for (String externalInitMethod : externalInitMethods) {
+		for (String externalInitMethod : EXTERNAL_INIT_METHODS) {
 			for(Class<?> clazz : classes) {
 				try {
 					Method initMethod = clazz.getDeclaredMethod(externalInitMethod);
@@ -207,13 +207,12 @@ public class ClassStateSupport {
 
 	/**
 	 * The class that needs to be reset
-	 * 1.The class passed in by initializeClasses, in the separateClassloader version, the class passed in by initializeClasses is empty
+	 * 1.The class passed in by initializeClasses, in the separateClassloader version, the class passed in by INITIALIZED_CLASSES is empty
 	 * 2.Use the class of ClassResetter.classloader (filter out the class in excluded.class)
 	 * @return
 	 */
 	private static List<String> getLoadedClassesNeedReset(){
-		List<String> needResetClasses = new ArrayList<>();
-		needResetClasses.addAll(initializedClasses);
+		List<String> needResetClasses = new ArrayList<>(INITIALIZED_CLASSES);
 		try {
 			//Get class using ClassResetter.classloader
 			needResetClasses.addAll(getClassloaderLoadClasses()
@@ -221,10 +220,10 @@ public class ClassStateSupport {
 					//(filter out interfaces)
 					.filter(Class::isInterface)
 					.map(Class::getName)
-					//According to the class name, filter out names that contain notResetClassContains
-					.filter(oneClassName->notResetClassContains.stream().anyMatch(oneClassName::contains)
-							//According to the class name, filter out the class ending with notResetClassSuffix in the name
-							||notResetClassSuffix.stream().anyMatch(oneClassName::endsWith)
+					//According to the class name, filter out names that contain NOT_RESET_CLASS_CONTAINS
+					.filter(oneClassName->NOT_RESET_CLASS_CONTAINS.stream().anyMatch(oneClassName::contains)
+							//According to the class name, filter out the class ending with NOT_RESET_CLASS_SUFFIX in the name
+							||NOT_RESET_CLASS_SUFFIX.stream().anyMatch(oneClassName::endsWith)
 							//Filter the classes in excluded.class according to the class name
 							|| ExcludedClasses.getPackagesShouldNotBeInstrumented().stream().anyMatch(oneClassName::startsWith))
 					.collect(Collectors.toList()));
