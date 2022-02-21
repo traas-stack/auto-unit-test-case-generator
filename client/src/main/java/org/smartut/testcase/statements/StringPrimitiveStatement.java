@@ -30,8 +30,10 @@ import org.smartut.Properties;
 import org.smartut.seeding.ConstantPool;
 import org.smartut.seeding.ConstantPoolManager;
 import org.smartut.testcase.TestCase;
+import org.smartut.testcase.TestFactory;
 import org.smartut.testcase.execution.CodeUnderTestException;
 import org.smartut.testcase.execution.Scope;
+import org.smartut.utils.CallUtil;
 import org.smartut.utils.Randomness;
 
 /**
@@ -178,6 +180,15 @@ public class StringPrimitiveStatement extends PrimitiveStatement<String> {
 		value = s;
 	}
 
+	@Override
+	public boolean mutate(TestCase test, TestFactory factory) {
+		return Boolean.TRUE.equals(CallUtil.call(Properties.STATEMENT_PLUGIN, "mutate", this, test, factory));
+	}
+
+	public boolean supperMutate(TestCase test, TestFactory factory) {
+		return super.mutate(test, factory);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.smartut.testcase.PrimitiveStatement#randomize()
 	 */
@@ -194,7 +205,9 @@ public class StringPrimitiveStatement extends PrimitiveStatement<String> {
 			else
 				value = Randomness.nextString(Randomness.nextInt(Properties.STRING_LENGTH));
 		}
+		CallUtil.call(Properties.STATEMENT_PLUGIN, "randomize", this);
 	}
+
 
 	@Override
 	public Throwable execute(Scope scope, PrintStream out)

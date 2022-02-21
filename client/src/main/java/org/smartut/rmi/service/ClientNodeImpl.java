@@ -36,7 +36,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.smartut.*;
-import org.smartut.Properties.NoSuchParameterException;
+import org.smartut.config.PropertiesLoader.NoSuchParameterException;
 import org.smartut.classpath.ClassPathHandler;
 import org.smartut.coverage.ClassStatisticsPrinter;
 import org.smartut.ga.Chromosome;

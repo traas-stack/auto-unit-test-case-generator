@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author Gordon Fraser
  */
-public class Properties {
+public class Properties extends AdaptedProperties {
 
 	private final static Logger logger = LoggerFactory.getLogger(Properties.class);
 
@@ -216,7 +216,7 @@ public class Properties {
 	public static int MAX_DELTA = 20;
 
 	@Parameter(key = "random_perturbation", group = "Test Creation", description = "Probability to replace a primitive with a random new value rather than adding a delta")
-	public static double RANDOM_PERTURBATION = 0.2;
+	public static double RANDOM_PERTURBATION = 0.85;
 
 	@Parameter(key = "max_array", group = "Test Creation", description = "Maximum length of randomly generated arrays")
 	public static int MAX_ARRAY = 10;
@@ -2229,20 +2229,6 @@ public class Properties {
 		if (instance == null)
 			instance = new Properties(true, true);
 		return instance;
-	}
-
-	/**
-	 * This exception is used when a non-existent parameter is accessed
-	 *
-	 *
-	 */
-	public static class NoSuchParameterException extends Exception {
-
-		private static final long serialVersionUID = 9074828392047742535L;
-
-		public NoSuchParameterException(String key) {
-			super("No such property defined: " + key);
-		}
 	}
 
 	private static void setClassPrefix() {

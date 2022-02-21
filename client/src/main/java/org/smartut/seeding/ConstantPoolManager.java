@@ -23,6 +23,9 @@ package org.smartut.seeding;
 import org.smartut.Properties;
 import org.smartut.utils.Randomness;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author Gordon Fraser
  * 
@@ -34,10 +37,13 @@ public class ConstantPoolManager {
 	private ConstantPool[] pools;
 	private double[] probabilities;
 
+	private List<ConstantPool> customizedPools = new LinkedList<>();
 	/*
 	 * We treat it in a special way, for now, just for making experiments
 	 * easier to run
 	 */
+	private static final int SUT_POOL_INDEX = 0;
+	private static final int NON_SUT_POOL_INDEX = 1;
 	private static final int DYNAMIC_POOL_INDEX = 2;
 
 	private ConstantPoolManager() {
@@ -89,16 +95,21 @@ public class ConstantPoolManager {
 	 */
 
 	public void addSUTConstant(Object value) {
-		pools[0].add(value);
+		pools[SUT_POOL_INDEX].add(value);
 	}
 
 	public void addNonSUTConstant(Object value) {
-		pools[1].add(value);
+		pools[NON_SUT_POOL_INDEX].add(value);
 	}
 
 	public void addDynamicConstant(Object value) {
 		pools[DYNAMIC_POOL_INDEX].add(value);
 	}
+
+	public ConstantPool getSUTConstantPool() {
+		return pools[SUT_POOL_INDEX];
+	}
+
 
 	public ConstantPool getConstantPool() {
 		double p = Randomness.nextDouble();
@@ -122,4 +133,16 @@ public class ConstantPoolManager {
 	public void reset() {
 		init();
 	}
+
+	public void addCustomizedPool(ConstantPool customizedPool, int index){
+		customizedPools.add(index, customizedPool);
+	}
+
+	public ConstantPool getCustomizedPool(int index){
+		if (customizedPools.size() > index){
+			return customizedPools.get(index);
+		}
+		return null;
+	}
+
 }

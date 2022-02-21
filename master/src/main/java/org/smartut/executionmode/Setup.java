@@ -28,7 +28,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.smartut.SmartUt;
 import org.smartut.Properties;
-import org.smartut.Properties.NoSuchParameterException;
+import org.smartut.config.PropertiesLoader.NoSuchParameterException;
 import org.smartut.utils.LoggingUtils;
 
 public class Setup {

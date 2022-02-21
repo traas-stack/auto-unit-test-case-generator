@@ -21,7 +21,7 @@ package org.smartut;
 
 import static org.junit.Assert.fail;
 
-import org.smartut.Properties.NoSuchParameterException;
+import org.smartut.config.PropertiesLoader.NoSuchParameterException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
