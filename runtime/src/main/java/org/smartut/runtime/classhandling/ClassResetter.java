@@ -146,10 +146,9 @@ public class ClassResetter {
 		}
 
 		boolean safe = Sandbox.isSafeToExecuteSUTCode();
-		//beforeClass【initializeSecurityManagerForSUT】时会初始化manage，在AfterClass ResetClass之后【resetDefaultSecurityManager】会把manage设置为空
-		//所以ResetClass时manage应该不为null
-		//ExecutingTestCase在Before【goingToExecuteSUTCode】设置为true，在After【doneWithExecutingSUTCode】设置为false
-		//由于每次After时进行resetCut，最后AfterClass才进行resetClass，所以最后resetClass时并没有executeTestCase，取消对应校验
+		//manage should not be null when ResetClass
+		// resetCut is performed every time After, and resetClass is performed at the end of AfterClass,
+		// there is no executeTestCase at the last resetClass, and the corresponding verification is cancelled.
 		if (Sandbox.isSecurityManagerInitialized()) {
 			InstrumentingAgent.activate();
 			org.smartut.runtime.Runtime.getInstance().resetRuntime();

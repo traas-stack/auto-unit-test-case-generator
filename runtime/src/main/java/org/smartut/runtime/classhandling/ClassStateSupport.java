@@ -55,16 +55,16 @@ public class ClassStateSupport {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClassStateSupport.class);
 
-	//新增resetClasses的时间控制
+	//Added time control for resetClasses
 	private static final long INIT_CLASS_TIME_OUT = 3L;
 
-	//初始化的class进行缓存，reset时使用
+	//The initialized class is cached and used when reset
 	private static final List<String> initializedClasses = new ArrayList<>();
 
-	//包含这些的class不进行reset
+	//Classes containing these are not reset
 	private static final List<String> notResetClassContains = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil");
 
-	//以这些String结尾的class不进行reset
+	//Classes ending with these Strings are not reset
 	private static final List<String> notResetClassSuffix = Arrays.asList("_SSTest", "scaffolding");
 
 	private static final String[] externalInitMethods = new String[] {"$jacocoInit", "$gzoltarInit"};
@@ -155,10 +155,10 @@ public class ClassStateSupport {
 	 *
 	 */
 	public static void resetClasses() {
-//		有可能卡住，reset classes增加超时控制
+//		It is possible to get stuck, reset classes increase timeout control
 		final ExecutorService exec = Executors.newFixedThreadPool(1);
 		Callable call = () -> {
-			// 把initClasses的类进行reset
+			// Reset the class of initClasses
 				for(String initializedClassName : getLoadedClassesNeedReset()) {
 					if(initializedClassName.isEmpty()) {
 						continue;
@@ -170,7 +170,7 @@ public class ClassStateSupport {
 
 		try {
 			Future result = exec.submit(call);
-			// 设定超时时间 3s超时
+			// Set the timeout time 3s
 			result.get(INIT_CLASS_TIME_OUT, TimeUnit.SECONDS);
 		} catch (TimeoutException e) {
 			logger.warn("reset classes are timeout, time out seconds is {}", INIT_CLASS_TIME_OUT);
@@ -206,26 +206,26 @@ public class ClassStateSupport {
 	}
 
 	/**
-	 * 需要进行reset的class
-	 * 1.initializeClasses传人的class，在separateClassloader版本中initializeClasses传人的class为空
-	 * 2.使用ClassResetter.classloader的class(过滤掉excluded.class中的class)
+	 * The class that needs to be reset
+	 * 1.The class passed in by initializeClasses, in the separateClassloader version, the class passed in by initializeClasses is empty
+	 * 2.Use the class of ClassResetter.classloader (filter out the class in excluded.class)
 	 * @return
 	 */
 	private static List<String> getLoadedClassesNeedReset(){
 		List<String> needResetClasses = new ArrayList<>();
 		needResetClasses.addAll(initializedClasses);
 		try {
-			//获取使用ClassResetter.classloader的class
+			//Get class using ClassResetter.classloader
 			needResetClasses.addAll(getClassloaderLoadClasses()
 					.stream()
-					//(过滤掉接口)
+					//(filter out interfaces)
 					.filter(Class::isInterface)
 					.map(Class::getName)
-					//根据class名字，过滤掉名字中包含notResetClassContains
+					//According to the class name, filter out names that contain notResetClassContains
 					.filter(oneClassName->notResetClassContains.stream().anyMatch(oneClassName::contains)
-							//根据class名字，过滤掉名字中以notResetClassSuffix结尾的class
+							//According to the class name, filter out the class ending with notResetClassSuffix in the name
 							||notResetClassSuffix.stream().anyMatch(oneClassName::endsWith)
-							//根据class名字，过滤excluded.class中的class
+							//Filter the classes in excluded.class according to the class name
 							|| ExcludedClasses.getPackagesShouldNotBeInstrumented().stream().anyMatch(oneClassName::startsWith))
 					.collect(Collectors.toList()));
 		} catch (Exception e) {
@@ -234,7 +234,7 @@ public class ClassStateSupport {
 	}
 
 	/**
-	 * 针对当前被测class进行reset
+	 * Reset the current class under test
 	 */
 	public static void resetCUT() {
 		ClassResetter.getInstance().reset(RuntimeSettings.className);

@@ -344,7 +344,7 @@ public class Scaffolding {
 
 		if (classesToReset.size() != 0) {
 
-			//修改为在beforeClass-initializeClasses时setClassLoader
+			//Modified to setClassLoader when beforeClass-initializeClasses
 //			bd.append(BLOCK_SPACE);
 //			bd.append(ClassResetter.class.getName() + ".getInstance().setClassLoader(");
 //			bd.append(testClassName + ".class.getClassLoader()); \n\n");
@@ -352,7 +352,7 @@ public class Scaffolding {
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName() + ".resetClasses(");
 
-			//需要reset的class不列在Scaffolding-resetClasses里
+			//Classes that need to be reset are not listed in Scaffolding-resetClasses
 //			for (int i = 0; i < classesToReset.size(); i++) {
 //				String className = classesToReset.get(i);
 //				bd.append("\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
@@ -490,8 +490,8 @@ public class Scaffolding {
 			bd.append(BLOCK_SPACE);
 			bd.append(JDKClassResetter.class.getName() + ".reset(); \n");
 
-			//增加resetCUT方法，每个用例执行完后reset被测类static reset方法
-			//不reset所有的class 减少执行时间
+			//Add the resetCUT method, reset the static reset method of the class under test after each use case is executed
+			//Do not reset all classes to reduce execution time
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName()).append(".resetCUT(); \n");
 //			bd.append("resetClasses(); \n");
@@ -626,7 +626,7 @@ public class Scaffolding {
 			bd.append(METHOD_SPACE);
 			bd.append("public static void clearSmartUtFramework(){ \n");
 
-			//在所有用例执行完毕，才针对于所有class进行reset
+			//After all use cases are executed, reset is performed for all classes
 			bd.append(BLOCK_SPACE);
 			bd.append("resetClasses(); \n");
 
