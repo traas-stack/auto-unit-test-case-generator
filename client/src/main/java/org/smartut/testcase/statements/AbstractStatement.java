@@ -99,6 +99,11 @@ public abstract class AbstractStatement implements Statement, Serializable {
 	protected Set<Assertion> assertions = new LinkedHashSet<>();
 
 	protected String comment = "";
+
+	/**
+	 *  Whether the statement could be deleted when mutated
+	 */
+	protected boolean couldMutateDelete = true;
 	
 	/**
 	 * <p>
@@ -477,6 +482,7 @@ public abstract class AbstractStatement implements Statement, Serializable {
 		Statement result = copy(newTestCase, 0);
 		result.getReturnValue().setOriginalCode(retval.getOriginalCode());
 		result.addComment(getComment());
+		result.setCouldMutationDelete(this.couldMutateDelete);
 		return result;
 	}
 
@@ -501,5 +507,15 @@ public abstract class AbstractStatement implements Statement, Serializable {
 	@Override
 	public boolean isReflectionStatement() {
 		return false;
+	}
+
+	@Override
+	public boolean couldMutateDelete() {
+		return this.couldMutateDelete;
+	}
+
+	@Override
+	public void setCouldMutationDelete(boolean couldMutateDelete) {
+		this.couldMutateDelete = couldMutateDelete;
 	}
 }

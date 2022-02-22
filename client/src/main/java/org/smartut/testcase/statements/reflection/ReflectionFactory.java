@@ -19,6 +19,7 @@
  */
 package org.smartut.testcase.statements.reflection;
 
+import org.smartut.Properties;
 import org.smartut.runtime.Reflection;
 import org.smartut.utils.Randomness;
 
@@ -26,7 +27,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class used to get private fields/methods to construct statements in the generated tests
@@ -38,6 +41,7 @@ public class ReflectionFactory {
     private final Class<?> target;
     private final List<Field> fields;
     private final List<Method> methods;
+    private Map<Method, Integer> methodsInvokeMap = new LinkedHashMap<>();
 
 
     public ReflectionFactory(Class<?> target) throws IllegalArgumentException{
@@ -114,11 +118,46 @@ public class ReflectionFactory {
         if(methods.isEmpty()){
             throw new IllegalStateException("No private method");
         }
-        return Randomness.choice(methods);
+        // first choose method has not been invoked
+        List<Method> noneInvokeList = new ArrayList<>();
+        for(Method method : methods) {
+            if(!methodsInvokeMap.containsKey(method) || methodsInvokeMap.get(method) == 0) {
+                noneInvokeList.add(method);
+            }
+        }
+        if(noneInvokeList.size() > 0) {
+            Method method = Randomness.choice(noneInvokeList);
+            methodsInvokeMap.put(method, methodsInvokeMap.getOrDefault(method, 0) + 1);
+            return method;
+        }
+        Method method = Randomness.choice(methods);
+        methodsInvokeMap.put(method, methodsInvokeMap.getOrDefault(method, 0) + 1);
+        return method;
     }
 
     public Class<?> getReflectedClass(){
         return target;
+    }
+
+    public List<Field> getFields() {
+        return this.fields;
+    }
+
+    public List<Method> getMethods() {
+        return this.methods;
+    }
+
+    public boolean hasPrivateMethods(){
+        return !methods.isEmpty();
+    }
+
+    public boolean doesTargetMethodExists(){
+        for(Method method : methods){
+            if(method.getName().equals(Properties.TARGET_METHOD)){
+                return true;
+            }
+        }
+        return false;
     }
 }
 

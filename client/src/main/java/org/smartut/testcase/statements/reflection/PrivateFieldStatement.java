@@ -36,6 +36,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +61,8 @@ public class PrivateFieldStatement extends MethodStatement {
 
     private boolean isStaticField = false;
 
+    private transient Type fieldType;
+
     static {
         try {
             //Class<T> klass, T instance, String fieldName, Object value
@@ -71,22 +74,33 @@ public class PrivateFieldStatement extends MethodStatement {
     }
 
     public PrivateFieldStatement(TestCase tc, Class<?> klass , String fieldName, VariableReference callee, VariableReference param)
-            throws NoSuchFieldException, IllegalArgumentException, ConstructionFailedException {
+        throws NoSuchFieldException, IllegalArgumentException, ConstructionFailedException {
+        this(tc, klass, fieldName, callee, param, null);
+    }
+
+    public PrivateFieldStatement(TestCase tc,
+                                 Class<?> klass ,
+                                 String fieldName,
+                                 VariableReference callee,
+                                 VariableReference param,
+                                 Type fieldType)
+        throws NoSuchFieldException, IllegalArgumentException, ConstructionFailedException {
         super(
-                tc,
-                new GenericMethod(setVariable, PrivateAccess.class),
-                null, //it is static
-                Arrays.asList(  // setVariable(Class<T> klass, T instance, String fieldName, Object value)
-                        new ConstantValue(tc, new GenericClass(Class.class), klass),  // Class<T> klass
-                        //new ClassPrimitiveStatement(tc,klass).getReturnValue(),  // Class<T> klass
-                        callee, // T instance
-                        new ConstantValue(tc, new GenericClass(String.class), fieldName),  // String fieldName
-                        param // Object value
-                )
+            tc,
+            new GenericMethod(setVariable, PrivateAccess.class),
+            null, //it is static
+            Arrays.asList(  // setVariable(Class<T> klass, T instance, String fieldName, Object value)
+                new ConstantValue(tc, new GenericClass(Class.class), klass),  // Class<T> klass
+                //new ClassPrimitiveStatement(tc,klass).getReturnValue(),  // Class<T> klass
+                callee, // T instance
+                new ConstantValue(tc, new GenericClass(String.class), fieldName),  // String fieldName
+                param // Object value
+            )
         );
         this.ownerClass = new GenericClass(klass);
         this.className = this.ownerClass.getRawClass().getCanonicalName();
         this.fieldName = fieldName;
+        this.fieldType = fieldType;
 
         List<GenericClass> parameterTypes = new ArrayList<>();
         parameterTypes.add(this.ownerClass);

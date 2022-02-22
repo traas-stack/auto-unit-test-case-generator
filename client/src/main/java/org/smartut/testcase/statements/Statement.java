@@ -393,4 +393,12 @@ public interface Statement {
 	 */
     void setRetval(VariableReference newRetVal);
 
+	/**
+	 * Check if the statement could be deleted when mutated
+	 * @return
+	 */
+	boolean couldMutateDelete();
+
+	void setCouldMutationDelete(boolean couldMutateDelete);
+
 }

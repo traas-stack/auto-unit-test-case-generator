@@ -541,7 +541,7 @@ public class Properties {
 
 	@Parameter(key = "p_test_change", group = "Search Algorithm", description = "Probability of changing statements during mutation")
     @DoubleValue(min = 0.0, max = 1.0)
-	public static double P_TEST_CHANGE = 1d / 3d;
+	public static double P_TEST_CHANGE = 1d / 2d;
 
 	@Parameter(key = "p_test_insert", group = "Search Algorithm", description = "Probability of inserting new statements during mutation")
     @DoubleValue(min = 0.0, max = 1.0)
@@ -590,6 +590,10 @@ public class Properties {
 	@Parameter(key = "population", group = "Search Algorithm", description = "Population size of genetic algorithm")
 	@IntValue(min = 1)
 	public static int POPULATION = 50;
+
+	@Parameter(key = "init_method_size", group = "Search Algorithm", description = "Method number in one initial case")
+	@IntValue(min = 1)
+	public static int INIT_METHOD_SIZE = 1;
 
 	public enum PopulationLimit {
 		INDIVIDUALS, TESTS, STATEMENTS;
