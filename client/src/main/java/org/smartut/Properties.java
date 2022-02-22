@@ -1611,8 +1611,8 @@ public class Properties extends AdaptedProperties {
 	 * Load and initialize a properties file from the default path
 	 */
 	public void loadProperties(boolean silent) {
-		loadPropertiesFile(System.getProperty(PROPERTIES_FILE,
-				"smartut-files/smartut.properties"), silent);
+		properties = loadPropertiesFile(verifyPropertiesPath(System.getProperty(PROPERTIES_FILE,
+				"smartut-files/smartut.properties")), silent);
 		initializeProperties();
 	}
 
@@ -1623,54 +1623,22 @@ public class Properties extends AdaptedProperties {
 	 *            a {@link java.lang.String} object.
 	 */
 	public void loadProperties(String propertiesPath, boolean silent) {
-		loadPropertiesFile(propertiesPath, silent);
+		properties = loadPropertiesFile(verifyPropertiesPath(propertiesPath), silent);
 		initializeProperties();
 	}
 
 	/**
-	 * Load a properties file
+	 * verify a properties file path，if not exists, return the default
 	 *
 	 * @param propertiesPath
 	 *            a {@link java.lang.String} object.
 	 */
-	public void loadPropertiesFile(String propertiesPath, boolean silent) {
-		properties = new java.util.Properties();
-		try {
-			InputStream in = null;
-			File propertiesFile = new File(propertiesPath);
-			if (propertiesFile.exists()) {
-				in = new FileInputStream(propertiesPath);
-				properties.load(in);
-
-				if (!silent)
-					LoggingUtils.getSmartUtLogger().info(
-							"* Properties loaded from "
-									+ propertiesFile.getAbsolutePath());
-			} else {
-				propertiesPath = "smartut.properties";
-				in = this.getClass().getClassLoader()
-						.getResourceAsStream(propertiesPath);
-				if (in != null) {
-					properties.load(in);
-					if (!silent)
-						LoggingUtils.getSmartUtLogger().info(
-								"* Properties loaded from "
-										+ this.getClass().getClassLoader()
-												.getResource(propertiesPath)
-												.getPath());
-				}
-				// logger.info("* Properties loaded from default configuration file.");
-			}
-		} catch (FileNotFoundException e) {
-			logger.warn("- Error: Could not find configuration file "
-					+ propertiesPath);
-		} catch (IOException e) {
-			logger.warn("- Error: Could not find configuration file "
-					+ propertiesPath);
-		} catch (Exception e) {
-			logger.warn("- Error: Could not find configuration file "
-					+ propertiesPath);
+	private String verifyPropertiesPath(String propertiesPath) {
+		File propertiesFile = new File(propertiesPath);
+		if (propertiesFile.exists()){
+			return propertiesPath;
 		}
+		return "smartut.properties";
 	}
 
 	/** All fields representing values, inserted via reflection */
@@ -2067,58 +2035,9 @@ public class Properties extends AdaptedProperties {
 		if (!parameterMap.containsKey(key)) {
 			throw new NoSuchParameterException(key);
 		}
-
 		Field f = parameterMap.get(key);
 		changedFields.add(key);
-
-		//Enum
-		if (f.getType().isEnum()) {
-			f.set(null, Enum.valueOf((Class<Enum>) f.getType(),
-					value.toUpperCase()));
-		}
-		//Integers
-		else if (f.getType().equals(int.class)) {
-			setValue(key, Integer.parseInt(value));
-		} else if (f.getType().equals(Integer.class)) {
-			setValue(key, (Integer) Integer.parseInt(value));
-		}
-		//Long
-		else if (f.getType().equals(long.class)) {
-			setValue(key, Long.parseLong(value));
-		} else if (f.getType().equals(Long.class)) {
-			setValue(key, (Long) Long.parseLong(value));
-		}
-		//Boolean
-		else if (f.getType().equals(boolean.class)) {
-			setValue(key, strictParseBoolean(value));
-		} else if (f.getType().equals(Boolean.class)) {
-			setValue(key, (Boolean) strictParseBoolean(value));
-		}
-		//Double
-		else if (f.getType().equals(double.class)) {
-			setValue(key, Double.parseDouble(value));
-		} else if (f.getType().equals(Double.class)) {
-			setValue(key, (Double) Double.parseDouble(value));
-		}
-		//Array
-		else if (f.getType().isArray()) {
-			if (f.getType().isAssignableFrom(String[].class)) {
-				setValue(key, value.split(":"));
-			} else if (f.getType().getComponentType().equals(Criterion.class)) {
-				String[] values = value.split(":");
-				Criterion[] criteria = new Criterion[values.length];
-
-				int pos = 0;
-				for (String stringValue : values) {
-					criteria[pos++] = Enum.valueOf(Criterion.class,
-							stringValue.toUpperCase());
-				}
-
-				f.set(this, criteria);
-			}
-		} else {
-			f.set(null, value);
-		}
+		fieldSetValue(f, value);
 	}
 
 	/**
