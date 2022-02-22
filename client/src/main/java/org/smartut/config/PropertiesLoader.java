@@ -21,6 +21,9 @@ public class PropertiesLoader {
     protected final static Logger logger = LoggerFactory.getLogger(PropertiesLoader.class);
 
     protected void fieldSetValue(Field field, Object valueObj) throws IllegalAccessException {
+        if (field == null){
+            return;
+        }
         if (valueObj instanceof String){
             String valueStr = (String) valueObj;
             if (StringUtils.isBlank(valueStr)){
@@ -29,14 +32,31 @@ public class PropertiesLoader {
             Class<?> type = field.getType();
             if (type.isEnum()){
                 field.set(null, Enum.valueOf((Class<Enum>) field.getType(), valueStr.toUpperCase()));
+                return;
             } else if (type.isArray()){
                 Class<?> componentType = type.getComponentType();
-                valueObj = Stream.of(valueStr.split(":")).map(x -> strToObj(componentType, x)).toArray();
+                if (componentType.isEnum()){
+                    if (componentType.equals(org.smartut.Properties.Criterion.class)) {
+                        String[] values = valueStr.split(":");
+                        org.smartut.Properties.Criterion[] criteria = new org.smartut.Properties.Criterion[values.length];
+                        int pos = 0;
+                        for (String stringValue : values) {
+                            criteria[pos++] = Enum.valueOf(org.smartut.Properties.Criterion.class,
+                                    stringValue.toUpperCase());
+                        }
+                        field.set(this, criteria);
+                    }
+                    return;
+                }else {
+                    valueObj = Stream.of(valueStr.split(":")).map(x -> strToObj(componentType, x)).toArray();
+                }
             }else {
                 valueObj = strToObj(type, valueStr);
             }
         }
-        field.set(this, valueObj);
+        if (valueObj != null){
+            field.set(this, valueObj);
+        }
     }
 
     protected Object strToObj(Class<?> type, String str){
@@ -112,7 +132,7 @@ public class PropertiesLoader {
                             + propertiesFile.getAbsolutePath());
                 }
             } else {
-                in = PropertiesLoader.class.getClass().getClassLoader().getResourceAsStream(propertiesPath);
+                in = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesPath);
                 if (in != null) {
                     properties.load(in);
                     if (!silent){

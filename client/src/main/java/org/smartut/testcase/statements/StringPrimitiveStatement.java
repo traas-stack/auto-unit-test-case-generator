@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.smartut.Properties;
 import org.smartut.seeding.ConstantPool;
 import org.smartut.seeding.ConstantPoolManager;
@@ -182,6 +183,9 @@ public class StringPrimitiveStatement extends PrimitiveStatement<String> {
 
 	@Override
 	public boolean mutate(TestCase test, TestFactory factory) {
+		if (StringUtils.isBlank(Properties.STATEMENT_PLUGIN)){
+			return super.mutate(test, factory);
+		}
 		return Boolean.TRUE.equals(CallUtil.call(Properties.STATEMENT_PLUGIN, "mutate", this, test, factory));
 	}
 
@@ -205,7 +209,9 @@ public class StringPrimitiveStatement extends PrimitiveStatement<String> {
 			else
 				value = Randomness.nextString(Randomness.nextInt(Properties.STRING_LENGTH));
 		}
-		CallUtil.call(Properties.STATEMENT_PLUGIN, "randomize", this);
+		if (!StringUtils.isBlank(Properties.STATEMENT_PLUGIN)){
+			CallUtil.call(Properties.STATEMENT_PLUGIN, "randomize", this);
+		}
 	}
 
 

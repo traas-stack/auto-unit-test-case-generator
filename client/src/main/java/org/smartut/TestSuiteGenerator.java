@@ -106,8 +106,10 @@ public class TestSuiteGenerator {
 			Throwable t = execResult.getAllThrownExceptions().iterator().next();
 			throw t;
 		}
-		for (String codeAnalysisPlugin : Properties.CODE_ANALYSIS_PLUGINS) {
-			CallUtil.call(codeAnalysisPlugin, "analyze");
+		if (Properties.CODE_ANALYSIS_PLUGINS != null){
+			for (String codeAnalysisPlugin : Properties.CODE_ANALYSIS_PLUGINS) {
+				CallUtil.call(codeAnalysisPlugin, "analyze");
+			}
 		}
 		// Analysis has to happen *after* the CUT is loaded since it will cause
 		// several other classes to be loaded (including the CUT), but we require
