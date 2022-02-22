@@ -55,12 +55,12 @@ public class AbstractEnvironment implements ConfigurableEnvironment {
         try {
             props.load(is);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("LoadProperties error: " + e.getMessage());
         } finally {
             try {
                 is.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("LoadProperties error: " + e.getMessage());
             }
         }
         return props;

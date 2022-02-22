@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.stream.Stream;
 
 public class PropertiesLoader {
 
@@ -19,11 +20,7 @@ public class PropertiesLoader {
             Class<?> type = field.getType();
             if (type.isArray()){
                 Class<?> componentType = type.getComponentType();
-                if (!componentType.equals(String.class)){
-                    logger.warn("Config error, the properties array only support string type array: " + field.getName().toLowerCase());
-                    return;
-                }
-                valueObj = valueStr.split(",");
+                valueObj = Stream.of(valueStr.split(":")).map(x -> strToObj(componentType, x)).toArray();
             }else {
                 valueObj = strToObj(type, valueStr);
             }

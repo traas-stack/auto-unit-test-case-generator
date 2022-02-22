@@ -10,7 +10,7 @@ import org.smartut.config.AbstractProperties;
 public class AdaptedProperties extends AbstractProperties {
 
     @Properties.Parameter(key = "version", group = "AdapterPlugin", description = "Project version; defaults opensource")
-    public static String VERSION;
+    public static String VERSION = "opensource";
 
     @Properties.Parameter(key = "code_analysis_plugins", group = "AdapterPlugin", description = "Code analysis phase plugins class")
     public static String[] CODE_ANALYSIS_PLUGINS;

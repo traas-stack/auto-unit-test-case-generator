@@ -1,9 +1,9 @@
-package org.smartut.plugins;
+package org.smartut.plugins.setup;
 
 /**
  * CodeAnalysisPlugins serve as the plugins associated with Code analysis phase
  *
- * author: Ding
+ * @author: Ding
  */
 public interface CodeAnalysisPlugins {
 

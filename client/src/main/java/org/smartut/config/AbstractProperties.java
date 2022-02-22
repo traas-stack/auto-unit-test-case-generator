@@ -30,7 +30,6 @@ public class AbstractProperties extends PropertiesLoader {
                 try {
                     fieldSetValue(field, mergedSource.get(field.getName().toLowerCase()));
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
                     logger.warn("Config error: " + field.getName().toLowerCase());
                 }
             }
