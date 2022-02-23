@@ -45,7 +45,6 @@ public class SmartUtClassLoader extends ClassLoader {
 	private final ClassLoader classLoader;
 	private final Map<String, Class<?>> classes = new HashMap<>();
 	private final Set<String> skipInstrumentationForPrefix = new HashSet<>();
-	private final String JSON_PREFIX="com.alibaba.fastjson.";
 
 	public SmartUtClassLoader() {
 		this(new RuntimeInstrumentation());
@@ -79,11 +78,12 @@ public class SmartUtClassLoader extends ClassLoader {
 		if ("<smartut>".equals(name))
 			throw new ClassNotFoundException();
 		Class<?> result = classes.get(name);
+		String jsonPrefix = "com.alibaba.fastjson.";
 		if (Objects.nonNull(result)) {
 			return result;
 		} else if (RuntimeInstrumentation.checkIfCanInstrument(name)) {
 			return normalInstrumentClass(name);
-		} else if (RuntimeSettings.jsonInstrumentationClass && name.startsWith(JSON_PREFIX)) {
+		} else if (RuntimeSettings.jsonInstrumentationClass && name.startsWith(jsonPrefix)) {
 			return instrumentClass(name,InstrumentType.JSON);
 		}
 		result = findLoadedClass(name);
@@ -95,8 +95,9 @@ public class SmartUtClassLoader extends ClassLoader {
 	}
 
 	private Class<?> normalInstrumentClass(String name) throws ClassNotFoundException{
-		if (Thread.currentThread().getContextClassLoader() == null)
-			Thread.currentThread().setContextClassLoader(SmartUtRunner.smartUtClassLoaderMap.get(RuntimeSettings.caseName));
+		if (Thread.currentThread().getContextClassLoader() == null) {
+			Thread.currentThread().setContextClassLoader(SmartUtRunner.SMART_UT_CLASS_LOADER_MAP.get(RuntimeSettings.caseName));
+		}
 		logger.info("Seeing class for first time: " + name);
 		return instrumentClass(name,InstrumentType.NORMAL);
 	}
@@ -123,12 +124,13 @@ public class SmartUtClassLoader extends ClassLoader {
 			logger.info("Error while loading class: " + t);
 			throw new ClassNotFoundException(t.getMessage(), t);
 		} finally {
-			if (is != null)
+			if (is != null) {
 				try {
 					is.close();
 				} catch (IOException e) {
 					throw new Error(e);
 				}
+			}
 		}
 	}
 

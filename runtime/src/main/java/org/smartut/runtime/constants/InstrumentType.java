@@ -1,5 +1,13 @@
 package org.smartut.runtime.constants;
 
+
 public enum InstrumentType {
-    NORMAL,JSON
+    /**
+     * exclude.class corresponding to Instrument
+     */
+    NORMAL,
+    /**
+     * fastjson corresponding to Instrument
+     */
+    JSON
 }
