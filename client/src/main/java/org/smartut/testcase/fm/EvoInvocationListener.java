@@ -22,7 +22,7 @@ package org.smartut.testcase.fm;
 import com.googlecode.gentyref.GenericTypeReflector;
 import org.mockito.internal.invocation.InterceptedInvocation;
 import org.smartut.Properties;
-import org.smartut.setup.DependencyAnalysis;
+import org.smartut.seeding.CastClassManager;
 import org.smartut.utils.LoggingUtils;
 import org.smartut.utils.generic.GenericClass;
 import org.mockito.invocation.DescribedInvocation;
@@ -30,18 +30,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.listeners.InvocationListener;
 import org.mockito.listeners.MethodInvocationReport;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -187,12 +183,8 @@ public class EvoInvocationListener implements InvocationListener, Serializable {
         InterceptedInvocation interceptedInvocation = (InterceptedInvocation) di;
         InvocationOnMock impl = (InvocationOnMock) di;
         Method method = impl.getMethod();
-
-        //cast needs target_class and line
-        Pattern pattern = Pattern.compile("-> at (.*?)\\(.*:(\\d+)\\)");
-        Matcher matcher = pattern.matcher(interceptedInvocation.getLocation().toString());
-
         Type returnType = getActualType(method);
+        Class<?> castClass = null;
         if(returnType != null){
             try {
                 if (returnType instanceof Class) {
@@ -203,56 +195,24 @@ public class EvoInvocationListener implements InvocationListener, Serializable {
                         return null;
                     }
 
-                    int oldClazzModifiers = oldClazz.getModifiers();
+                    //cast needs target_class and line
+                    Pattern pattern = Pattern.compile("-> at (.*?)\\(.*:(\\d+)\\)");
+                    Matcher matcher = pattern.matcher(interceptedInvocation.getLocation().toString());
 
                     // locate location
                     Integer location = null;
-                    if(matcher.find()) {
-                        String matcherClassName = matcher.group(1).substring(0,matcher.group(1).lastIndexOf("."));
-                        if(Properties.TARGET_CLASS.equals(matcherClassName)){
-                            location = Integer.valueOf(matcher.group(2));
-                        }
+                    String matcherClassName = null;
+                    if (matcher.find()) {
+                        matcherClassName = matcher.group(1).substring(0, matcher.group(1).lastIndexOf("."));
+                        location = Integer.valueOf(matcher.group(2));
                     }
 
-                    // hit location
-                    if(location!= null && DependencyAnalysis.getLineToTypeMap().containsKey(location)){
-                        // handle : 1. method is interface or abstract 2. returnType is Object
-                        if (Modifier.isInterface(oldClazzModifiers) || Modifier.isAbstract(oldClazzModifiers)
-                            || returnType.getTypeName().equals("java.lang.Object")
-                        ){
-                            Class<?> clazz = DependencyAnalysis.getLineToTypeMap().get(location);
-                            if(oldClazz.isAssignableFrom(clazz)){
-                                return clazz;
-                            }
-                        }
-                    }
-                    else {
-                        // if not hit location, random choose a value from typePool for search
-                        if (Modifier.isInterface(oldClazzModifiers) || Modifier.isAbstract(oldClazzModifiers)) {
-                            // choose from typePool
-                            Map<Type, Integer> typeChoicePool = new HashMap<>();
-                            Map<Class<?>, Integer> variableTypes = DependencyAnalysis.getVariableClasses();
-                            for (Class variableType : variableTypes.keySet()) {
-                                if (oldClazz.isAssignableFrom(variableType)) {
-                                    typeChoicePool.put(variableType, variableTypes.get(variableType));
-                                }
-                            }
-                            // add Abstract class as well
-                            if (Modifier.isAbstract(oldClazzModifiers)) {
-                                typeChoicePool.put(returnType, 1);
-                            }
-                            // random choice one
-                            if (typeChoicePool.size() > 0) {
-                                Random random = new Random();
-                                int randomIndex = random.nextInt(typeChoicePool.values().stream().reduce(0, Integer::sum)) + 1;
-                                int searchIndex = 0;
-                                for (Type type : typeChoicePool.keySet()) {
-                                    searchIndex += typeChoicePool.get(type);
-                                    if (searchIndex >= randomIndex) {
-                                        return type;
-                                    }
-                                }
-                            }
+                    if (Properties.TARGET_CLASS.equals(matcherClassName)) {
+                        //select class with location
+                        castClass = CastClassManager.getInstance().selectCastClassWithLine(oldClazz, location);
+                        //select class from variable types
+                        if (castClass == null) {
+                            castClass = CastClassManager.getInstance().selectCastClassFromVariable(oldClazz);
                         }
                     }
                 }
@@ -262,7 +222,7 @@ public class EvoInvocationListener implements InvocationListener, Serializable {
             }
         }
 
-        return null;
+        return castClass;
     }
 
     /**

@@ -299,12 +299,6 @@ public class MethodStatement extends EntityWithParametersStatement {
 			exceptionThrown = e.getCause();
 			logger.debug("Exception thrown in method {}: {}", method.getName(),
 			             exceptionThrown);
-
-			// Analyze cast value, when met ClassCastException, we should invoke updateVariableClass
-			if(exceptionThrown != null && exceptionThrown.toString().contains("ClassCastException")){
-				String[] exceptionThrownTokens = exceptionThrown.toString().split(" ");
-				DependencyAnalysis.updateVariableClass(exceptionThrownTokens[exceptionThrownTokens.length - 1]);
-			}
 		}
 		return exceptionThrown;
 	}

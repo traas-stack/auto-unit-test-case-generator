@@ -30,6 +30,8 @@ import java.lang.reflect.WildcardType;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
@@ -55,6 +57,11 @@ public class GenericClass implements Serializable {
 	                                                             "byte");
 
 	private static final long serialVersionUID = -3307107227790458308L;
+
+	/**
+	 *  only compile once
+	 */
+	private static final Pattern typePattern = Pattern.compile("<(.+?)>");
 
 	/**
 	 * Set of wrapper classes
@@ -162,7 +169,7 @@ public class GenericClass implements Serializable {
 		try {
 			return TypeUtils.isAssignable(rhsType, lhsType);
 		} catch (Throwable e) {
-			logger.debug("Found unassignable type: " + e);
+			logger.debug("Found unassignable type: ", e);
 			return false;
 		}
 	}
@@ -306,7 +313,7 @@ public class GenericClass implements Serializable {
 				//logger.debug("Checking instantiation: " + instantiation);
 				return instantiation.canBeInstantiatedTo(otherType);
 			} catch (ConstructionFailedException e) {
-				logger.debug("Failed to instantiate " + toString());
+				logger.debug("Failed to instantiate {}", toString());
 				return false;
 			}
 		}
@@ -403,7 +410,19 @@ public class GenericClass implements Serializable {
 			return false;
 		GenericClass other = (GenericClass) obj;
 		//return type.equals(other.type);
-		return getTypeName().equals(other.getTypeName());
+		String thisTypeName = getTypeName();
+		String otherTypeName = other.getTypeName();
+
+		// invoke equals first for reduce calculate
+		if(thisTypeName.equals(otherTypeName)) {
+			return true;
+		}
+		// judge type variable equals if not equals
+		if(thisTypeName.contains("<") && otherTypeName.contains("<")) {
+			return typeNameEquals(thisTypeName, otherTypeName);
+		} else {
+			return false;
+		}
 		/*
 		if (raw_class == null) {
 			if (other.raw_class != null)
@@ -419,6 +438,73 @@ public class GenericClass implements Serializable {
 		    return false;
 		    */
 		// return true;
+	}
+
+	/**
+	 * handle special type variable equals, avoid stack overflow
+	 * e.g. type1: scala.collection.immutable.Map<A, com.alipay.akeconsole.core.service.services.impl.AuthenticationServiceImpl>.WithDefault<A, A>
+	 *      type2: scala.collection.immutable.Map<A, com.alipay.akeconsole.core.service.services.impl.AuthenticationServiceImpl>.WithDefault<T1, T1>
+	 * result is not equals before as to cause stack overflow
+	 * @param typeName1  typeName1
+	 * @param typeName2  typeName2
+	 * @return           equals or not
+	 */
+	private boolean typeNameEquals(String typeName1, String typeName2) {
+		Matcher matcher1 = typePattern.matcher(typeName1);
+		Matcher matcher2 = typePattern.matcher(typeName2);
+
+		// record type list
+		List<String> typeList1 = new ArrayList<>(10);
+		List<String> typeList2 = new ArrayList<>(10);
+		while(matcher1.find()) {
+			// get < > content
+			String matchRet = matcher1.group(1);
+			// filter < > content step by step
+			typeName1 = typeName1.substring(0, typeName1.indexOf(matchRet)) + typeName1.substring((typeName1.indexOf(matchRet) + matchRet.length()));
+			typeList1.add(matchRet);
+		}
+
+		while(matcher2.find()) {
+			// get < > content
+			String matchRet = matcher2.group(1);
+			// filter < > content step by step
+			typeName2 = typeName2.substring(0, typeName2.indexOf(matchRet)) + typeName2.substring((typeName2.indexOf(matchRet) + matchRet.length()));
+			typeList2.add(matchRet);
+		}
+
+		if(typeList1.size() != typeList2.size()) {
+			return false;
+		}
+
+		// compare result without type variable
+		if(!typeName1.equals(typeName2)) {
+			return false;
+		}
+
+		// compare type variable：1. if concrete, need compare with equals; 2. otherwise, only the symbol of type variable not equals, should ignore
+		for(int i = 0; i < typeList1.size(); ++i) {
+			String type1 = typeList1.get(i);
+			String type2 = typeList2.get(i);
+
+			String[] parts1 = type1.split(",");
+			String[] parts2 = type2.split(",");
+
+			if(parts1.length != parts2.length) {
+				return false;
+			}
+
+			for(int j = 0; j < parts1.length; ++j) {
+				String part1 = parts1[j];
+				String part2 = parts2[j];
+				if(part1.contains(".") || part2.contains(".")) {
+					if(!part1.equals(part2)) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
 	}
 
 	public Class<?> getBoxedType() {
@@ -560,11 +646,10 @@ public class GenericClass implements Serializable {
 	private GenericClass getGenericInstantiation(Map<TypeVariable<?>, Type> typeMap,
 	        int recursionLevel) throws ConstructionFailedException {
 
-		logger.debug("Instantiation " + toString() + " with type map " + typeMap);
+		logger.debug("Instantiation {} with type map {}", toString(), typeMap);
 		// If there are no type variables, create copy
 		if (isRawClass() || !hasWildcardOrTypeVariables() || recursionLevel > Properties.MAX_GENERIC_DEPTH) {
-			logger.debug("Nothing to replace: " + toString() + ", " + isRawClass() + ", "
-			        + hasWildcardOrTypeVariables());
+			logger.debug("Nothing to replace: {}, {}, {}", toString(), isRawClass(), hasWildcardOrTypeVariables());
 			return new GenericClass(this);
 		}
 
@@ -723,7 +808,7 @@ public class GenericClass implements Serializable {
 				logger.debug("Parameter has no wildcard or type variable");
 				parameterTypes[numParam++] = parameterClass.getType();
 			} else {
-				logger.debug("Current parameter has type variables: " + parameterClass);
+				logger.debug("Current parameter has type variables: {}", parameterClass);
 
 				Map<TypeVariable<?>, Type> extendedMap = new HashMap<>(
 						typeMap);
@@ -734,8 +819,8 @@ public class GenericClass implements Serializable {
 
 				if (parameterClass.isWildcardType()) {
 					logger.debug("Is wildcard type, here we should value the wildcard boundaries");
-					logger.debug("Wildcard boundaries: "+parameterClass.getGenericBounds());
-					logger.debug("Boundaries of underlying var: "+Arrays.asList(typeParameters.get(numParam).getBounds()));
+					logger.debug("Wildcard boundaries: {}", parameterClass.getGenericBounds());
+					logger.debug("Boundaries of underlying var: {}", Arrays.asList(typeParameters.get(numParam).getBounds()));
 					GenericClass parameterInstance = parameterClass.getGenericWildcardInstantiation(extendedMap, recursionLevel + 1);
 					//GenericClass parameterTypeClass = new GenericClass(typeParameters.get(numParam));
 //					if(!parameterTypeClass.isAssignableFrom(parameterInstance)) {
@@ -747,8 +832,7 @@ public class GenericClass implements Serializable {
 					//                                                              recursionLevel + 1);
 					parameterTypes[numParam++] = parameterInstance.getType();
 				} else {
-					logger.debug("Is not wildcard but type variable? "
-					        + parameterClass.isTypeVariable());
+					logger.debug("Is not wildcard but type variable? {}", parameterClass.isTypeVariable());
 
 					GenericClass parameterInstance = parameterClass.getGenericInstantiation(extendedMap,
 					                                                                        recursionLevel + 1);
@@ -759,7 +843,7 @@ public class GenericClass implements Serializable {
 
 		if (hasOwnerType()) {
 			GenericClass ownerClass = getOwnerType().getGenericInstantiation(typeMap,
-			                                                                 recursionLevel);
+			                                                                 recursionLevel + 1);
 			ownerType = ownerClass.getType();
 		}
 
@@ -1039,8 +1123,7 @@ public class GenericClass implements Serializable {
 		superClass.getParameterTypes().toArray(parameterTypes);
 
 		if (targetClass.equals(currentClass)) {
-			logger.info("Raw classes match, setting parameters to: "
-			        + superClass.getParameterTypes());
+			logger.info("Raw classes match, setting parameters to: {}", superClass.getParameterTypes());
 			exactClass.type = new ParameterizedTypeImpl(currentClass, parameterTypes,
 			        pType.getOwnerType());
 		} else {
@@ -1059,16 +1142,15 @@ public class GenericClass implements Serializable {
 				TypeVariable<?> var = variables.get(i);
 				if (superTypeMap.containsKey(var)) {
 					arguments[i] = superTypeMap.get(var);
-					logger.info("Setting type variable " + var + " to "
-					        + superTypeMap.get(var));
+					logger.info("Setting type variable {} to {}", var, superTypeMap.get(var));
 				} else if (arguments[i] instanceof WildcardType
 				        && i < parameterTypes.length) {
-					logger.info("Replacing wildcard with " + parameterTypes[i]);
-					logger.info("Lower Bounds: "
-					        + Arrays.asList(TypeUtils.getImplicitLowerBounds((WildcardType) arguments[i])));
-					logger.info("Upper Bounds: "
-					        + Arrays.asList(TypeUtils.getImplicitUpperBounds((WildcardType) arguments[i])));
-					logger.info("Type variable: " + variables.get(i));
+					logger.info("Replacing wildcard with {}", parameterTypes[i]);
+					logger.info("Lower Bounds: {}",
+						Arrays.asList(TypeUtils.getImplicitLowerBounds((WildcardType) arguments[i])));
+					logger.info("Upper Bounds: {}",
+						Arrays.asList(TypeUtils.getImplicitUpperBounds((WildcardType) arguments[i])));
+					logger.info("Type variable: {}", variables.get(i));
 					if (!TypeUtils.isAssignable(parameterTypes[i], arguments[i])) {
 						logger.info("Not assignable to bounds!");
 						return null;
@@ -1592,7 +1674,7 @@ public class GenericClass implements Serializable {
 
 		// ? extends X
 		for (Type theType : wildcardType.getUpperBounds()) {
-			logger.debug("Checking upper bound "+theType);
+			logger.debug("Checking upper bound {}", theType);
 			// Special case: Enum is defined as Enum<T extends Enum>
 			if (GenericTypeReflector.erase(theType).equals(Enum.class)) {
 				// if this is an enum then it's ok.
@@ -1607,9 +1689,14 @@ public class GenericClass implements Serializable {
 
 			Type type = GenericUtils.replaceTypeVariables(theType, ownerVariableMap);
 			//logger.debug("Bound after variable replacement: " + type);
-			if (!isAssignableTo(type)) {
+			if (!isAssignableTo(type) && !(type instanceof WildcardType)) {
 				// If the boundary is not assignable it may still be possible
 				// to instantiate the generic to an assignable type
+				try {
+					GenericTypeReflector.erase(type).isAssignableFrom(getRawClass());
+				} catch (Exception e) {
+					logger.warn("satisfiesBoundaries erase exception", e);
+				}
 				if (GenericTypeReflector.erase(type).isAssignableFrom(getRawClass())) {
 					Type instanceType = GenericTypeReflector.getExactSuperType(type,
 					                                                           getRawClass());
@@ -1621,8 +1708,7 @@ public class GenericClass implements Serializable {
 					}
 
 					if (GenericClass.isAssignable(type, instanceType)) {
-						logger.debug("Found assignable generic exact type: "
-						        + instanceType);
+						logger.debug("Found assignable generic exact type: {}", instanceType);
 						continue;
 					}
 				}
@@ -1635,12 +1721,12 @@ public class GenericClass implements Serializable {
 		Type[] lowerBounds = wildcardType.getLowerBounds();
 		if (lowerBounds != null && lowerBounds.length > 0) {
 			for (Type theType : wildcardType.getLowerBounds()) {
-				logger.debug("Checking lower bound "+theType);
+				logger.debug("Checking lower bound {}", theType);
 				Type type = GenericUtils.replaceTypeVariables(theType, ownerVariableMap);
-				logger.debug("Bound after variable replacement: " + type);
-				logger.debug("Is assignable from "+toString()+"?");
+				logger.debug("Bound after variable replacement: {}", type);
+				logger.debug("Is assignable from {} ?", toString());
 				if (!isAssignableFrom(type)) {
-					logger.debug("Not assignable from "+toString());
+					logger.debug("Not assignable from {}", toString());
 					// If the boundary is not assignable it may still be possible
 					// to instantiate the generic to an assignable type
 					if(type instanceof WildcardType)
@@ -1656,15 +1742,14 @@ public class GenericClass implements Serializable {
 						}
 
 						if (GenericClass.isAssignable(type, instanceType)) {
-							logger.debug("Found assignable generic exact type: "
-							        + instanceType);
+							logger.debug("Found assignable generic exact type: {}", instanceType);
 							continue;
 						}
 					}
 					isAssignable = false;
 					break;
 				} else {
-					logger.debug("Is assignable from "+toString());
+					logger.debug("Is assignable from {}", toString());
 				}
 			}
 		}
