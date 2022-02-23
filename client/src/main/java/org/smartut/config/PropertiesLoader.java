@@ -35,17 +35,7 @@ public class PropertiesLoader {
                 return;
             } else if (type.isArray()){
                 Class<?> componentType = type.getComponentType();
-                if (componentType.isEnum()){
-                    if (componentType.equals(org.smartut.Properties.Criterion.class)) {
-                        String[] values = valueStr.split(":");
-                        org.smartut.Properties.Criterion[] criteria = new org.smartut.Properties.Criterion[values.length];
-                        int pos = 0;
-                        for (String stringValue : values) {
-                            criteria[pos++] = Enum.valueOf(org.smartut.Properties.Criterion.class,
-                                    stringValue.toUpperCase());
-                        }
-                        field.set(this, criteria);
-                    }
+                if (componentType.isEnum()){//enum arr only support Criterion.class in org.smartut.Properties
                     return;
                 }else {
                     valueObj = Stream.of(valueStr.split(":")).map(x -> strToObj(componentType, x)).toArray();

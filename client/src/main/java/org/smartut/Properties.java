@@ -2037,7 +2037,34 @@ public class Properties extends AdaptedProperties {
 		}
 		Field f = parameterMap.get(key);
 		changedFields.add(key);
-		fieldSetValue(f, value);
+		//int
+		if (f.getType().equals(int.class)) {
+			setValue(key, Integer.parseInt(value));
+		}
+		//long
+		else if (f.getType().equals(long.class)) {
+			setValue(key, Long.parseLong(value));
+		}
+		//boolean
+		else if (f.getType().equals(boolean.class)) {
+			setValue(key, strictParseBoolean(value));
+		}
+		//double
+		else if (f.getType().equals(double.class)) {
+			setValue(key, Double.parseDouble(value));
+		}
+		//Criterion.class Array
+		else if (f.getType().isArray() && (f.getType().getComponentType().equals(Criterion.class))) {
+			String[] values = value.split(":");
+			Criterion[] criteria = new Criterion[values.length];
+			int pos = 0;
+			for (String stringValue : values) {
+				criteria[pos++] = Enum.valueOf(Criterion.class, stringValue.toUpperCase());
+			}
+			f.set(this, criteria);
+		} else {
+			fieldSetValue(f, value);
+		}
 	}
 
 	/**
