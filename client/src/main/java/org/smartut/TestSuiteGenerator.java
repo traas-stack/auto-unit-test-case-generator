@@ -397,29 +397,41 @@ public class TestSuiteGenerator {
 			inliner.inline(testSuite);
 		}
 
+		/**
+		 *  minimize optimize：
+		 *  1. case remove： based on covered goals，filter case，delete case without mut.
+		 *  2. pre-minimize: for every case，delete useless privateAccess.setVariable statement.
+		 *  3. minimize per case: for every case，delete statement backward，
+		 *  run case after every statement delete for fitness guarantee.
+		 */
 		if (Properties.MINIMIZE) {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.MINIMIZATION);
-			// progressMonitor.setCurrentPhase("Minimizing test cases");
-			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
-				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
-                        + "Skipping minimization because not enough time is left");
-				ClientServices.track(RuntimeVariable.Result_Size, testSuite.size());
-				ClientServices.track(RuntimeVariable.Minimized_Size, testSuite.size());
-				ClientServices.track(RuntimeVariable.Result_Length, testSuite.totalLengthOfTestCases());
-				ClientServices.track(RuntimeVariable.Minimized_Length, testSuite.totalLengthOfTestCases());
-			} else {
 
-				double before = testSuite.getFitness();
 
-				TestSuiteMinimizer minimizer = new TestSuiteMinimizer(getFitnessFactories());
+			List<TestFitnessFactory<? extends TestFitnessFunction>> fitnessFactories = getFitnessFactories();
+			// 1. whole test minimize
+			TestSuiteMinimizer minimizer = new TestSuiteMinimizer(fitnessFactories);
+			logger.warn("Start remove redundant test suite");
+			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Minimizing test suite");
+			// remove redundant and without mut cases
+			minimizer.minimize(testSuite, false);
+			logger.warn("Remove redundant test suite DONE");
 
-				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Minimizing test suite");
-				minimizer.minimize(testSuite, true);
+			// 2. pre minimize
+			double before = testSuite.getFitness();
+			PreTestSuiteMiniMizer preMinimizer = new PreTestSuiteMiniMizer(fitnessFactories);
+			logger.warn("Start pre minimizing test suite");
+			preMinimizer.minimize(testSuite);
+			logger.warn("Pre minimize test suite DONE");
 
-				double after = testSuite.getFitness();
-				if (after > before + 0.01d) { // assume minimization
-					throw new Error("SmartUt bug: minimization lead fitness from " + before + " to " + after);
-				}
+			// 3. gracefully delete
+			logger.warn("Start gracefully delete test case");
+			minimizer.minimizeByDeleteStatementPerTest(testSuite);
+			logger.warn("gracefully delete DONE");
+
+			double after = testSuite.getFitness();
+			if (after > before + 0.01d) { // assume minimization
+				throw new Error("SmartUnit bug: minimization lead fitness from " + before + " to " + after);
 			}
 		} else {
 			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {

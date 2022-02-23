@@ -168,4 +168,8 @@ public class PrivateFieldStatement extends MethodStatement {
         }
         return super.execute(scope, out);
     }
+
+    public String getFieldName() {
+        return fieldName;
+    }
 }

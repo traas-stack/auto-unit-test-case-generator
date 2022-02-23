@@ -708,6 +708,12 @@ public class Properties {
 	@IntValue(min = 0)
 	public static int MINIMIZATION_TIMEOUT = 60;
 
+	@Parameter(key = "minimization_goals_filter", group = "Search Algorithm", description = "Whether filter goals by certain criteria")
+	public static boolean MINIMIZATION_GOALS_FILTER = true;
+
+	@Parameter(key = "pre_minimize_verify_fitness", group = "Search Algorithm", description = "Pre_minimize test suite verify fitness is worse after each deletion")
+	public static boolean PRE_MINIMIZE_VERIFY_FITNESS = true;
+
     @Parameter(key = "assertion_timeout", group = "Search Algorithm", description = "Seconds allowed for assertion generation at the end")
     @IntValue(min = 0)
     public static int ASSERTION_TIMEOUT = 60;
