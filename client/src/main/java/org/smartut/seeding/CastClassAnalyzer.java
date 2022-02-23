@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.LocalVariableNode;
 import org.smartut.Properties;
 import org.smartut.setup.DependencyAnalysis;
 import org.objectweb.asm.Opcodes;
@@ -44,7 +46,11 @@ public class CastClassAnalyzer {
 
 	private final Map<Type, Integer> castClassMap = new HashMap<>();
 
-	public Map<Type, Integer> analyze(String className) {
+	private final Map<String, Integer>  variableTypesForCast = new HashMap<>();
+
+	private final Map<Integer, String> castClassMapWithLine = new HashMap<>();
+
+	public void analyze(String className) {
 		ClassNode targetClass = DependencyAnalysis.getClassNode(className);
 
 		if (targetClass != null)
@@ -52,7 +58,6 @@ public class CastClassAnalyzer {
 		if (Properties.INSTRUMENT_PARENT) {
 			handleSuperClasses(targetClass);
 		}
-		return castClassMap;
 	}
 
 	/**
@@ -147,6 +152,7 @@ public class CastClassAnalyzer {
 	@SuppressWarnings("unchecked")
 	public void handleMethodNode(ClassNode cn, MethodNode mn, int depth) {
 
+		// handle type variable
 		if (mn.signature != null) {
 			logger.debug("Visiting signature: " + mn.signature);
 			CollectParameterTypesVisitor visitor = new CollectParameterTypesVisitor(
@@ -161,30 +167,36 @@ public class CastClassAnalyzer {
 			}
 		}
 
+		// handle cast
 		InsnList instructions = mn.instructions;
 		Iterator<AbstractInsnNode> iterator = instructions.iterator();
+		int currentLine = 0;
 
 		// TODO: This really shouldn't be here but in its own class
 		while (iterator.hasNext()) {
 			AbstractInsnNode insn = iterator.next();
-			if (insn.getOpcode() == Opcodes.CHECKCAST) {
+			if(insn instanceof LineNumberNode){
+				currentLine = ((LineNumberNode) insn).line;
+			}else if (insn.getOpcode() == Opcodes.CHECKCAST) {
 				TypeInsnNode typeNode = (TypeInsnNode) insn;
 				Type castType = Type.getObjectType(typeNode.desc);
 				while (castType.getSort() == Type.ARRAY) {
 					castType = castType.getElementType();
 				}
-				logger.debug("Adding new cast class from cast: " + castType);
+				logger.debug("Adding new cast class from cast: {}", castType);
 				if (!castClassMap.containsKey(castType))
 					castClassMap.put(castType, depth + 1);
+				castClassMapWithLine.put(currentLine, typeNode.desc);
 			} else if (insn.getOpcode() == Opcodes.INSTANCEOF) {
 				TypeInsnNode typeNode = (TypeInsnNode) insn;
 				Type castType = Type.getObjectType(typeNode.desc);
 				while (castType.getSort() == Type.ARRAY) {
 					castType = castType.getElementType();
 				}
-				logger.debug("Adding new cast class from instanceof: " + castType);
+				logger.debug("Adding new cast class from instanceof: {}", castType);
 				if (!castClassMap.containsKey(castType))
 					castClassMap.put(castType, depth + 1);
+				variableTypesForCast.put(typeNode.desc, 1);
 			} else if (insn.getOpcode() == Opcodes.LDC) {
 				LdcInsnNode ldcNode = (LdcInsnNode) insn;
 				if (ldcNode.cst instanceof Type) {
@@ -194,10 +206,37 @@ public class CastClassAnalyzer {
 					}
 					if (!castClassMap.containsKey(type))
 						castClassMap.put(type, depth + 1);
+					variableTypesForCast.put(type.getClassName(),1);
 				}
+			}
+		}
+		// colleect all Variable Type
+		handleVariableTypesInMethod(cn,mn);
+	}
 
+	private void handleVariableTypesInMethod(ClassNode cn, MethodNode mn) {
+		for (LocalVariableNode localVariableNode : mn.localVariables) {
+			String variableClassName = localVariableNode.desc;
+
+			if (variableClassName.startsWith("L")) {
+				variableClassName = variableClassName.replaceFirst("L", "").replace(";", "");
+			}
+			if (!variableClassName.equals(cn.name)) {
+				//除当前class外，Load其他variable
+				variableTypesForCast.put(variableClassName, 1);
 			}
 		}
 	}
 
+	public Map<Type, Integer> getCastClassMap() {
+		return castClassMap;
+	}
+
+	public Map<String, Integer> getVariableTypesForCast() {
+		return variableTypesForCast;
+	}
+
+	public Map<Integer, String> getCastClassMapWithLine() {
+		return castClassMapWithLine;
+	}
 }

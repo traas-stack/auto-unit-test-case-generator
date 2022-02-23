@@ -48,11 +48,14 @@ import org.smartut.utils.SpawnProcessKeepAliveChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * <p>
@@ -78,6 +81,19 @@ public class SmartUt {
 
     static {
         LoggingUtils.loadLogbackForSmartUt();
+
+        // exclude error log print by dependency jar because of project_info generate fail
+        String logConfig = ".level=" + Level.INFO + "\n";
+        logConfig += "handlers=java.util.logging.ConsoleHandler\n";
+        logConfig += "java.util.logging.ConsoleHandler" + ".level=" + Level.SEVERE + "\n";
+        logConfig += "com.sun.xml.bind.v2.util" + ".level=" + Level.OFF + "\n";
+        try {
+            java.util.logging.LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(logConfig.getBytes(
+                StandardCharsets.UTF_8)));
+        }
+        catch (IOException e) {
+            LoggingUtils.getSmartUtLogger().warn("java.util.logging init error");
+        }
     }
 
     public static String generateInheritanceTree(String cp) throws IOException {

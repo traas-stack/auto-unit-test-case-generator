@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.smartut.Properties;
+import org.smartut.setup.DependencyAnalysis;
 import org.smartut.testcase.variable.ArrayIndex;
 import org.smartut.testcase.variable.ArrayReference;
 import org.smartut.testcase.TestCase;

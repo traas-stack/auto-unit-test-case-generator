@@ -388,7 +388,7 @@ public class TestSuiteGenerator {
 
 		if (Properties.INLINE) {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.INLINING);
-			ConstantInliner inliner = new ConstantInliner();
+			ConstantInliner inliner = new ConstantInliner(true);
 			// progressMonitor.setCurrentPhase("Inlining constants");
 
 			// Map<FitnessFunction<? extends TestSuite<?>>, Double> fitnesses =

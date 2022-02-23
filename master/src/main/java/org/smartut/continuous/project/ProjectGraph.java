@@ -356,7 +356,8 @@ public class ProjectGraph {
 		if (!castInformation.containsKey(className)) {
 			CastClassAnalyzer analyzer = new CastClassAnalyzer();
 			// The analyzer gets the classnode from the DependencyAnalysis classnode cache
-			Map<Type, Integer> castMap = analyzer.analyze(className);
+			analyzer.analyze(className);
+			Map<Type, Integer> castMap = analyzer.getCastClassMap();
 			Set<String> castClasses = new LinkedHashSet<>();
 			for (Type type : castMap.keySet()) {
 				String name = type.getClassName();
