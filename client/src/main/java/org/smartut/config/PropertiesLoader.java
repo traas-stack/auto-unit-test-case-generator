@@ -38,7 +38,8 @@ public class PropertiesLoader {
                 if (componentType.isEnum()){//enum arr only support Criterion.class in org.smartut.Properties
                     return;
                 }else {
-                    valueObj = Stream.of(valueStr.split(":")).map(x -> strToObj(componentType, x)).toArray();
+                    Stream<Object> objectStream = Stream.of(valueStr.split(":")).map(x -> strToObj(componentType, x));
+                    valueObj = streamToArr(objectStream, componentType);
                 }
             }else {
                 valueObj = strToObj(type, valueStr);
@@ -71,10 +72,29 @@ public class PropertiesLoader {
             obj = Boolean.valueOf(str);
         }else if (type.equals(boolean.class)){
             obj = Boolean.parseBoolean(str);
-        }else if (type.equals(org.smartut.Properties.Criterion.class)){
-            obj = Enum.valueOf(org.smartut.Properties.Criterion.class, str.toUpperCase());
         }
         return obj;
+    }
+
+    private Object streamToArr(Stream<Object> stream, Class<?> componentType){
+        //String
+        if (componentType.equals(String.class)){
+            return stream.toArray(String[]::new);
+        }
+        //Integers
+        else if (componentType.equals(Integer.class) || componentType.equals(int.class)){
+            return stream.toArray(Integer[]::new);
+        //Long
+        }else if (componentType.equals(Long.class) || componentType.equals(long.class)){
+            return stream.toArray(Long[]::new);
+        //Double
+        }else if (componentType.equals(Double.class) || componentType.equals(double.class)){
+            return stream.toArray(Double[]::new);
+        //Boolean
+        }else if (componentType.equals(Boolean.class) || componentType.equals(boolean.class)){
+            return stream.toArray(Boolean[]::new);
+        }
+        return stream.toArray();
     }
 
     /**
