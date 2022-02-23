@@ -89,7 +89,7 @@ public class ClientProcess {
 					+ Properties.PROCESS_COMMUNICATION_PORT);
 		}
 
-		if(Properties.SPAWN_PROCESS_MANAGER_PORT != null){
+		if(Properties.SPAWN_PROCESS_MANAGER_PORT != null && !Properties.CLIENT_ON_THREAD){
 			SpawnProcessKeepAliveChecker.getInstance().registerToRemoteServerAndDieIfFails(
 					Properties.SPAWN_PROCESS_MANAGER_PORT
 			);

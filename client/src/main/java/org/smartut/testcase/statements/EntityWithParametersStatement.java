@@ -105,6 +105,16 @@ public abstract class EntityWithParametersStatement extends AbstractStatement{
         return Collections.unmodifiableList(parameters);
     }
 
+    /**
+     * Dangerous! modify parameters directly is very dangerous，do NOT use this unless necessarily
+     * If iterator only，get from ParameterReferences method
+     * Take care of data inline when modified
+     * @return parameters list
+     */
+    public List<VariableReference> getParameterReferencesModifier() {
+        return parameters;
+    }
+
     /* (non-Javadoc)
 	 * @see org.smartut.testcase.StatementInterface#replace(org.smartut.testcase.VariableReference, org.smartut.testcase.VariableReference)
 	 */

@@ -60,6 +60,11 @@ public class MethodDescriptor implements Comparable<MethodDescriptor>, Serializa
 
     private String id; //derived field
 
+    /**
+     *  method call sequence
+     */
+    private int index;
+
 
     /**
      *
@@ -79,6 +84,22 @@ public class MethodDescriptor implements Comparable<MethodDescriptor>, Serializa
         this.methodName = methodName;
         this.className = className;
         this.inputParameterMatchers = inputParameterMatchers;
+    }
+
+    /**
+     * init with particular type
+     * @param method              function
+     * @param retvalType          genericClass type
+     * @param typeClass           actual type
+     * @param index               call sequence
+     */
+    public MethodDescriptor(Method method, GenericClass retvalType, Type typeClass, int index){
+        Inputs.checkNull(method, retvalType);
+        this.method = new GenericMethod(method, retvalType, typeClass);
+        methodName = method.getName();
+        className = method.getDeclaringClass().getName();
+        inputParameterMatchers = initMatchers(this.method, retvalType);
+        this.index = index;
     }
 
     private String initMatchers(GenericMethod method, GenericClass retvalType) {
@@ -200,6 +221,11 @@ public class MethodDescriptor implements Comparable<MethodDescriptor>, Serializa
     public MethodDescriptor getCopy(){
         MethodDescriptor copy = new MethodDescriptor(method, methodName, className, inputParameterMatchers);
         copy.counter = this.counter;
+
+        // copy type
+        if(this.getGenericMethod().getTypeClass() != null) {
+            copy.getGenericMethod().setTypeClass(this.getGenericMethod().getTypeClass());
+        }
         return copy;
     }
 
@@ -263,7 +289,12 @@ public class MethodDescriptor implements Comparable<MethodDescriptor>, Serializa
     }
     
     public GenericMethod getGenericMethodFor(GenericClass clazz) throws ConstructionFailedException {
-        return method.getGenericInstantiation(clazz);
+        GenericMethod gMethod = method.getGenericInstantiation(clazz);
+        // set actual type
+        if(this.method.getTypeClass() != null) {
+            gMethod.setTypeClass(this.method.getTypeClass());
+        }
+        return gMethod;
     }
 
     public GenericClass getReturnClass() {
@@ -290,6 +321,12 @@ public class MethodDescriptor implements Comparable<MethodDescriptor>, Serializa
     public String getID(){
         if(id == null){
             id = className +"."+ getMethodName() + "#" + getInputParameterMatchers();
+
+            // if having type class, id will be like className#actualType#index for distinguish
+            if(this.getGenericMethod().getTypeClass() != null) {
+                id += "#" + this.getGenericMethod().getTypeClass().getTypeName();
+                id += "#" + this.index;
+            }
         }
         return id;
     }
@@ -317,6 +354,12 @@ public class MethodDescriptor implements Comparable<MethodDescriptor>, Serializa
         if(com!=0){
             return com;
         }
+
+        // if having type class, should sort by method invoke sequence, Not by count number
+        if(this.getGenericMethod().getTypeClass() != null && o.getGenericMethod().getTypeClass() != null) {
+            return 0;
+        }
+
         return this.counter - o.counter;
     }
 }
