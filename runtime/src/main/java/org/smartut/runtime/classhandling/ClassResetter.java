@@ -161,7 +161,7 @@ public class ClassResetter {
 				LoopCounter.getInstance().setActive(false);
 				m.invoke(null, (Object[]) null);
 			} catch (IllegalAccessException | IllegalArgumentException e) {
-				logger.error("" + e, e);
+				logger.error("reset class {}",classNameWithDots, e);
 			} catch (NoClassDefFoundError e) {
 				AtMostOnceLogger.error(logger, e.toString());
 			} catch (InvocationTargetException e) {

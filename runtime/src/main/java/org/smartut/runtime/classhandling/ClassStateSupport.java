@@ -29,6 +29,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -56,7 +58,18 @@ public class ClassStateSupport {
 	private static final Logger logger = LoggerFactory.getLogger(ClassStateSupport.class);
 
 	//Added time control for resetClasses
-	private static final long INIT_CLASS_TIME_OUT = 3L;
+	private static final long CLASS_TIME_OUT = 3L;
+
+	private static final int THREAD_POOL_SIZE = 3;
+
+
+	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(THREAD_POOL_SIZE,
+			THREAD_POOL_SIZE,
+			0L,
+			TimeUnit.MILLISECONDS,
+			new LinkedBlockingQueue<>(1024));
+
+
 
 	//The initialized class is cached and used when reset
 	private static final List<String> INITIALIZED_CLASSES = new ArrayList<>();
@@ -156,7 +169,6 @@ public class ClassStateSupport {
 	 */
 	public static void resetClasses() {
 //		It is possible to get stuck, reset classes increase timeout control
-		final ExecutorService exec = Executors.newFixedThreadPool(1);
 		Callable call = () -> {
 			// Reset the class of initClasses
 				for(String initializedClassName : getLoadedClassesNeedReset()) {
@@ -169,15 +181,15 @@ public class ClassStateSupport {
 		};
 
 		try {
-			Future result = exec.submit(call);
+			Future result = executor.submit(call);
 			// Set the timeout time 3s
-			result.get(INIT_CLASS_TIME_OUT, TimeUnit.SECONDS);
+			result.get(CLASS_TIME_OUT, TimeUnit.SECONDS);
 		} catch (TimeoutException e) {
-			logger.warn("reset classes are timeout, time out seconds is {}", INIT_CLASS_TIME_OUT);
+			logger.warn("reset classes are timeout, time out seconds is {}", CLASS_TIME_OUT);
 		} catch (Exception e) {
 			logger.warn("reset classes meet exception {}", e.getMessage());
 		}
-		exec.shutdown();
+		executor.shutdown();
 	}
 
 	/**
@@ -193,14 +205,14 @@ public class ClassStateSupport {
 				clazz = clazz.getSuperclass();
 			}
 
-			java.lang.reflect.Field ClassLoader_classes_field = clazz
+			java.lang.reflect.Field classLoaderClassesField = clazz
 					.getDeclaredField("classes");
 
-			ClassLoader_classes_field.setAccessible(true);
-			 classes = (Vector<Class<?>>) ClassLoader_classes_field.get(classLoader);
+			classLoaderClassesField.setAccessible(true);
+			 classes = (Vector<Class<?>>) classLoaderClassesField.get(classLoader);
 
-		}catch (Exception e){
-
+		} catch (Exception e) {
+			logger.error("getClassloaderLoadClasses error", e);
 		}
 		return classes;
 	}
@@ -228,6 +240,7 @@ public class ClassStateSupport {
 							|| ExcludedClasses.getPackagesShouldNotBeInstrumented().stream().anyMatch(oneClassName::startsWith))
 					.collect(Collectors.toList()));
 		} catch (Exception e) {
+			logger.error("getLoadedClassesNeedReset error",e);
 		}
 		return needResetClasses;
 	}
