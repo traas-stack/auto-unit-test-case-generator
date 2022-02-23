@@ -19,22 +19,9 @@
  */
 package org.smartut.runtime.classhandling;
 
-import java.lang.instrument.UnmodifiableClassException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smartut.runtime.LoopCounter;
 import org.smartut.runtime.RuntimeSettings;
 import org.smartut.runtime.agent.InstrumentingAgent;
@@ -42,9 +29,20 @@ import org.smartut.runtime.instrumentation.ExcludedClasses;
 import org.smartut.runtime.instrumentation.InstrumentedClass;
 import org.smartut.runtime.sandbox.Sandbox;
 import org.smartut.runtime.util.AtMostOnceLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.lang.instrument.UnmodifiableClassException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 
 /**
@@ -63,11 +61,12 @@ public class ClassStateSupport {
 	private static final int THREAD_POOL_SIZE = 3;
 
 
-	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(THREAD_POOL_SIZE,
+	private static final ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(THREAD_POOL_SIZE,
 			THREAD_POOL_SIZE,
 			0L,
 			TimeUnit.MILLISECONDS,
-			new LinkedBlockingQueue<>(1024));
+			new LinkedBlockingQueue<>(1024),
+			new BasicThreadFactory.Builder().namingPattern("class-state-support-pool-%d").build());
 
 
 
@@ -181,7 +180,7 @@ public class ClassStateSupport {
 		};
 
 		try {
-			Future result = executor.submit(call);
+			Future result = EXECUTOR.submit(call);
 			// Set the timeout time 3s
 			result.get(CLASS_TIME_OUT, TimeUnit.SECONDS);
 		} catch (TimeoutException e) {
@@ -189,7 +188,7 @@ public class ClassStateSupport {
 		} catch (Exception e) {
 			logger.warn("reset classes meet exception {}", e.getMessage());
 		}
-		executor.shutdown();
+		EXECUTOR.shutdown();
 	}
 
 	/**
