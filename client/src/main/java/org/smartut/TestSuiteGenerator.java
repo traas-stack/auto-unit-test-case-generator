@@ -59,6 +59,7 @@ import org.smartut.testcase.statements.numeric.BooleanPrimitiveStatement;
 import org.smartut.testcase.variable.VariableReference;
 import org.smartut.testsuite.*;
 import org.smartut.utils.ArrayUtil;
+import org.smartut.utils.CallUtil;
 import org.smartut.utils.LoggingUtils;
 import org.smartut.utils.generic.GenericMethod;
 import org.slf4j.Logger;
@@ -82,6 +83,7 @@ public class TestSuiteGenerator {
 
 
 	private void initializeTargetClass() throws Throwable {
+		logger.warn("initializeTargetClass start！");
 		String cp = ClassPathHandler.getInstance().getTargetProjectClasspath();
 
 		// Generate inheritance tree and call graph *before* loading the CUT
@@ -104,12 +106,17 @@ public class TestSuiteGenerator {
 			Throwable t = execResult.getAllThrownExceptions().iterator().next();
 			throw t;
 		}
-
+		if (Properties.CODE_ANALYSIS_PLUGINS != null){
+			for (String codeAnalysisPlugin : Properties.CODE_ANALYSIS_PLUGINS) {
+				CallUtil.call(codeAnalysisPlugin, "analyze");
+			}
+		}
 		// Analysis has to happen *after* the CUT is loaded since it will cause
 		// several other classes to be loaded (including the CUT), but we require
 		// the CUT to be loaded first
 		DependencyAnalysis.analyzeClass(Properties.TARGET_CLASS, Arrays.asList(cp.split(File.pathSeparator)));
 		LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Finished analyzing classpath");
+		logger.warn("initializeTargetClass finish！");
 	}
 
 	/**

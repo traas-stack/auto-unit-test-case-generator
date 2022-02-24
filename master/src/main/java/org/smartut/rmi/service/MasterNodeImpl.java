@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.smartut.ClientProcess;
 import org.smartut.Properties;
-import org.smartut.Properties.NoSuchParameterException;
+import org.smartut.config.PropertiesLoader.NoSuchParameterException;
 import org.smartut.ga.Chromosome;
 import org.smartut.result.TestGenerationResult;
 import org.smartut.statistics.SearchStatistics;

@@ -94,7 +94,7 @@ public abstract class AbstractStatement implements Statement, Serializable {
 	/**
 	 * Reference of the test case this statement belongs to. Should never be null.
 	 */
-	protected final TestCase tc;
+	public final TestCase tc;
 
 	protected Set<Assertion> assertions = new LinkedHashSet<>();
 
