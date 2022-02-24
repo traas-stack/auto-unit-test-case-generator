@@ -622,7 +622,7 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
     }
 
     protected MockSettings createMockSettings() {
-        return withSettings().invocationListeners(listener);
+        return withSettings().invocationListeners(listener).stubOnly();
     }
 
     @Override

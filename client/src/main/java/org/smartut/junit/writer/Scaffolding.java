@@ -273,7 +273,10 @@ public class Scaffolding {
 				if (st instanceof FunctionalMockStatement) {
 					FunctionalMockStatement fms = (FunctionalMockStatement) st;
 					String name = new GenericClass(fms.getReturnType()).getRawClass().getTypeName();
-					mockStatements.add("mock(Class.forName(\""+name+"\", false, "+testClassName + ".class.getClassLoader()));");
+
+					// fix OOM issue
+					mockStatements.add("mock(Class.forName(\""+name+"\", false, "+testClassName + ".class.getClassLoader()), "
+						+ "withSettings().stubOnly());");
 				}
 			}
 		}
