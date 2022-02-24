@@ -28,10 +28,6 @@
     </profiles>
 
 	<dependencies>
-<!--        <dependency>-->
-<!--            <groupId>xerces</groupId>-->
-<!--            <artifactId>xercesImpl</artifactId>-->
-<!--        </dependency>-->
 
 		<!-- SmartUt Modules -->
 
@@ -100,7 +96,6 @@
             <artifactId>logback-classic</artifactId>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode.gentyref</groupId>
             <artifactId>gentyref</artifactId>

@@ -135,7 +135,7 @@ public class TestClusterGenerator {
 		logger.info("Resolving dependencies");
 		resolveDependencies(blackList);
 
-		handleSpecialCases();
+		// handleSpecialCases();
 
 		logger.info("Removing unusable generators");
 		TestCluster.getInstance().removeUnusableGenerators();
@@ -205,10 +205,13 @@ public class TestClusterGenerator {
 		if (Properties.SEED_TYPES) {
 			Set<String> blackList = new LinkedHashSet<>();
 			initBlackListWithPrimitives(blackList);
+			Set<String> blackListWithObject = new LinkedHashSet<>();
+			initBackListWithPrimitivesAndObject(blackListWithObject);
 
 			Set<String> classNames = new LinkedHashSet<>();
 			CastClassAnalyzer analyzer = new CastClassAnalyzer();
-			Map<Type, Integer> castMap = analyzer.analyze(Properties.TARGET_CLASS);
+			analyzer.analyze(Properties.TARGET_CLASS);
+			Map<Type, Integer> castMap = analyzer.getCastClassMap();
 
 			for (Entry<Type, Integer> castEntry : castMap.entrySet()) {
 				String className = castEntry.getKey().getClassName();
@@ -220,12 +223,42 @@ public class TestClusterGenerator {
 				}
 			}
 
+			Map<Integer, String> castMapWithLine = analyzer.getCastClassMapWithLine();
+			for(Entry<Integer, String> entry : castMapWithLine.entrySet()){
+				if(blackListWithObject.contains(entry.getValue())) {
+					continue;
+				}
+				CastClassManager.getInstance().addCastClassWithLine(entry.getKey(), entry.getValue());
+			}
+
+			Map<String, Integer> variableTypesForCast = analyzer.getVariableTypesForCast();
+			for(Entry<String, Integer> entry : variableTypesForCast.entrySet()){
+				if(blackListWithObject.contains(entry.getKey())) {
+					continue;
+				}
+				CastClassManager.getInstance().addVariableType(entry.getKey(), entry.getValue());
+			}
 			// If SEED_TYPES is false, only Object is a cast class
 			// logger.info("Handling cast classes");
 			// addCastClasses(classNames, blackList);
-			logger.debug("Cast classes used: " + classNames);
+			logger.debug("Cast classes used: {}", classNames);
 		}
 
+	}
+
+	private void initBlackListWithSmartSuitePrimitives(Set<String> blackList) throws NullPointerException {
+		blackList.add("int");
+		blackList.add("short");
+		blackList.add("float");
+		blackList.add("double");
+		blackList.add("byte");
+		blackList.add("char");
+		blackList.add("boolean");
+		blackList.add("long");
+		blackList.add(java.lang.Enum.class.getName());
+		blackList.add(java.lang.String.class.getName());
+		blackList.add(java.lang.Class.class.getName());
+		blackList.add(java.lang.ThreadGroup.class.getName()); // may lead to SmartSuite killing all threads
 	}
 
 	private void gatherStatistics() {
@@ -261,6 +294,18 @@ public class TestClusterGenerator {
 		blackList.add("char");
 		blackList.add("boolean");
 		blackList.add("long");
+	}
+
+	private void initBackListWithPrimitivesAndObject(Set<String> blackList) throws  NullPointerException{
+		blackList.add("int");
+		blackList.add("short");
+		blackList.add("float");
+		blackList.add("double");
+		blackList.add("byte");
+		blackList.add("char");
+		blackList.add("boolean");
+		blackList.add("long");
+		blackList.add("java/lang/Object");
 	}
 
 	private boolean addCastClassDependencyIfAccessible(String className, Set<String> blackList) {

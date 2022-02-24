@@ -296,7 +296,7 @@ public class Properties extends AdaptedProperties {
 
 	@Parameter(key = "functional_mocking_input_limit", group = "Test Creation", description = "When mocking a method, define max number of mocked return values for that method. Calls after the last will just re-use the last specified value")
 	@DoubleValue(min = 1)
-	public static int FUNCTIONAL_MOCKING_INPUT_LIMIT = 5;
+	public static int FUNCTIONAL_MOCKING_INPUT_LIMIT = 18;
 
 	@Parameter(key = "num_parallel_clients", group = "Test Creation", description = "Number of SmartUt clients to run in parallel")
 	public static int NUM_PARALLEL_CLIENTS = 1;
@@ -1386,6 +1386,9 @@ public class Properties extends AdaptedProperties {
 
     @Parameter(key = "max_loop_iterations", group = "Test Execution", description = "Max number of iterations allowed per loop. A negative value means no check is done.")
     public static long MAX_LOOP_ITERATIONS = RuntimeSettings.maxNumberOfIterationsPerLoop;
+
+	@Parameter(key = "generate_false_next", group = "Test Generation", description = "Whether generate false to the end of iterator next")
+	public static boolean GENERATE_FALSE_NEXT = true;
 
     // ---------------------------------------------------------------
 	// Debugging

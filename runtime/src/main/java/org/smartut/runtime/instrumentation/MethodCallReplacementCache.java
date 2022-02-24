@@ -285,9 +285,10 @@ public class MethodCallReplacementCache {
 				PackageInfo.getNameWithSlash(org.smartut.runtime.System.class), "identityHashCode",
 				"(Ljava/lang/Object;)I", false, false));
 
-		addReplacementCall(new MethodCallReplacement("java/lang/Object", "toString", "()Ljava/lang/String;",
-				Opcodes.INVOKEVIRTUAL, PackageInfo.getNameWithSlash(org.smartut.runtime.System.class), "toString",
-				"(Ljava/lang/Object;)Ljava/lang/String;", false, false));
+		//Object.toString() replacement cause override method to fail
+//		addReplacementCall(new MethodCallReplacement("java/lang/Object", "toString", "()Ljava/lang/String;",
+//				Opcodes.INVOKEVIRTUAL, PackageInfo.getNameWithSlash(org.smartut.runtime.System.class), "toString",
+//				"(Ljava/lang/Object;)Ljava/lang/String;", false, false));
 
 		addReplacementCall(new MethodCallReplacement("java/lang/Math", "random", "()D", Opcodes.INVOKESTATIC,
 				PackageInfo.getNameWithSlash(org.smartut.runtime.Random.class), "nextDouble", "()D", false, false));

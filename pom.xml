@@ -417,11 +417,6 @@
                 <artifactId>system-rules</artifactId>
                 <version>1.19.0</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>xerces</groupId>-->
-<!--                <artifactId>xercesImpl</artifactId>-->
-<!--                <version>2.11.0</version>-->
-<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -820,7 +815,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <deployURL>Needs to be fixed in Jenkins</deployURL>
-        <jjwt.version>0.7.0</jjwt.version>
         <!-- empty by default. activated through profile -->
         <!-- systemTests></systemTests>
         <integrationTests></integrationTests -->

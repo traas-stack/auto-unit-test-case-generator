@@ -2008,9 +2008,13 @@ public class TestFactory {
 
         if(reflectionFactory.nextUseField()){
             Field field = reflectionFactory.nextField();
+
+			// bugfix: fix field type for collections/map like Map<String, Double>, List<String>
+			Type fieldType = field.getGenericType();
+			//we need a reference to the SUT, and one to a variable of same type of chosen field
+			List<Type> types = Arrays.asList(reflectionFactory.getReflectedClass(), fieldType);
             parameters = satisfyParameters(test, null,
-                    //we need a reference to the SUT, and one to a variable of same type of chosen field
-                    Arrays.asList(reflectionFactory.getReflectedClass(), field.getType()), null,
+                    types , null,
                     position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 
             try {
@@ -2063,10 +2067,13 @@ public class TestFactory {
 		if(reflectionFactory.nextUseField()){
 			Field field = reflectionFactory.nextField();
 
+			// bugfix: fix field type for collections/map like Map<String, Double>, List<String>
+			Type fieldType = field.getGenericType();
+
 			// Added 'null' as additional parameter - fix for @NotNull annotations issue on smartut mailing list
 			parameters = satisfyParameters(test, callee,
 					//we need a reference to the SUT, and one to a variable of same type of chosen field
-					Collections.singletonList(field.getType()), null, position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
+					Collections.singletonList(fieldType), null, position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
 
 			try {
 				st = new PrivateFieldStatement(test,reflectionFactory.getReflectedClass(),field.getName(),
