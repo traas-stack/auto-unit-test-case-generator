@@ -152,15 +152,16 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
 			TestChromosome parent2 = this.selectionFunction.select(this.population);
 			TestChromosome offspring1 = parent1.clone();
 			TestChromosome offspring2 = parent2.clone();
+			// no more crossover
 			// apply crossover
-			if (Randomness.nextDouble() <= Properties.CROSSOVER_RATE) {
-				try {
-					this.crossoverFunction.crossOver(offspring1, offspring2);
-				} catch (ConstructionFailedException e) {
-					logger.debug("CrossOver failed.");
-					continue;
-				}
-			}
+			//if (Randomness.nextDouble() <= Properties.CROSSOVER_RATE) {
+			//	try {
+			//		this.crossoverFunction.crossOver(offspring1, offspring2);
+			//	} catch (ConstructionFailedException e) {
+			//		logger.debug("CrossOver failed.");
+			//		continue;
+			//	}
+			//}
 
 			this.removeUnusedVariables(offspring1);
 			this.removeUnusedVariables(offspring2);

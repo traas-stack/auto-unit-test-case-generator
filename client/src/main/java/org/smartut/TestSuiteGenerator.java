@@ -360,6 +360,7 @@ public class TestSuiteGenerator {
 				.removeIf(t -> t.getLastExecutionResult() != null && (t.getLastExecutionResult().hasTimeout() ||
 																	  t.getLastExecutionResult().hasTestException()));
 
+		logger.warn("start postProcessTests");
 		if (Properties.CTG_SEEDS_FILE_OUT != null) {
 			TestSuiteSerialization.saveTests(testSuite, new File(Properties.CTG_SEEDS_FILE_OUT));
 		} else if (Properties.TEST_FACTORY == TestFactory.SERIALIZATION) {
@@ -386,6 +387,7 @@ public class TestSuiteGenerator {
 			}
 		}
 
+		logger.warn("postProcessTests testSuite before inline, size is {}", testSuite.size());
 		if (Properties.INLINE) {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.INLINING);
 			ConstantInliner inliner = new ConstantInliner(true);
@@ -396,6 +398,9 @@ public class TestSuiteGenerator {
 
 			inliner.inline(testSuite);
 		}
+		logger.warn("postProcessTests testSuite after inline, size is {}", testSuite.size());
+
+		logger.warn("postProcessTests testSuite size before minimize: {}", testSuite.getTestChromosomes().size());
 
 		/**
 		 *  minimize optimize：
@@ -450,6 +455,9 @@ public class TestSuiteGenerator {
 			CoverageCriteriaAnalyzer.analyzeCoverage(testSuite);
 		}
 
+		//after minimize, save the tests as seeds
+		logger.warn("postProcessTests testSuite size after minimize: {}", testSuite.getTestChromosomes().size());
+
 		double coverage = testSuite.getCoverage();
 
 		if (ArrayUtil.contains(Properties.CRITERION, Criterion.MUTATION)
@@ -458,7 +466,7 @@ public class TestSuiteGenerator {
 		}
 
 		StatisticsSender.executedAndThenSendIndividualToMaster(testSuite);
-		LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generated " + testSuite.size()
+		LoggingUtils.getSmartUtLogger().warn("* " + ClientProcess.getPrettyPrintIdentifier() + "Generated " + testSuite.size()
                 + " tests with total length " + testSuite.totalLengthOfTestCases());
 
 		// TODO: In the end we will only need one analysis technique
@@ -508,7 +516,7 @@ public class TestSuiteGenerator {
 		}
 
 		if (Properties.ASSERTIONS) {
-			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
+			LoggingUtils.getSmartUtLogger().warn("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
 			// progressMonitor.setCurrentPhase("Generating assertions");
 			ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
 			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
@@ -531,10 +539,12 @@ public class TestSuiteGenerator {
 		}
         else if (Properties.JUNIT_TESTS && (Properties.JUNIT_CHECK == Properties.JUnitCheckValues.TRUE ||
                 Properties.JUNIT_CHECK == Properties.JUnitCheckValues.OPTIONAL)) {
+			logger.warn("Start JUNIT COMPILE AND CHECK");
             if(ClassPathHacker.isJunitCheckAvailable())
                 compileAndCheckTests(testSuite);
             else
                 logger.warn("Cannot run Junit test. Cause {}",ClassPathHacker.getCause());
+			logger.warn("JUNIT COMPILE AND CHECK DONE");
         }
 	}
 
