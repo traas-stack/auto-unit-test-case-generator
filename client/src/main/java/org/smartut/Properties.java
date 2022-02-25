@@ -283,6 +283,10 @@ public class Properties {
     @DoubleValue(min = 0.0, max = 1.0)
     public static double REFLECTION_START_PERCENT = 0.0;
 
+	@Parameter(key = "reflection_parent_depth", group = "Test Creation", description = "The depth of get parent class private field")
+	@DoubleValue(min = 0.0, max = 1.0)
+	public static int REFLECTION_PARENT_DEPTH = 2;
+
 	@Parameter(key = "p_functional_mocking", group = "Test Creation", description = "Probability [0,1] of using functional mocking (eg Mockito) when creating object instances")
 	@DoubleValue(min = 0.0, max = 1.0)
 	public static double P_FUNCTIONAL_MOCKING = 1.0; // Optimal value: 0.8

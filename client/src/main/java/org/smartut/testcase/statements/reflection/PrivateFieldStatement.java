@@ -19,6 +19,7 @@
  */
 package org.smartut.testcase.statements.reflection;
 
+import org.smartut.Properties;
 import org.smartut.ga.ConstructionFailedException;
 import org.smartut.runtime.PrivateAccess;
 import org.smartut.testcase.TestFactory;
@@ -114,8 +115,29 @@ public class PrivateFieldStatement extends MethodStatement {
             if (Modifier.isStatic(f.getModifiers()))
                 isStaticField = true;
         } catch(NoSuchFieldException f) {
-            // This should never happen
-            throw new RuntimeException("SmartUt bug", f);
+            // consider private filed in parent
+            boolean found = false;
+            int parentIndex = 0;
+            while(parentIndex++ < Properties.REFLECTION_PARENT_DEPTH) {
+                Class<?> superClass = klass.getSuperclass();
+                if(superClass == null || superClass.getName().equals(Object.class.getName())) {
+                    break;
+                }
+
+                try {
+                    Field field = superClass.getDeclaredField(fieldName);
+                    found = true;
+                    if (Modifier.isStatic(field.getModifiers()))
+                        isStaticField = true;
+                    break;
+                } catch (NoSuchFieldException e2) {
+
+                }
+            }
+            if(!found) {
+                // This should never happen
+                throw new RuntimeException("SmartUnit bug", f);
+            }
         }
     }
 

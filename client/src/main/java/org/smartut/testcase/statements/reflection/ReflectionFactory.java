@@ -63,7 +63,36 @@ public class ReflectionFactory {
         List<Field> toSkip = null;
 
         for(Field f : Reflection.getDeclaredFields(target)){
-            if(Modifier.isPrivate(f.getModifiers())
+            // add none public type
+            if(!Modifier.isPublic(f.getModifiers())
+                && !f.isSynthetic()
+                && (toSkip==null || ! toSkip.contains(f))
+                && !f.getName().equals("serialVersionUID")
+                // read/writeObject must not be invoked directly, otherwise it raises a java.io.NotActiveException
+                && !f.getName().equals("writeObject")
+                && !f.getName().equals("readObject")
+                // final primitives cannot be changed
+                && !(Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
+                // changing final strings also doesn't make much sense
+                && !(Modifier.isFinal(f.getModifiers()) && f.getType().equals(String.class))
+                //static fields lead to just too many problems... although this could be set as a parameter
+                && !Modifier.isStatic(f.getModifiers())
+            ) {
+                fields.add(f);
+            }
+        }
+
+        // add field in parent class
+        int index = 0;
+        while(index++ < Properties.REFLECTION_PARENT_DEPTH) {
+            Class<?> superClass = target.getSuperclass();
+            // if parent is null or is Object class, return
+            if(null == superClass || superClass.getName().equals(Object.class.getName())) {
+                break;
+            }
+
+            for(Field f : Reflection.getDeclaredFields(superClass)){
+                if(!Modifier.isPublic(f.getModifiers())
                     && !f.isSynthetic()
                     && (toSkip==null || ! toSkip.contains(f))
                     && !f.getName().equals("serialVersionUID")
@@ -76,8 +105,9 @@ public class ReflectionFactory {
                     && !(Modifier.isFinal(f.getModifiers()) && f.getType().equals(String.class))
                     //static fields lead to just too many problems... although this could be set as a parameter
                     && !Modifier.isStatic(f.getModifiers())
-                    ) {
-                fields.add(f);
+                ) {
+                    fields.add(f);
+                }
             }
         }
     }
