@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smartut.runtime.LoopCounter;
 import org.smartut.runtime.RuntimeSettings;
+import org.smartut.runtime.SmartUtRunner;
 import org.smartut.runtime.agent.InstrumentingAgent;
 import org.smartut.runtime.instrumentation.ExcludedClasses;
 import org.smartut.runtime.instrumentation.InstrumentedClass;
@@ -37,8 +38,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -83,9 +82,7 @@ public class ClassStateSupport {
 
 	private static final String[] EXTERNAL_INIT_METHODS = new String[] {"$jacocoInit", "$gzoltarInit"};
 
-	private static final long INIT_CLASS_TIME_OUT = 3L;
 
-	private static final ExecutorService exec = Executors.newFixedThreadPool(3);
 
 	private static final List<String> initializedClasses = new ArrayList<>();
     /**
@@ -100,7 +97,8 @@ public class ClassStateSupport {
      * @param classNames
      */
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
-
+		//Only smartut case uses smartutclassloader, which is set in before class
+		SmartUtRunner.useSmartUtClassLoader();
 		// initializeClasses may block, use thread pool and increase timeout control
 		// Compatibility: set classloader at the beginning, and no explicit call is required during reset
 		ClassResetter.getInstance().setClassLoader(classLoader);
@@ -124,17 +122,17 @@ public class ClassStateSupport {
 		};
 
 		try {
-			Future<Boolean> result = exec.submit(call);
+			Future<Boolean> result = EXECUTOR.submit(call);
 			// Set timeout
-			Boolean obj = result.get(INIT_CLASS_TIME_OUT, TimeUnit.SECONDS);
+			Boolean obj = result.get(CLASS_TIME_OUT, TimeUnit.SECONDS);
 			return obj;
 		} catch (TimeoutException e) {
-			logger.warn("initializing classes are timeout, time out seconds is {}", INIT_CLASS_TIME_OUT);
+			logger.warn("initializing classes are timeout, time out seconds is {}", CLASS_TIME_OUT);
 		} catch (Exception e) {
 			logger.warn("initializing classes meet exception {}", e.getMessage());
 		}
 
-		exec.shutdown();
+		EXECUTOR.shutdown();
 		return false;
 	}
 
@@ -225,6 +223,8 @@ public class ClassStateSupport {
 
 		} catch (Exception e) {
 			logger.error("getClassloaderLoadClasses error", e);
+		}finally {
+			SmartUtRunner.resetSmartUtClassLoader();
 		}
 		return classes;
 	}

@@ -81,7 +81,7 @@ public class TransformerForTests implements ClassFileTransformer {
 				return classfileBuffer;
 			}
 
-			return instrumenter.transformBytes(loader, className, reader, false); // TODO: Need to set skip instrumentation for test class
+			return instrumenter.transformBytes(className, reader, false); // TODO: Need to set skip instrumentation for test class
 		}
 	}
 	
