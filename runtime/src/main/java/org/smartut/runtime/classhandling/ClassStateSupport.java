@@ -205,7 +205,7 @@ public class ClassStateSupport {
 	}
 
 	/**
-	 * 使用ClassResetter.classloader load的class list
+	 * Class list loaded using ClassResetter.classloader
 	 * @return load classes
 	 */
 	private static Vector<Class<?>> getClassloaderLoadClasses(){
