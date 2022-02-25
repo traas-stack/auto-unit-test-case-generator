@@ -345,6 +345,13 @@ public class TestSuiteGenerator {
 	 */
 	protected void postProcessTests(TestSuiteChromosome testSuite) {
 
+
+		// last check for update mock methods, we have done this in TestCodeVisitor before, however, before minimize &
+		// assertion generation will be better. So move st.doesNeedToUpdateInputs() in TestCodeVisitor here
+		for(TestChromosome testChromosome : testSuite.getTestChromosomes()){
+			testChromosome.mockChange();
+		}
+
 		// If overall time is short, the search might not have had enough time
 		// to come up with a suite without timeouts. However, they will slow
 		// down
