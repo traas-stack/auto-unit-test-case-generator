@@ -110,7 +110,7 @@ public class ClassStateSupport {
 			boolean problem = false;
 
 			List<Class<?>> classes = loadClasses(classLoader, classNamesWithCUT);
-			initialiseExternalTools(classLoader, classes);
+			initialiseExternalTools(classes);
 
 			if(RuntimeSettings.isUsingAnyMocking()) {
 				problem =classes.stream().filter(Class::isInterface).anyMatch(clazz->!InstrumentedClass.class.isAssignableFrom(clazz));
