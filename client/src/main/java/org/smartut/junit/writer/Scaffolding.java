@@ -344,23 +344,25 @@ public class Scaffolding {
 
 		if (classesToReset.size() != 0) {
 
-			bd.append(BLOCK_SPACE);
-			bd.append(ClassResetter.class.getName() + ".getInstance().setClassLoader(");
-			bd.append(testClassName + ".class.getClassLoader()); \n\n");
+			//Modified to setClassLoader when beforeClass-initializeClasses
+//			bd.append(BLOCK_SPACE);
+//			bd.append(ClassResetter.class.getName() + ".getInstance().setClassLoader(");
+//			bd.append(testClassName + ".class.getClassLoader()); \n\n");
 
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName() + ".resetClasses(");
 
-			for (int i = 0; i < classesToReset.size(); i++) {
-				String className = classesToReset.get(i);
-				bd.append("\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
-				if (i < classesToReset.size() - 1) {
-					bd.append(",");
-				}
-			}
-
-			bd.append("\n");
-			bd.append(BLOCK_SPACE);
+			//Classes that need to be reset are not listed in Scaffolding-resetClasses
+//			for (int i = 0; i < classesToReset.size(); i++) {
+//				String className = classesToReset.get(i);
+//				bd.append("\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
+//				if (i < classesToReset.size() - 1) {
+//					bd.append(",");
+//				}
+//			}
+//
+//			bd.append("\n");
+//			bd.append(BLOCK_SPACE);
 			bd.append(");\n");
 		}
 
@@ -490,8 +492,12 @@ public class Scaffolding {
 		if (Properties.RESET_STATIC_FIELDS) {
 			bd.append(BLOCK_SPACE);
 			bd.append(JDKClassResetter.class.getName() + ".reset(); \n");
+
+			//Add the resetCUT method, reset the static reset method of the class under test after each use case is executed
+			//Do not reset all classes to reduce execution time
 			bd.append(BLOCK_SPACE);
-			bd.append("resetClasses(); \n");
+			bd.append(ClassStateSupport.class.getName()).append(".resetCUT(); \n");
+//			bd.append("resetClasses(); \n");
 		}
 
 		if (Properties.RESET_STATIC_FIELDS || wasSecurityException) {
@@ -622,6 +628,10 @@ public class Scaffolding {
 			bd.append("@AfterClass \n");
 			bd.append(METHOD_SPACE);
 			bd.append("public static void clearSmartUtFramework(){ \n");
+
+			//After all use cases are executed, reset is performed for all classes
+			bd.append(BLOCK_SPACE);
+			bd.append("resetClasses(); \n");
 
 			if (Properties.RESET_STATIC_FIELDS || wasSecurityException) {
 				bd.append(BLOCK_SPACE);
