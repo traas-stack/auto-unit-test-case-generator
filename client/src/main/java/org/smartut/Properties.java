@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author Gordon Fraser
  */
-public class Properties {
+public class Properties extends AdaptedProperties {
 
 	private final static Logger logger = LoggerFactory.getLogger(Properties.class);
 
@@ -139,9 +139,12 @@ public class Properties {
 	@Parameter(key = "chop_carved_exceptions", group = "Test Creation", description = "If a carved test throws an exception, either chop it off, or drop it")
 	public static boolean CHOP_CARVED_EXCEPTIONS = true;
 
+	@Parameter(key = "allow null", group = "Test Creation", description = "If allow null when create object")
+	public static boolean ALLOW_NULL = false;
+
 	@Parameter(key = "null_probability", group = "Test Creation", description = "Probability to use null instead of constructing an object")
 	@DoubleValue(min = 0.0, max = 1.0)
-	public static double NULL_PROBABILITY = 0.1;
+	public static double NULL_PROBABILITY = 0.0;
 
 	@Parameter(key = "object_reuse_probability", group = "Test Creation", description = "Probability to reuse an existing reference, if available")
 	@DoubleValue(min = 0.0, max = 1.0)
@@ -213,7 +216,7 @@ public class Properties {
 	public static int MAX_DELTA = 20;
 
 	@Parameter(key = "random_perturbation", group = "Test Creation", description = "Probability to replace a primitive with a random new value rather than adding a delta")
-	public static double RANDOM_PERTURBATION = 0.2;
+	public static double RANDOM_PERTURBATION = 0.85;
 
 	@Parameter(key = "max_array", group = "Test Creation", description = "Maximum length of randomly generated arrays")
 	public static int MAX_ARRAY = 10;
@@ -274,26 +277,26 @@ public class Properties {
 
     @Parameter(key = "p_reflection_on_private", group = "Test Creation", description = "Probability [0,1] of using reflection to set private fields or call private methods")
     @DoubleValue(min = 0.0, max = 1.0)
-    public static double P_REFLECTION_ON_PRIVATE = 0.0; // Optimal value: 0.5
+    public static double P_REFLECTION_ON_PRIVATE = 0.65; // Optimal value: 0.5
 
     @Parameter(key = "reflection_start_percent", group = "Test Creation", description = "Percentage [0,1] of search budget after which reflection fields/methods handling is activated")
     @DoubleValue(min = 0.0, max = 1.0)
-    public static double REFLECTION_START_PERCENT = 0.8;
+    public static double REFLECTION_START_PERCENT = 0.0;
 
 	@Parameter(key = "p_functional_mocking", group = "Test Creation", description = "Probability [0,1] of using functional mocking (eg Mockito) when creating object instances")
 	@DoubleValue(min = 0.0, max = 1.0)
-	public static double P_FUNCTIONAL_MOCKING = 0.0; // Optimal value: 0.8
+	public static double P_FUNCTIONAL_MOCKING = 1.0; // Optimal value: 0.8
 
 	@Parameter(key = "mock_if_no_generator", group = "Test Creation", description = "Allow mock objects if there are no generators")
 	public static boolean MOCK_IF_NO_GENERATOR = true;
 
 	@Parameter(key = "functional_mocking_percent", group = "Test Creation", description = "Percentage [0,1] of search budget after which functional mocking can be activated. Mocking of missing concrete classes will be activated immediately regardless of this parameter")
 	@DoubleValue(min = 0.0, max = 1.0)
-	public static double FUNCTIONAL_MOCKING_PERCENT = 0.5;
+	public static double FUNCTIONAL_MOCKING_PERCENT = 0.0;
 
 	@Parameter(key = "functional_mocking_input_limit", group = "Test Creation", description = "When mocking a method, define max number of mocked return values for that method. Calls after the last will just re-use the last specified value")
 	@DoubleValue(min = 1)
-	public static int FUNCTIONAL_MOCKING_INPUT_LIMIT = 5;
+	public static int FUNCTIONAL_MOCKING_INPUT_LIMIT = 18;
 
 	@Parameter(key = "num_parallel_clients", group = "Test Creation", description = "Number of SmartUt clients to run in parallel")
 	public static int NUM_PARALLEL_CLIENTS = 1;
@@ -303,6 +306,12 @@ public class Properties {
 
 	@Parameter(key = "migrants_communication_rate", group = "Test Creation", description = "Determines amount of migrants per communication step")
 	public static int MIGRANTS_COMMUNICATION_RATE = 3;
+
+	@Parameter(key = "master_remote_debug", group = "Test Creation", description = "master process debug")
+	public static boolean MASTER_REMOTE_DEBUG = false;
+
+	@Parameter(key = "client_remote_debug", group = "Test Creation", description = "client process debug")
+	public static boolean CLIENT_REMOTE_DEBUG = false;
 
 	// ---------------------------------------------------------------
 	// Search algorithm
@@ -1378,6 +1387,9 @@ public class Properties {
     @Parameter(key = "max_loop_iterations", group = "Test Execution", description = "Max number of iterations allowed per loop. A negative value means no check is done.")
     public static long MAX_LOOP_ITERATIONS = RuntimeSettings.maxNumberOfIterationsPerLoop;
 
+	@Parameter(key = "generate_false_next", group = "Test Generation", description = "Whether generate false to the end of iterator next")
+	public static boolean GENERATE_FALSE_NEXT = true;
+
     // ---------------------------------------------------------------
 	// Debugging
 
@@ -1387,9 +1399,9 @@ public class Properties {
 	@Parameter(key = "profile", group = "Debugging", description = "Enables profiler support in the client VM")
 	public static String PROFILE = "";
 
-	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 1044")
+	@Parameter(key = "port", group = "Debugging", description = "Port on localhost, to which the client VM will listen for a remote debugger; defaults to 8015")
 	@IntValue(min = 1024, max = 65535)
-	public static int PORT = 1044;
+	public static int PORT = 8015;
 
 	@Parameter(key = "jmc", group = "Debugging", description = "Experimental: activate Flight Recorder in spawn client process for Java Mission Control")
 	public static boolean JMC = false;
@@ -1602,8 +1614,8 @@ public class Properties {
 	 * Load and initialize a properties file from the default path
 	 */
 	public void loadProperties(boolean silent) {
-		loadPropertiesFile(System.getProperty(PROPERTIES_FILE,
-				"smartut-files/smartut.properties"), silent);
+		properties = loadPropertiesFile(verifyPropertiesPath(System.getProperty(PROPERTIES_FILE,
+				"smartut-files/smartut.properties")), silent);
 		initializeProperties();
 	}
 
@@ -1614,54 +1626,22 @@ public class Properties {
 	 *            a {@link java.lang.String} object.
 	 */
 	public void loadProperties(String propertiesPath, boolean silent) {
-		loadPropertiesFile(propertiesPath, silent);
+		properties = loadPropertiesFile(verifyPropertiesPath(propertiesPath), silent);
 		initializeProperties();
 	}
 
 	/**
-	 * Load a properties file
+	 * verify a properties file path，if not exists, return the default
 	 *
 	 * @param propertiesPath
 	 *            a {@link java.lang.String} object.
 	 */
-	public void loadPropertiesFile(String propertiesPath, boolean silent) {
-		properties = new java.util.Properties();
-		try {
-			InputStream in = null;
-			File propertiesFile = new File(propertiesPath);
-			if (propertiesFile.exists()) {
-				in = new FileInputStream(propertiesPath);
-				properties.load(in);
-
-				if (!silent)
-					LoggingUtils.getSmartUtLogger().info(
-							"* Properties loaded from "
-									+ propertiesFile.getAbsolutePath());
-			} else {
-				propertiesPath = "smartut.properties";
-				in = this.getClass().getClassLoader()
-						.getResourceAsStream(propertiesPath);
-				if (in != null) {
-					properties.load(in);
-					if (!silent)
-						LoggingUtils.getSmartUtLogger().info(
-								"* Properties loaded from "
-										+ this.getClass().getClassLoader()
-												.getResource(propertiesPath)
-												.getPath());
-				}
-				// logger.info("* Properties loaded from default configuration file.");
-			}
-		} catch (FileNotFoundException e) {
-			logger.warn("- Error: Could not find configuration file "
-					+ propertiesPath);
-		} catch (IOException e) {
-			logger.warn("- Error: Could not find configuration file "
-					+ propertiesPath);
-		} catch (Exception e) {
-			logger.warn("- Error: Could not find configuration file "
-					+ propertiesPath);
+	private String verifyPropertiesPath(String propertiesPath) {
+		File propertiesFile = new File(propertiesPath);
+		if (propertiesFile.exists()){
+			return propertiesPath;
 		}
+		return "smartut.properties";
 	}
 
 	/** All fields representing values, inserted via reflection */
@@ -2058,57 +2038,35 @@ public class Properties {
 		if (!parameterMap.containsKey(key)) {
 			throw new NoSuchParameterException(key);
 		}
-
 		Field f = parameterMap.get(key);
 		changedFields.add(key);
-
-		//Enum
-		if (f.getType().isEnum()) {
-			f.set(null, Enum.valueOf((Class<Enum>) f.getType(),
-					value.toUpperCase()));
-		}
-		//Integers
-		else if (f.getType().equals(int.class)) {
+		//int
+		if (f.getType().equals(int.class)) {
 			setValue(key, Integer.parseInt(value));
-		} else if (f.getType().equals(Integer.class)) {
-			setValue(key, (Integer) Integer.parseInt(value));
 		}
-		//Long
+		//long
 		else if (f.getType().equals(long.class)) {
 			setValue(key, Long.parseLong(value));
-		} else if (f.getType().equals(Long.class)) {
-			setValue(key, (Long) Long.parseLong(value));
 		}
-		//Boolean
+		//boolean
 		else if (f.getType().equals(boolean.class)) {
 			setValue(key, strictParseBoolean(value));
-		} else if (f.getType().equals(Boolean.class)) {
-			setValue(key, (Boolean) strictParseBoolean(value));
 		}
-		//Double
+		//double
 		else if (f.getType().equals(double.class)) {
 			setValue(key, Double.parseDouble(value));
-		} else if (f.getType().equals(Double.class)) {
-			setValue(key, (Double) Double.parseDouble(value));
 		}
-		//Array
-		else if (f.getType().isArray()) {
-			if (f.getType().isAssignableFrom(String[].class)) {
-				setValue(key, value.split(":"));
-			} else if (f.getType().getComponentType().equals(Criterion.class)) {
-				String[] values = value.split(":");
-				Criterion[] criteria = new Criterion[values.length];
-
-				int pos = 0;
-				for (String stringValue : values) {
-					criteria[pos++] = Enum.valueOf(Criterion.class,
-							stringValue.toUpperCase());
-				}
-
-				f.set(this, criteria);
+		//Criterion.class Array
+		else if (f.getType().isArray() && (f.getType().getComponentType().equals(Criterion.class))) {
+			String[] values = value.split(":");
+			Criterion[] criteria = new Criterion[values.length];
+			int pos = 0;
+			for (String stringValue : values) {
+				criteria[pos++] = Enum.valueOf(Criterion.class, stringValue.toUpperCase());
 			}
+			f.set(this, criteria);
 		} else {
-			f.set(null, value);
+			fieldSetValue(f, value);
 		}
 	}
 
@@ -2220,20 +2178,6 @@ public class Properties {
 		if (instance == null)
 			instance = new Properties(true, true);
 		return instance;
-	}
-
-	/**
-	 * This exception is used when a non-existent parameter is accessed
-	 *
-	 *
-	 */
-	public static class NoSuchParameterException extends Exception {
-
-		private static final long serialVersionUID = 9074828392047742535L;
-
-		public NoSuchParameterException(String key) {
-			super("No such property defined: " + key);
-		}
 	}
 
 	private static void setClassPrefix() {

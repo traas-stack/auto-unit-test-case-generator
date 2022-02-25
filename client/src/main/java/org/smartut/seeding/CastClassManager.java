@@ -19,18 +19,21 @@
  */
 package org.smartut.seeding;
 
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 
 import org.smartut.Properties;
@@ -51,6 +54,10 @@ public class CastClassManager {
 	private static final Logger logger = LoggerFactory.getLogger(CastClassManager.class);
 
 	private final Map<GenericClass, Integer> classMap = new LinkedHashMap<>();
+
+	private final Map<Class<?>, Integer>  variableTypes = new LinkedHashMap<>();
+
+	private final Map<Integer, Class<?>> classMapWithLine = new LinkedHashMap<>();
 
 	public static List<GenericClass> sortByValue(Map<GenericClass, Integer> map) {
 		List<Map.Entry<GenericClass, Integer>> list = new LinkedList<>(
@@ -97,13 +104,10 @@ public class CastClassManager {
 	}
 
 	public void addCastClass(String className, int depth) {
-		try {
-			Class<?> clazz = TestGenerationContext.getInstance().getClassLoaderForSUT().loadClass(className);
+		Class<?> clazz = getClazz(className);
+		if (clazz != null) {
 			GenericClass castClazz = new GenericClass(clazz);
 			addCastClass(castClazz.getWithWildcardTypes(), depth);
-		} catch (ClassNotFoundException e) {
-			// Ignore
-			logger.debug("Error including cast class " + className + " because: " + e);
 		}
 	}
 
@@ -135,6 +139,65 @@ public class CastClassManager {
 			if(TestUsageChecker.canUse(clazz.getRawClass()))
 				classMap.put(clazz, depth);
 		}
+	}
+
+	public void addVariableType(String className, Integer count) {
+		Class<?> clazz = getClazz(className);
+		if (clazz != null) {
+			variableTypes.put(clazz, count);
+		}
+	}
+
+	public void addCastClassWithLine(Integer lineNumber, String className){
+		Class<?> clazz = getClazz(className);
+		if (clazz != null) {
+			classMapWithLine.put(lineNumber, clazz);
+		}
+	}
+
+	public Class<?> selectCastClassWithLine(Class oldClazz, Integer location){
+		if(classMapWithLine.containsKey(location)){
+			int oldClazzModifiers = oldClazz.getModifiers();
+			if (Modifier.isInterface(oldClazzModifiers) || Modifier.isAbstract(oldClazzModifiers)
+				|| java.lang.Object.class.getName().equals(oldClazz.getName())){
+				Class<?> clazz = CastClassManager.getInstance().getCastClassMapWithLine().get(location);
+				if(oldClazz.isAssignableFrom(clazz)){
+					return clazz;
+				}
+			}
+		}
+		return null;
+	}
+
+	public Class<?> selectCastClassFromVariable(Class oldClazz){
+		int oldClazzModifiers = oldClazz.getModifiers();
+		if (Modifier.isInterface(oldClazzModifiers) || Modifier.isAbstract(oldClazzModifiers)
+			|| java.lang.Object.class.getName().equals(oldClazz.getName())) {
+			Map<Class<?>, Integer> typeChoicePool = new HashMap<>();
+			Map<Class<?>, Integer> variableTypes = CastClassManager.getInstance().getVariableTypesForCast();
+			for (Class variableType : variableTypes.keySet()) {
+				if (oldClazz.isAssignableFrom(variableType)) {
+					typeChoicePool.put(variableType, variableTypes.get(variableType));
+				}
+			}
+			//add Abstract class as well
+			if (Modifier.isAbstract(oldClazzModifiers)) {
+				typeChoicePool.put(oldClazz, 1);
+			}
+			//random choice one
+			if (typeChoicePool.size() > 0) {
+				Random random = new Random();
+				int randomIndex = random.nextInt(typeChoicePool.values().stream().reduce(0, Integer::sum)) + 1;
+				int searchIndex = 0;
+				for (Class<?> type : typeChoicePool.keySet()) {
+					searchIndex += typeChoicePool.get(type);
+					if (searchIndex >= randomIndex) {
+						return type;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	private void handleComparable() {
@@ -532,13 +595,32 @@ public class CastClassManager {
 		return false;
 	}
 
-	public Set<GenericClass> getCastClasses() {
-		return classMap.keySet();
-	}
-
 	public void clear() {
 		classMap.clear();
 		initDefaultClasses();
 	}
 
+	private Class<?> getClazz(String className) {
+		Class<?> clazz = null;
+		className = className.replace("/", ".").replace(";", "");
+		try {
+			clazz = TestGenerationContext.getInstance().getClassLoaderForSUT()
+				.loadClass(className);
+		} catch (Exception e) {
+			logger.debug("can not load class for name: " + className);
+		}
+		return clazz;
+	}
+
+	public Set<GenericClass> getCastClasses() {
+		return classMap.keySet();
+	}
+
+	public Map<Class<?>, Integer> getVariableTypesForCast() {
+		return variableTypes;
+	}
+
+	public Map<Integer, Class<?>> getCastClassMapWithLine() {
+		return classMapWithLine;
+	}
 }

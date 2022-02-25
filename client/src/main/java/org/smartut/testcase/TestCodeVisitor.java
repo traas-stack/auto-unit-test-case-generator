@@ -1234,25 +1234,17 @@ public class TestCodeVisitor extends TestVisitor {
 			result += "(" + variableType + ") ";
 		}
 
-			/*
-				Tricky situation. Ideally, we would want to throw assumption error if a non-mocked method
-				is called, as to avoid false-positives when SUTs evolve.
-				However, it might well be that a test case is not updated, leaving mocks using the default
-				"null" return values. This would crash the JUnit check. Activating the  ViolatedAssumptionAnswer
-				during the search would just make things worse, as negatively effecting the search.
-				So we could just skip it, but this would effect false-positive preventions
-			 */
-		if (st.doesNeedToUpdateInputs()) {
-			try{
-				st.updateMockedMethods();
-			} catch (Exception e){
-			}
-			st.fillWithNullRefs();
-
-			//result += "mock(" + rawClassName + ".class);" + NEWLINE;
-		} else {
-			//result += "mock(" + rawClassName + ".class, new " + ViolatedAssumptionAnswer.class.getSimpleName() + "());" + NEWLINE;
-		}
+		/**
+		 * We have removed updateMockedMethods here, following is the comment originally:
+		 * "Tricky situation. Ideally, we would want to throw assumption error if a non-mocked method
+		 * 	is called, as to avoid false-positives when SUTs evolve.
+		 * 	However, it might well be that a test case is not updated, leaving mocks using the default
+		 * 				"null" return values. This would crash the JUnit check. Activating the
+		 * 				ViolatedAssumptionAnswer
+		 * 				during the search would just make things worse, as negatively effecting the search.
+		 * 				So we could just skip it, but this would effect false-positive preventions
+		 * 	"
+		 */
 
 		if(st instanceof FunctionalMockForAbstractClassStatement) {
 			result += "mock(" + rawClassName + ".class, CALLS_REAL_METHODS);" + NEWLINE;
@@ -1260,13 +1252,32 @@ public class TestCodeVisitor extends TestVisitor {
 			result += "mock(" + rawClassName + ".class, new " + ViolatedAssumptionAnswer.class.getSimpleName() + "());" + NEWLINE;
 		}
 
+		Set<String> idPrefixSet = new HashSet<>();
 		//when(...).thenReturn(...)
 		for(MethodDescriptor md : st.getMockedMethods()){
 			if(!md.shouldBeMocked()){
 				continue;
 			}
 
+			// for type class not null situation, id is constructed by method#param#actualType#index,
+			// should get params with same method#param prefix
+			String originId = md.getID();
+			String[] idParts = originId.split("#");
+			if(idParts.length >= 3) {
+				String idQuery = idParts[0] + "#" + idParts[1] + "#";
+				// if has been queried, pass
+				if(idPrefixSet.contains(idQuery)) {
+					continue;
+				}
+				idPrefixSet.add(idQuery);
+			}
+
 			List<VariableReference> params = st.getParameters(md.getID());
+
+			// bugfix: many NPE when execute test case
+			if(params == null){
+				continue;
+			}
 
 			GenericClass returnType = md.getReturnClass();
 			// Class<?> returnType = md.getMethod().getReturnType();

@@ -326,7 +326,7 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
 	}
 
 
-	private boolean mockChange()  {
+	public boolean mockChange()  {
 
 		/*
 			Be sure to update the mocked values if there has been any change in
@@ -353,12 +353,9 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
 			int preLength = test.size();
 
 			try {
-				List<Type> missing = fms.updateMockedMethods();
 				int pos = st.getPosition();
-				logger.debug("Generating parameters for mock call");
-				// Added 'null' as additional parameter - fix for @NotNull annotations issue on smartut mailing list
-				List<VariableReference> refs = TestFactory.getInstance().satisfyParameters(test, null, missing,null, pos, 0, true, false,true);
-				fms.addMissingInputs(refs);
+				// satisfy parameter inside updateMockedMethods method
+				fms.updateMockedMethods();
 			} catch (Exception e){
 				//shouldn't really happen because, in the worst case, we could create mocks for missing parameters
 				String msg = "Functional mock problem: "+e.toString();

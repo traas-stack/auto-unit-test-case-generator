@@ -30,6 +30,7 @@ import org.smartut.runtime.instrumentation.InstrumentedClass;
 import org.smartut.runtime.mock.SmartUtMock;
 import org.smartut.runtime.mock.MockList;
 import org.smartut.runtime.util.AtMostOnceLogger;
+import org.smartut.testcase.TestFactory;
 import org.smartut.testcase.fm.EvoInvocationListener;
 import org.smartut.testcase.fm.MethodDescriptor;
 import org.smartut.runtime.util.Inputs;
@@ -56,6 +57,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -107,6 +109,14 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
      * This list needs to be kept sorted
      */
     protected final List<MethodDescriptor> mockedMethods;
+
+    /**
+     * return mock method parameter map related to this statement
+     * @return
+     */
+    public Map<String, int[]> getMethodParameters() {
+        return methodParameters;
+    }
 
     /**
      * key -> MethodDescriptor id,
@@ -274,14 +284,44 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
     public List<VariableReference> getParameters(String id) throws IllegalArgumentException {
         Inputs.checkNull(id);
 
-        int[] minMax = methodParameters.get(id);
-        if (minMax == null) {
-            return null;
-        }
-
         List<VariableReference> list = new ArrayList<>();
-        for (int i = minMax[0]; i <= minMax[1]; i++) {
-            list.add(parameters.get(i));
+
+        // for method contains actual typeClass，id is constructed by method#param#actualType#index，
+        // here we get params contains same method#param prfix
+        String[] idParts = id.split("#");
+        String idQuery;
+        if(idParts.length >= 3) {
+            // method#param for query
+            idQuery = idParts[0] + "#" + idParts[1] + "#";
+
+            for(Entry<String, int[]> entry : methodParameters.entrySet()) {
+                if(entry.getKey().startsWith(idQuery)) {
+                    int[] minMax = entry.getValue();
+                    if(minMax == null) {
+                        continue;
+                    }
+                    for (int i = minMax[0]; i <= minMax[1]; i++) {
+                        try {
+                            list.add(parameters.get(i));
+                        } catch (IndexOutOfBoundsException e) {
+                            logger.error("Index out of bounds in functional mock getParameters, message is {}", e.getMessage());
+                        }
+                    }
+                }
+            }
+        } else {
+            int[] minMax = methodParameters.get(id);
+            if (minMax == null) {
+                return null;
+            }
+
+            for (int i = minMax[0]; i <= minMax[1]; i++) {
+                try {
+                    list.add(parameters.get(i));
+                }catch (IndexOutOfBoundsException e){
+                    logger.error("Index out of bounds in functional mock getParameters, message is {}", e.getMessage());
+                }
+            }
         }
         return list;
     }
@@ -432,7 +472,13 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
                     logger.debug("Return type: "+returnType +" for retval "+retval.getGenericClass());
                     list.add(returnType);
 
-                    super.parameters.add(null); //important place holder for following updates
+                    // satisfy return value immediately instead of calling these methods after updateMockedMethods
+                    List<Type> needSatisfyType = new ArrayList<>();
+                    needSatisfyType.add(returnType);
+                    TestCase test = getTestCase();
+                    int pos = getPosition();
+                    List<VariableReference> references = TestFactory.getInstance().satisfyParameters(test, null,needSatisfyType ,null, pos, 0, Properties.ALLOW_NULL, false,true);
+                    super.parameters.add(references.get(0)); //important place holder for following updates
                     added++;
                 }
             }
@@ -606,13 +652,66 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
                         //execute all "when" statements
                         int index = 0;
 
+                        // first loop mockedMethods, find methodDescriptors with same id prefix,
+                        // which means generate by same method with type variable.
+                        // record prefix index in mockedMethod list
+                        Map<String, List<Integer>> prefixPosMap= new LinkedHashMap<>();
+                        for(int i = 0; i < mockedMethods.size(); ++i) {
+                            MethodDescriptor md = mockedMethods.get(i);
+                            String id = md.getID();
+                            String[] idParts = id.split("#");
+                            if(idParts.length >= 3) {
+                                String idPrefix = idParts[0] + "#" + idParts[1] + "#";
+                                if(prefixPosMap.containsKey(idPrefix)) {
+                                    List<Integer> posList = prefixPosMap.get(idPrefix);
+                                    posList.add(i);
+                                } else {
+                                    List<Integer> posList = new ArrayList<>();
+                                    posList.add(i);
+                                    prefixPosMap.put(idPrefix, posList);
+                                }
+                            }
+                        }
+
                         logger.debug("Mockito: going to mock {} different methods",mockedMethods.size());
-                        for (MethodDescriptor md : mockedMethods) {
+                        for (int mdIndex = 0; mdIndex < mockedMethods.size(); ++mdIndex) {
+                            MethodDescriptor md = mockedMethods.get(mdIndex);
 
                             if (!md.shouldBeMocked()) {
                                 //no need to mock a method that returns void
                                 logger.debug("Mockito: method {} cannot be mocked",md.getMethodName());
                                 continue;
+                            }
+
+                            // only handle the first md with same id prefix
+                            boolean needExecuted = true;
+                            List<Integer> posList = null;
+                            for(Entry<String, List<Integer>> entry : prefixPosMap.entrySet()) {
+                                String idPrefix = entry.getKey();
+                                if(md.getID().startsWith(idPrefix) ) {
+                                    // whether the first one
+                                    posList = entry.getValue();
+                                    assert posList.size() > 0;
+                                    if(!posList.get(0).equals(mdIndex)) {
+                                        logger.debug("Mockito: this md has been handled, id is {}", md.getID());
+                                        needExecuted = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if(!needExecuted) {
+                                continue;
+                            }
+
+                            // size should add the counter number in type class not null situation
+                            int size = Math.min(md.getCounter(), Properties.FUNCTIONAL_MOCKING_INPUT_LIMIT);
+                            if(posList != null) {
+                                int totalSize = 0;
+                                for(Integer posIndex : posList) {
+                                    totalSize += mockedMethods.get(posIndex).getCounter();
+                                }
+                                size = Math.min(totalSize, Properties.FUNCTIONAL_MOCKING_INPUT_LIMIT);
                             }
 
                             Method method = md.getMethod(); //target method, eg foo.aMethod(...)
@@ -667,7 +766,7 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
                             //thenReturn(...)
                             Object[] thenReturnInputs = null;
                             try {
-                                int size = Math.min(md.getCounter(), Properties.FUNCTIONAL_MOCKING_INPUT_LIMIT);
+                                //int size = Math.min(md.getCounter(), Properties.FUNCTIONAL_MOCKING_INPUT_LIMIT);
 
                                 thenReturnInputs = new Object[size];
 
