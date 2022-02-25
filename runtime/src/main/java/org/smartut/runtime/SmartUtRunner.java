@@ -152,8 +152,9 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
             //Record the corresponding SmartUtClassLoader
             SMART_UT_CLASS_LOADER_MAP.put(clazz.getName(), classLoader);
             RuntimeSettings.caseName = clazz.getName();
-            if (!RESET_CLASS_LOADER_MAP.containsKey(Thread.currentThread().getId()))
+            if (!RESET_CLASS_LOADER_MAP.containsKey(Thread.currentThread().getId())) {
                 RESET_CLASS_LOADER_MAP.put(Thread.currentThread().getId(), Thread.currentThread().getContextClassLoader());
+            }
 //            Thread.currentThread().setContextClassLoader(classLoader);
             return Class.forName(clazz.getName(), true, classLoader);
         } catch (ClassNotFoundException e) {
