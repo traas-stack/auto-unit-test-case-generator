@@ -148,7 +148,7 @@ public class ClassStateSupport {
 	 * tool, we need to make sure it is initialised so that the shutdownhook is added before
 	 * the first test is executed.
 	 */
-	private static void initialiseExternalTools(ClassLoader classLoader, List<Class<?>> classes) {
+	private synchronized static void initialiseExternalTools(ClassLoader classLoader, List<Class<?>> classes) {
 
 		for (String externalInitMethod : EXTERNAL_INIT_METHODS) {
 			for(Class<?> clazz : classes) {

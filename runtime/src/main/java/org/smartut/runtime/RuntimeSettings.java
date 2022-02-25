@@ -95,7 +95,7 @@ public class RuntimeSettings {
     /**
      * How many iterations is each loop allowed to take?
      */
-    public static long maxNumberOfIterationsPerLoop = 10_000;
+    public static long maxNumberOfIterationsPerLoop = Long.MAX_VALUE;
 
     /**
      * Should tests be executed in a separate instrumenting class loader
