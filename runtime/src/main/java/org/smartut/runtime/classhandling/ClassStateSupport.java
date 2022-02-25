@@ -19,27 +19,32 @@
  */
 package org.smartut.runtime.classhandling;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.smartut.runtime.LoopCounter;
+import org.smartut.runtime.RuntimeSettings;
+import org.smartut.runtime.agent.InstrumentingAgent;
+import org.smartut.runtime.instrumentation.ExcludedClasses;
+import org.smartut.runtime.instrumentation.InstrumentedClass;
+import org.smartut.runtime.sandbox.Sandbox;
+import org.smartut.runtime.util.AtMostOnceLogger;
+
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import org.smartut.runtime.LoopCounter;
-import org.smartut.runtime.RuntimeSettings;
-import org.smartut.runtime.agent.InstrumentingAgent;
-import org.smartut.runtime.instrumentation.InstrumentedClass;
-import org.smartut.runtime.sandbox.Sandbox;
-import org.smartut.runtime.util.AtMostOnceLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.stream.Collectors;
 
 
 /**
@@ -52,7 +57,31 @@ public class ClassStateSupport {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClassStateSupport.class);
 
-	private static final String[] externalInitMethods = new String[] {"$jacocoInit", "$gzoltarInit"};
+	//Added time control for resetClasses
+	private static final long CLASS_TIME_OUT = 3L;
+
+	private static final int THREAD_POOL_SIZE = 3;
+
+
+	private static final ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(THREAD_POOL_SIZE,
+			THREAD_POOL_SIZE,
+			0L,
+			TimeUnit.MILLISECONDS,
+			new LinkedBlockingQueue<>(1024),
+			new BasicThreadFactory.Builder().namingPattern("class-state-support-pool-%d").build());
+
+
+
+	//The initialized class is cached and used when reset
+	private static final List<String> INITIALIZED_CLASSES = new ArrayList<>();
+
+	//Classes containing these are not reset
+	private static final List<String> NOT_RESET_CLASS_CONTAINS = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil");
+
+	//Classes ending with these Strings are not reset
+	private static final List<String> NOT_RESET_CLASS_SUFFIX = Arrays.asList("_SSTest", "scaffolding");
+
+	private static final String[] EXTERNAL_INIT_METHODS = new String[] {"$jacocoInit", "$gzoltarInit"};
 
 	private static final long INIT_CLASS_TIME_OUT = 3L;
 
@@ -123,7 +152,7 @@ public class ClassStateSupport {
 	 */
 	private static void initialiseExternalTools(ClassLoader classLoader, List<Class<?>> classes) {
 
-		for (String externalInitMethod : externalInitMethods) {
+		for (String externalInitMethod : EXTERNAL_INIT_METHODS) {
 			for(Class<?> clazz : classes) {
 				try {
 					Method initMethod = clazz.getDeclaredMethod(externalInitMethod);
@@ -149,12 +178,90 @@ public class ClassStateSupport {
 	 *     This method will be usually called after a test is executed, ie in a @After
 	 * </p>
 	 *
-	 * @param classNames
 	 */
-	public static void resetClasses(String... classNames) {
-		for (String classNameToReset : classNames) {
-			ClassResetter.getInstance().reset(classNameToReset);
+	public static void resetClasses() {
+//		It is possible to get stuck, reset classes increase timeout control
+		Callable call = () -> {
+			// Reset the class of initClasses
+				for(String initializedClassName : getLoadedClassesNeedReset()) {
+					if(initializedClassName.isEmpty()) {
+						continue;
+					}
+					ClassResetter.getInstance().reset(initializedClassName);
+				}
+			return null;
+		};
+
+		try {
+			Future result = EXECUTOR.submit(call);
+			// Set the timeout time 3s
+			result.get(CLASS_TIME_OUT, TimeUnit.SECONDS);
+		} catch (TimeoutException e) {
+			logger.warn("reset classes are timeout, time out seconds is {}", CLASS_TIME_OUT);
+		} catch (Exception e) {
+			logger.warn("reset classes meet exception {}", e.getMessage());
 		}
+		EXECUTOR.shutdown();
+	}
+
+	/**
+	 * Class list loaded using ClassResetter.classloader
+	 * @return load classes
+	 */
+	private static Vector<Class<?>> getClassloaderLoadClasses(){
+		Vector<Class<?>> classes = new Vector<>();
+		try {
+			ClassLoader classLoader = ClassResetter.getInstance().getClassLoader();
+			Class<?> clazz = classLoader.getClass();
+			while (clazz != java.lang.ClassLoader.class) {
+				clazz = clazz.getSuperclass();
+			}
+
+			java.lang.reflect.Field classLoaderClassesField = clazz
+					.getDeclaredField("classes");
+
+			classLoaderClassesField.setAccessible(true);
+			 classes = (Vector<Class<?>>) classLoaderClassesField.get(classLoader);
+
+		} catch (Exception e) {
+			logger.error("getClassloaderLoadClasses error", e);
+		}
+		return classes;
+	}
+
+	/**
+	 * The class that needs to be reset
+	 * 1.The class passed in by initializeClasses, in the separateClassloader version, the class passed in by INITIALIZED_CLASSES is empty
+	 * 2.Use the class of ClassResetter.classloader (filter out the class in excluded.class)
+	 * @return
+	 */
+	private static List<String> getLoadedClassesNeedReset(){
+		List<String> needResetClasses = new ArrayList<>(INITIALIZED_CLASSES);
+		try {
+			//Get class using ClassResetter.classloader
+			needResetClasses.addAll(getClassloaderLoadClasses()
+					.stream()
+					//(filter out interfaces)
+					.filter(Class::isInterface)
+					.map(Class::getName)
+					//According to the class name, filter out names that contain NOT_RESET_CLASS_CONTAINS
+					.filter(oneClassName->NOT_RESET_CLASS_CONTAINS.stream().anyMatch(oneClassName::contains)
+							//According to the class name, filter out the class ending with NOT_RESET_CLASS_SUFFIX in the name
+							||NOT_RESET_CLASS_SUFFIX.stream().anyMatch(oneClassName::endsWith)
+							//Filter the classes in excluded.class according to the class name
+							|| ExcludedClasses.getPackagesShouldNotBeInstrumented().stream().anyMatch(oneClassName::startsWith))
+					.collect(Collectors.toList()));
+		} catch (Exception e) {
+			logger.error("getLoadedClassesNeedReset error",e);
+		}
+		return needResetClasses;
+	}
+
+	/**
+	 * Reset the current class under test
+	 */
+	public static void resetCUT() {
+		ClassResetter.getInstance().reset(RuntimeSettings.className);
 	}
 
 
