@@ -22,7 +22,14 @@ package org.smartut.runtime.classhandling;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.smartut.runtime.LoopCounter;
 import org.smartut.runtime.RuntimeSettings;
@@ -47,6 +54,11 @@ public class ClassStateSupport {
 
 	private static final String[] externalInitMethods = new String[] {"$jacocoInit", "$gzoltarInit"};
 
+	private static final long INIT_CLASS_TIME_OUT = 3L;
+
+	private static final ExecutorService exec = Executors.newFixedThreadPool(3);
+
+	private static final List<String> initializedClasses = new ArrayList<>();
     /**
      * Load all the classes with given name with the provided input classloader.
      * Those classes are all supposed to be instrumented.
@@ -60,42 +72,48 @@ public class ClassStateSupport {
      */
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
 
-		boolean problem = false;
+		// initializeClasses may block, use thread pool and increase timeout control
+		// Compatibility: set classloader at the beginning, and no explicit call is required during reset
+		ClassResetter.getInstance().setClassLoader(classLoader);
+		// Add the tested class to the array that needs init
+		String[] classNamesWithCUT = addCutName(classNames);
 
-		List<Class<?>> classes = loadClasses(classLoader, classNames);
-		if(classes.size() != classNames.length) {
-			problem = true;
+		Callable<Boolean> call = () -> {
+			//Start init
+			boolean problem = false;
+
+			List<Class<?>> classes = loadClasses(classLoader, classNamesWithCUT);
+			initialiseExternalTools(classLoader, classes);
+
+			if(RuntimeSettings.isUsingAnyMocking()) {
+				problem =classes.stream().filter(Class::isInterface).anyMatch(clazz->!InstrumentedClass.class.isAssignableFrom(clazz));
+			}
+			// Record initializedClasses at the end
+			initializedClasses.addAll(Arrays.asList(classNames));
+
+			return problem;
+		};
+
+		try {
+			Future<Boolean> result = exec.submit(call);
+			// Set timeout
+			Boolean obj = result.get(INIT_CLASS_TIME_OUT, TimeUnit.SECONDS);
+			return obj;
+		} catch (TimeoutException e) {
+			logger.warn("initializing classes are timeout, time out seconds is {}", INIT_CLASS_TIME_OUT);
+		} catch (Exception e) {
+			logger.warn("initializing classes meet exception {}", e.getMessage());
 		}
 
-		initialiseExternalTools(classLoader, classes);
+		exec.shutdown();
+		return false;
+	}
 
-		if(RuntimeSettings.isUsingAnyMocking()) {
-
-			for (Class<?> clazz : classes) {
-
-                if(clazz.isInterface()) {
-                    /*
-                        FIXME: once we ll start to support Java 8, in which interfaces can have code,
-                        we ll need to instrument them as well
-                     */
-                    continue;
-                }
-
-                if (!InstrumentedClass.class.isAssignableFrom(clazz)) {
-                    String msg = "Class " + clazz.getName() + " was not instrumented by SmartUt. " +
-                            "This could happen if you are running JUnit tests in a way that is not handled by SmartUt, in " +
-                            "which some classes are loaded be reflection before the tests are run. Consult the SmartUt documentation " +
-                            "for possible workarounds for this issue.";
-                    logger.error(msg);
-					problem = true;
-                    //throw new IllegalStateException(msg); // throwing an exception might be a bit too extreme
-                }
-            }
-        }
-
-		return problem;
-
-		//retransformIfNeeded(classes); // cannot do it, as retransformation does not really work :(
+	private static String[] addCutName(String... classNames){
+		String[] classNamesWithCUT = new String[classNames.length + 1];
+		System.arraycopy(classNames, 0, classNamesWithCUT, 0, classNames.length);
+		classNamesWithCUT[classNames.length] = org.smartut.runtime.RuntimeSettings.className;
+		return classNamesWithCUT;
 	}
 
 	/*

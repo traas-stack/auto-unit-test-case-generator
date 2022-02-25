@@ -384,6 +384,7 @@ public class Scaffolding {
 					&& (name.endsWith(Properties.JUNIT_SUFFIX) || name.endsWith(Properties.SCAFFOLDING_SUFFIX))) {
 				continue;
 			}
+  	// todo Do you also need to record init mock class when using separateclassloader
 
 			classes.add(name);
 
@@ -398,29 +399,31 @@ public class Scaffolding {
 		// suite not compile
 		// return; // when test_scaffolding=false and no_runtime_dependency=true
 
-		List<String> allInstrumentedClasses = TestGenerationContext.getInstance().getClassLoaderForSUT()
-				.getViewOfInstrumentedClasses();
-		List<String> classesToInit = getClassesToInit(allInstrumentedClasses);
+//		List<String> allInstrumentedClasses = TestGenerationContext.getInstance().getClassLoaderForSUT()
+//				.getViewOfInstrumentedClasses();
+		// initializeClasses array using separateclassloader is empty
+//		List<String> classesToInit = getClassesToInit(allInstrumentedClasses);
 
 		bd.append("\n");
 		bd.append(METHOD_SPACE);
 		bd.append("private static void " + InitializingListener.INITIALIZE_CLASSES_METHOD + "() {\n");
 
-		if (classesToInit.size() != 0) {
+
+//		if (classesToInit.size() != 0) {
 			bd.append(BLOCK_SPACE);
 			bd.append(ClassStateSupport.class.getName() + ".initializeClasses(");
-			bd.append(testClassName + ".class.getClassLoader() ");
+			bd.append(testClassName + ".class.getClassLoader()");
 
-			for (String className : classesToInit) {
-				if (!BytecodeInstrumentation.checkIfCanInstrument(className)) {
-					continue;
-				}
-				bd.append(",\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
-			}
-			bd.append("\n");
-			bd.append(BLOCK_SPACE);
+//			for (String className : claswosesToInit) {
+//				if (!BytecodeInstrumentation.checkIfCanInstrument(className)) {
+//					continue;
+//				}
+//				bd.append(",\n" + INNER_BLOCK_SPACE + "\"" + className + "\"");
+//			}
+//			bd.append("\n");
+//			bd.append(BLOCK_SPACE);
 			bd.append(");\n");
-		}
+//		}
 
 		/*
 		 * Not needed any longer, since the issue was fixed with a
