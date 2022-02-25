@@ -131,4 +131,8 @@ public class PrivateMethodStatement extends MethodStatement {
 		return true;
 	}
 
+    public GenericMethod getReflectedMethod() {
+        return reflectedMethod;
+    }
+
 }

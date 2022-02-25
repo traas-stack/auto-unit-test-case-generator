@@ -49,7 +49,8 @@ public class JavaExecCmdUtil {
    * @see #getJavaBinExecutablePath(boolean)
    */
   public static String getJavaBinExecutablePath() {
-    return getJavaBinExecutablePath(false);
+    //Java full path is used by default
+    return getJavaBinExecutablePath(true);
   }
 
   private static Optional<String> getJavaHomeEnv() {

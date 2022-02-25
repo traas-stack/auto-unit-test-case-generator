@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
-import org.smartut.Properties.NoSuchParameterException;
+import org.smartut.config.PropertiesLoader.NoSuchParameterException;
 import org.smartut.ga.Chromosome;
 import org.smartut.result.TestGenerationResult;
 import org.smartut.statistics.RuntimeVariable;
