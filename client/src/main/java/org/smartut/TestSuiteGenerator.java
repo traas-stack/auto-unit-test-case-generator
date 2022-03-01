@@ -622,6 +622,25 @@ public class TestSuiteGenerator {
 
 	}
 
+	private void buildAssert(TestSuiteChromosome testSuite){
+		try {
+			//获取构建单测用例的Class
+			Class<?> targetClass = Class.forName(Properties.TARGET_CLASS, false, TestGenerationContext.getInstance().getClassLoaderForSUT());
+
+			//根据Properties以及class类型确定是否新增Assert
+			if (Properties.ASSERTIONS && !targetClass.isEnum()) {
+				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
+				logger.warn("Start adding assertions");
+				ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
+				TestSuiteGeneratorHelper.addAssertions(testSuite);
+				StatisticsSender.sendIndividualToMaster(testSuite); // FIXME: can we
+				logger.warn("Add assertions DONE");
+			}
+		}catch (ClassNotFoundException e){
+			logger.error("add assert : targetClass not found ",e);
+		}
+	}
+
 	private static int checkAllTestsIfTime(List<TestCase> testCases, long delta) {
 		if (TimeController.getInstance().hasTimeToExecuteATestCase()
 				&& TimeController.getInstance().isThereStillTimeInThisPhase(delta)) {

@@ -20,7 +20,11 @@
 package org.smartut.assertion;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.smartut.Properties;
 import org.smartut.testcase.TestCase;
@@ -271,5 +275,23 @@ public class OutputTrace<T extends OutputTraceEntry> implements Cloneable {
 	@Override
 	public String toString() {
 		return "Output trace of size " + trace.size();
+	}
+
+	public Set<Assertion> getAssertionsByStatement(int statementIndex, int testAssertionSize) {
+		Set<Assertion> assertions= new HashSet<>();
+		if(trace.containsKey(statementIndex)) {
+			Map<Integer, T> map = trace.get(statementIndex);
+			map.forEach((var, statement) -> {
+				assertions.addAll(statement.getAssertions().stream().map(assertion -> {
+					assert (assertion.isValid()) : "Invalid assertion: "
+							+ assertion.getCode() + ", " + assertion.value;
+					if (testAssertionSize >= Properties.MAX_LENGTH_TEST_CASE) {
+						return null;
+					}
+					return assertion;
+				}).filter(Objects::nonNull).collect(Collectors.toList()));
+			});
+		}
+		return assertions;
 	}
 }
