@@ -501,22 +501,8 @@ public class TestSuiteGenerator {
 				}
 			}
 		}
+		buildAssert(testSuite);
 
-		if (Properties.ASSERTIONS) {
-			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
-			// progressMonitor.setCurrentPhase("Generating assertions");
-			ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
-			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
-				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
-                        + "Skipping assertion generation because not enough time is left");
-			} else {
-				TestSuiteGeneratorHelper.addAssertions(testSuite);
-			}
-			StatisticsSender.sendIndividualToMaster(testSuite); // FIXME: can we
-																// pass the list
-																// of
-																// testsuitechromosomes?
-		}
 
 		if(Properties.NO_RUNTIME_DEPENDENCY) {
 			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
@@ -624,10 +610,10 @@ public class TestSuiteGenerator {
 
 	private void buildAssert(TestSuiteChromosome testSuite){
 		try {
-			//获取构建单测用例的Class
+			//Get the class that makes the ut case
 			Class<?> targetClass = Class.forName(Properties.TARGET_CLASS, false, TestGenerationContext.getInstance().getClassLoaderForSUT());
 
-			//根据Properties以及class类型确定是否新增Assert
+			//Determine whether to add Assert according to Properties and class type
 			if (Properties.ASSERTIONS && !targetClass.isEnum()) {
 				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
 				logger.warn("Start adding assertions");
