@@ -618,7 +618,12 @@ public class TestSuiteGenerator {
 				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
 				logger.warn("Start adding assertions");
 				ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
-				TestSuiteGeneratorHelper.addAssertions(testSuite);
+				if (TimeController.getInstance().hasTimeToExecuteATestCase()) {
+					TestSuiteGeneratorHelper.addAssertions(testSuite);
+				}else {
+					LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
+							+ "Skipping assertion generation because not enough time is left");
+				}
 				StatisticsSender.sendIndividualToMaster(testSuite); // FIXME: can we
 				logger.warn("Add assertions DONE");
 			}
