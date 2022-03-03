@@ -343,6 +343,9 @@ public class TestSuiteMinimizer {
                         + " from test");
                     TestChromosome originalTestChromosome = testChromosome.clone();
 
+                    // record exceptions size before delete statement
+                    int exceptSizeOriginal = testChromosome.getLastExecutionResult().getAllThrownExceptions().size();
+
                     boolean modified = false;
                     try {
                         TestFactory testFactory = TestFactory.getInstance();
@@ -366,13 +369,24 @@ public class TestSuiteMinimizer {
                         modifiedVerFitness.add(ff.getFitness(suite));
 
                     int compare_ff = 0;
-                    for (int i_fit = 0; i_fit < modifiedVerFitness.size(); i_fit++) {
-                        if (Double.compare(modifiedVerFitness.get(i_fit), fitness.get(i_fit)) < 0) {
-                            compare_ff = -1; // new value is lower than previous one
-                            break;
-                        } else if (Double.compare(modifiedVerFitness.get(i_fit), fitness.get(i_fit)) > 0) {
-                            compare_ff = 1; // new value is greater than previous one
-                            break;
+                    // record exceptions size after delete statement
+                    int exceptSizeDeleted = testChromosome.getLastExecutionResult().getAllThrownExceptions().size();
+                    boolean exceptionCheckPass = true;
+                    if(exceptSizeDeleted > exceptSizeOriginal) {
+                        logger.debug("exceptSizeOriginal is {}, exceptSizeDeleted is {}", exceptSizeOriginal, exceptSizeDeleted);
+                        exceptionCheckPass = false;
+                        compare_ff = 1;
+                    }
+                    // check exception first, then check fitness
+                    if(exceptionCheckPass) {
+                        for (int i_fit = 0; i_fit < modifiedVerFitness.size(); i_fit++) {
+                            if (Double.compare(modifiedVerFitness.get(i_fit), fitness.get(i_fit)) < 0) {
+                                compare_ff = -1; // new value is lower than previous one
+                                break;
+                            } else if (Double.compare(modifiedVerFitness.get(i_fit), fitness.get(i_fit)) > 0) {
+                                compare_ff = 1; // new value is greater than previous one
+                                break;
+                            }
                         }
                     }
 
@@ -559,9 +573,19 @@ public class TestSuiteMinimizer {
 
             int i = (int)Math.signum(coveredFilterGoals2 - coveredFilterGoals1);
 
-            // for Total_length strategy，length the shorter, the better，so put short length at head
+            // check exception number first, then check length
             if (i == 0) {
-                return o1.compareSecondaryObjective(o2);
+                // less exception rank higher
+                int o1ExceptsSize = o1.getLastExecutionResult().getAllThrownExceptions().size();
+                int o2ExceptSize = o2.getLastExecutionResult().getAllThrownExceptions().size();
+                int exceptCmpRet = (int)Math.signum(o1ExceptsSize - o2ExceptSize);
+
+                // for Total_length, the shorter, the better
+                if(exceptCmpRet == 0) {
+                    return o1.compareSecondaryObjective(o2);
+                }
+
+                return exceptCmpRet;
             }
             return i;
         });
