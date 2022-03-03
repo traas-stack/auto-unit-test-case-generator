@@ -1249,7 +1249,9 @@ public class TestCodeVisitor extends TestVisitor {
 		if(st instanceof FunctionalMockForAbstractClassStatement) {
 			result += "mock(" + rawClassName + ".class, CALLS_REAL_METHODS);" + NEWLINE;
 		} else {
-			result += "mock(" + rawClassName + ".class, new " + ViolatedAssumptionAnswer.class.getSimpleName() + "());" + NEWLINE;
+			// bugfix: OOM issue fix
+			result += "mock(" + rawClassName + ".class, withSettings().defaultAnswer(new "
+				+ ViolatedAssumptionAnswer.class.getSimpleName() + "()).stubOnly());" + NEWLINE;
 		}
 
 		Set<String> idPrefixSet = new HashSet<>();

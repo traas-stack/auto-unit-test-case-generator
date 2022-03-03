@@ -367,6 +367,7 @@ public class TestSuiteGenerator {
 				.removeIf(t -> t.getLastExecutionResult() != null && (t.getLastExecutionResult().hasTimeout() ||
 																	  t.getLastExecutionResult().hasTestException()));
 
+		logger.warn("start postProcessTests");
 		if (Properties.CTG_SEEDS_FILE_OUT != null) {
 			TestSuiteSerialization.saveTests(testSuite, new File(Properties.CTG_SEEDS_FILE_OUT));
 		} else if (Properties.TEST_FACTORY == TestFactory.SERIALIZATION) {
@@ -393,6 +394,7 @@ public class TestSuiteGenerator {
 			}
 		}
 
+		logger.warn("postProcessTests testSuite before inline, size is {}", testSuite.size());
 		if (Properties.INLINE) {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.INLINING);
 			ConstantInliner inliner = new ConstantInliner(true);
@@ -403,30 +405,45 @@ public class TestSuiteGenerator {
 
 			inliner.inline(testSuite);
 		}
+		logger.warn("postProcessTests testSuite after inline, size is {}", testSuite.size());
 
+		logger.warn("postProcessTests testSuite size before minimize: {}", testSuite.getTestChromosomes().size());
+
+		/**
+		 *  minimize optimize：
+		 *  1. case remove： based on covered goals，filter case，delete case without mut.
+		 *  2. pre-minimize: for every case，delete useless privateAccess.setVariable statement.
+		 *  3. minimize per case: for every case，delete statement backward，
+		 *  run case after every statement delete for fitness guarantee.
+		 */
 		if (Properties.MINIMIZE) {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.MINIMIZATION);
-			// progressMonitor.setCurrentPhase("Minimizing test cases");
-			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
-				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
-                        + "Skipping minimization because not enough time is left");
-				ClientServices.track(RuntimeVariable.Result_Size, testSuite.size());
-				ClientServices.track(RuntimeVariable.Minimized_Size, testSuite.size());
-				ClientServices.track(RuntimeVariable.Result_Length, testSuite.totalLengthOfTestCases());
-				ClientServices.track(RuntimeVariable.Minimized_Length, testSuite.totalLengthOfTestCases());
-			} else {
 
-				double before = testSuite.getFitness();
 
-				TestSuiteMinimizer minimizer = new TestSuiteMinimizer(getFitnessFactories());
+			List<TestFitnessFactory<? extends TestFitnessFunction>> fitnessFactories = getFitnessFactories();
+			// 1. whole test minimize
+			TestSuiteMinimizer minimizer = new TestSuiteMinimizer(fitnessFactories);
+			logger.warn("Start remove redundant test suite");
+			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Minimizing test suite");
+			// remove redundant and without mut cases
+			minimizer.minimize(testSuite, false);
+			logger.warn("Remove redundant test suite DONE");
 
-				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Minimizing test suite");
-				minimizer.minimize(testSuite, true);
+			// 2. pre minimize
+			double before = testSuite.getFitness();
+			PreTestSuiteMiniMizer preMinimizer = new PreTestSuiteMiniMizer(fitnessFactories);
+			logger.warn("Start pre minimizing test suite");
+			preMinimizer.minimize(testSuite);
+			logger.warn("Pre minimize test suite DONE");
 
-				double after = testSuite.getFitness();
-				if (after > before + 0.01d) { // assume minimization
-					throw new Error("SmartUt bug: minimization lead fitness from " + before + " to " + after);
-				}
+			// 3. gracefully delete
+			logger.warn("Start gracefully delete test case");
+			minimizer.minimizeByDeleteStatementPerTest(testSuite);
+			logger.warn("gracefully delete DONE");
+
+			double after = testSuite.getFitness();
+			if (after > before + 0.01d) { // assume minimization
+				throw new Error("SmartUnit bug: minimization lead fitness from " + before + " to " + after);
 			}
 		} else {
 			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
@@ -445,6 +462,9 @@ public class TestSuiteGenerator {
 			CoverageCriteriaAnalyzer.analyzeCoverage(testSuite);
 		}
 
+		//after minimize, save the tests as seeds
+		logger.warn("postProcessTests testSuite size after minimize: {}", testSuite.getTestChromosomes().size());
+
 		double coverage = testSuite.getCoverage();
 
 		if (ArrayUtil.contains(Properties.CRITERION, Criterion.MUTATION)
@@ -453,7 +473,7 @@ public class TestSuiteGenerator {
 		}
 
 		StatisticsSender.executedAndThenSendIndividualToMaster(testSuite);
-		LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generated " + testSuite.size()
+		LoggingUtils.getSmartUtLogger().warn("* " + ClientProcess.getPrettyPrintIdentifier() + "Generated " + testSuite.size()
                 + " tests with total length " + testSuite.totalLengthOfTestCases());
 
 		// TODO: In the end we will only need one analysis technique
@@ -503,7 +523,7 @@ public class TestSuiteGenerator {
 		}
 
 		if (Properties.ASSERTIONS) {
-			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
+			LoggingUtils.getSmartUtLogger().warn("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
 			// progressMonitor.setCurrentPhase("Generating assertions");
 			ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
 			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
@@ -526,10 +546,12 @@ public class TestSuiteGenerator {
 		}
         else if (Properties.JUNIT_TESTS && (Properties.JUNIT_CHECK == Properties.JUnitCheckValues.TRUE ||
                 Properties.JUNIT_CHECK == Properties.JUnitCheckValues.OPTIONAL)) {
+			logger.warn("Start JUNIT COMPILE AND CHECK");
             if(ClassPathHacker.isJunitCheckAvailable())
                 compileAndCheckTests(testSuite);
             else
                 logger.warn("Cannot run Junit test. Cause {}",ClassPathHacker.getCause());
+			logger.warn("JUNIT COMPILE AND CHECK DONE");
         }
 	}
 

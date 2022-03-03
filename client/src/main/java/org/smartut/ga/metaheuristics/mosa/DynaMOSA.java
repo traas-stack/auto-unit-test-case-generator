@@ -161,12 +161,15 @@ public class DynaMOSA extends AbstractMOSA {
 			this.distance.fastEpsilonDominanceAssignment(this.rankingFunction.getSubfront(i), this.goalsManager.getCurrentGoals());
 		}
 
-		// Evolve the population generation by generation until all gaols have been covered or the
+		// Evolve the population generation by generation until all goals have been covered or the
 		// search budget has been consumed.
+		logger.warn("Before evolve, currentTimestamp is {}", System.currentTimeMillis());
+		logger.warn("Before evolve, Properties search_budge is {}", Properties.SEARCH_BUDGET);
 		while (!isFinished() && this.goalsManager.getUncoveredGoals().size() > 0) {
 			this.evolve();
 			this.notifyIteration();
 		}
+		logger.warn("After evolve, currentTimestamp is {}", System.currentTimeMillis());
 
 		this.notifySearchFinished();
 	}

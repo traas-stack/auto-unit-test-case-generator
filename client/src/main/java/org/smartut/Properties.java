@@ -283,6 +283,10 @@ public class Properties extends AdaptedProperties {
     @DoubleValue(min = 0.0, max = 1.0)
     public static double REFLECTION_START_PERCENT = 0.0;
 
+	@Parameter(key = "reflection_parent_depth", group = "Test Creation", description = "The depth of get parent class private field")
+	@DoubleValue(min = 0.0, max = 1.0)
+	public static int REFLECTION_PARENT_DEPTH = 2;
+
 	@Parameter(key = "p_functional_mocking", group = "Test Creation", description = "Probability [0,1] of using functional mocking (eg Mockito) when creating object instances")
 	@DoubleValue(min = 0.0, max = 1.0)
 	public static double P_FUNCTIONAL_MOCKING = 1.0; // Optimal value: 0.8
@@ -541,7 +545,7 @@ public class Properties extends AdaptedProperties {
 
 	@Parameter(key = "p_test_change", group = "Search Algorithm", description = "Probability of changing statements during mutation")
     @DoubleValue(min = 0.0, max = 1.0)
-	public static double P_TEST_CHANGE = 1d / 3d;
+	public static double P_TEST_CHANGE = 1d / 2d;
 
 	@Parameter(key = "p_test_insert", group = "Search Algorithm", description = "Probability of inserting new statements during mutation")
     @DoubleValue(min = 0.0, max = 1.0)
@@ -590,6 +594,10 @@ public class Properties extends AdaptedProperties {
 	@Parameter(key = "population", group = "Search Algorithm", description = "Population size of genetic algorithm")
 	@IntValue(min = 1)
 	public static int POPULATION = 50;
+
+	@Parameter(key = "init_method_size", group = "Search Algorithm", description = "Method number in one initial case")
+	@IntValue(min = 1)
+	public static int INIT_METHOD_SIZE = 1;
 
 	public enum PopulationLimit {
 		INDIVIDUALS, TESTS, STATEMENTS;
@@ -703,6 +711,12 @@ public class Properties extends AdaptedProperties {
 	@Parameter(key = "minimization_timeout", group = "Search Algorithm", description = "Seconds allowed for minimization at the end")
 	@IntValue(min = 0)
 	public static int MINIMIZATION_TIMEOUT = 60;
+
+	@Parameter(key = "minimization_goals_filter", group = "Search Algorithm", description = "Whether filter goals by certain criteria")
+	public static boolean MINIMIZATION_GOALS_FILTER = true;
+
+	@Parameter(key = "pre_minimize_verify_fitness", group = "Search Algorithm", description = "Pre_minimize test suite verify fitness is worse after each deletion")
+	public static boolean PRE_MINIMIZE_VERIFY_FITNESS = true;
 
     @Parameter(key = "assertion_timeout", group = "Search Algorithm", description = "Seconds allowed for assertion generation at the end")
     @IntValue(min = 0)
@@ -1357,7 +1371,7 @@ public class Properties extends AdaptedProperties {
 	public static int CONCOLIC_TIMEOUT = 15000;
 
 	@Parameter(key = "shutdown_timeout", group = "Test Execution", description = "Milliseconds grace time to shut down test cleanly")
-	public static int SHUTDOWN_TIMEOUT = 1000;
+	public static int SHUTDOWN_TIMEOUT = 3000;
 
 	@Parameter(key = "mutation_timeouts", group = "Test Execution", description = "Number of timeouts before we consider a mutant killed")
 	public static int MUTATION_TIMEOUTS = 3;

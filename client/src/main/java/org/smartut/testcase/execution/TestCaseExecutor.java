@@ -413,7 +413,9 @@ public class TestCaseExecutor implements ThreadFactory {
 				}
 				logger.info(tc.toCode());
 				boolean loopCounter = LoopCounter.getInstance().isActivated();
-				while (isInStaticInit()) {
+				// use while may cause hanging of running test
+				// change while to for check only once and increase shutdown_timeout
+				if (isInStaticInit()) {
 					// LoopCounter and killswitch check the stacktrace often
 					// and that is costly - to speed things up we deactivate it
 					// until we're outside the static constructor

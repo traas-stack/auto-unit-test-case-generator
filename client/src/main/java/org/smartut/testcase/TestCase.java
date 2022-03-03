@@ -513,5 +513,11 @@ public interface TestCase extends Iterable<Statement>, Cloneable, Listenable<Voi
 	 * @param exceptions a {@link java.util.Map} object.
 	 */
     String toCode(Map<Integer, Throwable> exceptions);
+
+	/**
+	 * get last statement position of private fields in a test case
+	 * @return
+	 */
+	int getPrivateFieldLastPosition();
 	
 }

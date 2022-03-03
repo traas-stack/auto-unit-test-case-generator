@@ -46,6 +46,8 @@ public class PrivateAccess {
      */
     private static boolean shouldNotFailTest = true;
 
+    private static final int REFLECTION_PARENT_DEPTH = 2;
+
     public static void setShouldNotFailTest(boolean b){
         shouldNotFailTest = b;
     }
@@ -77,18 +79,38 @@ public class PrivateAccess {
         // note: 'instance' can be null (ie, for static variables), and of course "value"
 
         Field field = null;
+        int parentClassIndex = 0;
         try {
             field = klass.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            String message = "Field '"+fieldName+"' does not exist any more in class "+klass;
+            // add field in parent class
+            boolean found = false;
+            while(parentClassIndex++ < REFLECTION_PARENT_DEPTH) {
+                Class<?> superClass = klass.getSuperclass();
+                if(superClass == null || superClass.getName().equals(Object.class.getName())) {
+                    break;
+                }
 
-            if(shouldNotFailTest) {
-                // force the throwing of a JUnit AssumptionViolatedException
-                throw new FalsePositiveException(message);
-                //it is equivalent to calling
-                //org.junit.Assume.assumeTrue(message,false);
-            } else {
-                throw new IllegalArgumentException(message);
+                try {
+                    field = superClass.getDeclaredField(fieldName);
+                    found = true;
+                    break;
+                } catch (NoSuchFieldException e2) {
+
+                }
+            }
+
+            if(!found) {
+                String message = "Field '"+fieldName+"' does not exist any more in class "+klass;
+
+                if(shouldNotFailTest) {
+                    // force the throwing of a JUnit AssumptionViolatedException
+                    throw new FalsePositiveException(message);
+                    //it is equivalent to calling
+                    //org.junit.Assume.assumeTrue(message,false);
+                } else {
+                    throw new IllegalArgumentException(message);
+                }
             }
         }
         assert field != null;

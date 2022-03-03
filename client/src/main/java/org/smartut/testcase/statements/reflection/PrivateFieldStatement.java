@@ -19,6 +19,7 @@
  */
 package org.smartut.testcase.statements.reflection;
 
+import org.smartut.Properties;
 import org.smartut.ga.ConstructionFailedException;
 import org.smartut.runtime.PrivateAccess;
 import org.smartut.testcase.TestFactory;
@@ -36,6 +37,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +62,8 @@ public class PrivateFieldStatement extends MethodStatement {
 
     private boolean isStaticField = false;
 
+    private transient Type fieldType;
+
     static {
         try {
             //Class<T> klass, T instance, String fieldName, Object value
@@ -71,22 +75,33 @@ public class PrivateFieldStatement extends MethodStatement {
     }
 
     public PrivateFieldStatement(TestCase tc, Class<?> klass , String fieldName, VariableReference callee, VariableReference param)
-            throws NoSuchFieldException, IllegalArgumentException, ConstructionFailedException {
+        throws NoSuchFieldException, IllegalArgumentException, ConstructionFailedException {
+        this(tc, klass, fieldName, callee, param, null);
+    }
+
+    public PrivateFieldStatement(TestCase tc,
+                                 Class<?> klass ,
+                                 String fieldName,
+                                 VariableReference callee,
+                                 VariableReference param,
+                                 Type fieldType)
+        throws NoSuchFieldException, IllegalArgumentException, ConstructionFailedException {
         super(
-                tc,
-                new GenericMethod(setVariable, PrivateAccess.class),
-                null, //it is static
-                Arrays.asList(  // setVariable(Class<T> klass, T instance, String fieldName, Object value)
-                        new ConstantValue(tc, new GenericClass(Class.class), klass),  // Class<T> klass
-                        //new ClassPrimitiveStatement(tc,klass).getReturnValue(),  // Class<T> klass
-                        callee, // T instance
-                        new ConstantValue(tc, new GenericClass(String.class), fieldName),  // String fieldName
-                        param // Object value
-                )
+            tc,
+            new GenericMethod(setVariable, PrivateAccess.class),
+            null, //it is static
+            Arrays.asList(  // setVariable(Class<T> klass, T instance, String fieldName, Object value)
+                new ConstantValue(tc, new GenericClass(Class.class), klass),  // Class<T> klass
+                //new ClassPrimitiveStatement(tc,klass).getReturnValue(),  // Class<T> klass
+                callee, // T instance
+                new ConstantValue(tc, new GenericClass(String.class), fieldName),  // String fieldName
+                param // Object value
+            )
         );
         this.ownerClass = new GenericClass(klass);
         this.className = this.ownerClass.getRawClass().getCanonicalName();
         this.fieldName = fieldName;
+        this.fieldType = fieldType;
 
         List<GenericClass> parameterTypes = new ArrayList<>();
         parameterTypes.add(this.ownerClass);
@@ -100,8 +115,29 @@ public class PrivateFieldStatement extends MethodStatement {
             if (Modifier.isStatic(f.getModifiers()))
                 isStaticField = true;
         } catch(NoSuchFieldException f) {
-            // This should never happen
-            throw new RuntimeException("SmartUt bug", f);
+            // consider private filed in parent
+            boolean found = false;
+            int parentIndex = 0;
+            while(parentIndex++ < Properties.REFLECTION_PARENT_DEPTH) {
+                Class<?> superClass = klass.getSuperclass();
+                if(superClass == null || superClass.getName().equals(Object.class.getName())) {
+                    break;
+                }
+
+                try {
+                    Field field = superClass.getDeclaredField(fieldName);
+                    found = true;
+                    if (Modifier.isStatic(field.getModifiers()))
+                        isStaticField = true;
+                    break;
+                } catch (NoSuchFieldException e2) {
+
+                }
+            }
+            if(!found) {
+                // This should never happen
+                throw new RuntimeException("SmartUnit bug", f);
+            }
         }
     }
 
@@ -153,5 +189,9 @@ public class PrivateFieldStatement extends MethodStatement {
 
         }
         return super.execute(scope, out);
+    }
+
+    public String getFieldName() {
+        return fieldName;
     }
 }

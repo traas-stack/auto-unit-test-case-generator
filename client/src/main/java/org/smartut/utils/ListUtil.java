@@ -99,4 +99,24 @@ public abstract class ListUtil {
 		int index = getIndex(list);
 		return list.get(index);
 	}
+
+	public static <T> T selectByInvokeTimes(List<T> list, Map<T, Integer> invokeTimes) {
+		// get all zero invoke time list
+		List<T> noneInvokeList = new LinkedList<>();
+		for(T element: list) {
+			if(!invokeTimes.containsKey(element) || invokeTimes.get(element) == 0) {
+				noneInvokeList.add(element);
+			}
+		}
+
+		// if having none invoke method, first choose random method from this list
+		if(noneInvokeList.size() > 0) {
+			int index = getIndex(noneInvokeList);
+			return noneInvokeList.get(index);
+		}
+
+		int index = getIndex(list);
+		return list.get(index);
+
+	}
 }
