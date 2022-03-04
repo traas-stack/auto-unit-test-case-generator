@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -123,9 +124,12 @@ public class SpawnProcessKeepAliveChecker {
 
               boolean failed = false;
 
+              // client initiative need to close socket client, otherwise will leave a lot of close_wait connections
+              Socket socket = null;
+              Scanner in = null;
               try {
-                  Socket socket = new Socket(InetAddress.getLoopbackAddress(), port);
-                  Scanner in = new Scanner(socket.getInputStream());
+                  socket = new Socket(InetAddress.getLoopbackAddress(), port);
+                  in = new Scanner(socket.getInputStream());
 
                   sleep(DELTA_MS);
 
@@ -145,6 +149,17 @@ public class SpawnProcessKeepAliveChecker {
               } catch (InterruptedException e) {
                   //this is fine, and expected when process ends
                   failed = false;
+              } finally {
+                  if(in != null) {
+                      in.close();
+                  }
+                  if(socket != null) {
+                      try {
+                          socket.close();
+                      } catch (IOException ex) {
+                          ex.printStackTrace();
+                      }
+                  }
               }
 
               if(failed){
@@ -176,14 +191,35 @@ public class SpawnProcessKeepAliveChecker {
 
         @Override
         public void run() {
+            OutputStream outputStream = null;
             try {
-                PrintWriter out = new PrintWriter(socket.getOutputStream());
-                while (socket.isConnected()) {
-                    out.println(STILL_ALIVE);
+                outputStream = socket.getOutputStream();
+
+                while (true) {
+                    outputStream.write(STILL_ALIVE.getBytes());
+                    // flush to buffer
+                    outputStream.flush();
                     Thread.sleep(DELTA_MS);
                 }
             } catch (Exception e){
+                try {
+                    socket.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
                 //expected when remote host dies
+            } finally {
+                // socket + stream close
+                try{
+                    if(outputStream != null) {
+                        outputStream.close();
+                    }
+                    if(socket != null) {
+                        socket.close();
+                    }
+                } catch (IOException e) {
+                    logger.warn("Close keep alive task exception", e);
+                }
             }
         }
     }
