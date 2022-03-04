@@ -573,6 +573,9 @@ public class TestClusterGenerator {
 				}
 			}
 
+			// copy test methods to original test methods because method will be removed in testMethods when covered
+			cluster.copyMethodsToOriginalList();
+
 			for (Field field : TestClusterUtils.getFields(clazz)) {
 				logger.info("Checking target field " + field);
 

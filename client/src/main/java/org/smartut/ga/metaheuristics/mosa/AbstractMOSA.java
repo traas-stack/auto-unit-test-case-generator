@@ -29,8 +29,10 @@ import org.smartut.ga.FitnessFunction;
 import org.smartut.ga.archive.Archive;
 import org.smartut.ga.comparators.DominanceComparator;
 import org.smartut.ga.metaheuristics.GeneticAlgorithm;
+import org.smartut.setup.TestCluster;
 import org.smartut.testcase.TestCase;
 import org.smartut.testcase.TestChromosome;
+import org.smartut.testcase.TestFactory;
 import org.smartut.testcase.TestFitnessFunction;
 import org.smartut.testcase.secondaryobjectives.TestCaseSecondaryObjective;
 import org.smartut.testcase.statements.*;
@@ -43,6 +45,7 @@ import org.smartut.utils.LoggingUtils;
 import org.smartut.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smartut.utils.generic.GenericAccessibleObject;
 
 import java.util.*;
 
@@ -149,15 +152,16 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
 			TestChromosome parent2 = this.selectionFunction.select(this.population);
 			TestChromosome offspring1 = parent1.clone();
 			TestChromosome offspring2 = parent2.clone();
+			// no more crossover
 			// apply crossover
-			if (Randomness.nextDouble() <= Properties.CROSSOVER_RATE) {
-				try {
-					this.crossoverFunction.crossOver(offspring1, offspring2);
-				} catch (ConstructionFailedException e) {
-					logger.debug("CrossOver failed.");
-					continue;
-				}
-			}
+			//if (Randomness.nextDouble() <= Properties.CROSSOVER_RATE) {
+			//	try {
+			//		this.crossoverFunction.crossOver(offspring1, offspring2);
+			//	} catch (ConstructionFailedException e) {
+			//		logger.debug("CrossOver failed.");
+			//		continue;
+			//	}
+			//}
 
 			this.removeUnusedVariables(offspring1);
 			this.removeUnusedVariables(offspring2);
@@ -180,23 +184,24 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
 				offspringPopulation.add(offspring2);
 			}
 		}
+		// Not generate new test during evolve
 		// Add new randomly generate tests
-		for (int i = 0; i < Properties.POPULATION * Properties.P_TEST_INSERTION; i++) {
-			final TestChromosome tch;
-			if (this.getCoveredGoals().size() == 0 || Randomness.nextBoolean()) {
-				tch = this.chromosomeFactory.getChromosome();
-				tch.setChanged(true);
-			} else {
-				tch = Randomness.choice(this.getSolutions()).clone();
-				tch.mutate();
-//				tch.mutate(); // TODO why is it mutated twice?
-			}
-			if (tch.isChanged()) {
-				tch.updateAge(this.currentIteration);
-				this.calculateFitness(tch);
-				offspringPopulation.add(tch);
-			}
-		}
+//		for (int i = 0; i < Properties.POPULATION * Properties.P_TEST_INSERTION; i++) {
+//			final TestChromosome tch;
+//			if (this.getCoveredGoals().size() == 0 || Randomness.nextBoolean()) {
+//				tch = this.chromosomeFactory.getChromosome();
+//				tch.setChanged(true);
+//			} else {
+//				tch = Randomness.choice(this.getSolutions()).clone();
+//				tch.mutate();
+////				tch.mutate(); // TODO why is it mutated twice?
+//			}
+//			if (tch.isChanged()) {
+//				tch.updateAge(this.currentIteration);
+//				this.calculateFitness(tch);
+//				offspringPopulation.add(tch);
+//			}
+//		}
 		logger.info("Number of offsprings = {}", offspringPopulation.size());
 		return offspringPopulation;
 	}
@@ -348,12 +353,33 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
 		this.notifySearchStarted();
 		this.currentIteration = 0;
 
+		// init population size
+		initPopulationSize();
 		// Create a random parent population P0
 		this.generateInitialPopulation(Properties.POPULATION);
 
 		// Determine fitness
 		this.calculateFitness();
 		this.notifyIteration();
+	}
+
+	private void initPopulationSize() {
+		// population size related to method size
+		List<GenericAccessibleObject<?>> allTestMethods = TestCluster.getInstance().getOriginalTestCalls();
+		// need to filter constructors, public method only
+		List<GenericAccessibleObject<?>> testMethodFilterCons = TestCluster.getInstance().filterConstructors(allTestMethods);
+		// need to add private Method
+		int privateMethodsSize = TestFactory.getInstance().getPrivateMethodsSize();
+		int totalMethodSize = privateMethodsSize + testMethodFilterCons.size();
+		logger.warn("Before init, method to test size is {}", totalMethodSize);
+		int initPopulation = totalMethodSize * 2 + 1 < Properties.POPULATION ? Properties.POPULATION
+			: totalMethodSize * 2 + 1;
+		logger.warn("Before init, population size is {}", initPopulation);
+		try {
+			Properties.getInstance().setValue("population", initPopulation);
+		} catch (Exception e) {
+			throw new Error("Invalid value for population: " + e.getMessage());
+		}
 	}
 
 	/**

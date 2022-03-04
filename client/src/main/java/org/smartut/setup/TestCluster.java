@@ -67,6 +67,14 @@ public class TestCluster {
 	/** UUT methods we want to cover when testing */
 	private final static Set<GenericAccessibleObject<?>> testMethods = new LinkedHashSet<>();
 
+	/** To record original test methods because testMethods will delete method during evolve */
+	private final static Set<GenericAccessibleObject<?>> originalTestMethods = new LinkedHashSet<>();
+
+	/**
+	 *  record method has been invoked times, for test init
+	 */
+	private final static Map<GenericAccessibleObject<?>, Integer> testMethodsInvokeTimes = new LinkedHashMap<>();
+
 	/**
 	 * Methods used to modify and set the environment of the UUT
 	 */
@@ -361,6 +369,10 @@ public class TestCluster {
 		testMethods.remove(call);
 	}
 
+	public void copyMethodsToOriginalList() {
+		originalTestMethods.clear();
+		originalTestMethods.addAll(testMethods);
+	}
 
 	public void addEnvironmentTestCall(GenericAccessibleObject<?> call) throws IllegalArgumentException{
 		Inputs.checkNull(call);
@@ -656,6 +668,14 @@ public class TestCluster {
 	        throws ConstructionFailedException {
 
 		Set<GenericAccessibleObject<?>> calls = getCallsFor(clazz, true);
+
+		// filter the mut
+		List<GenericAccessibleObject<?>> testMethods = TestCluster.getInstance().getOriginalTestCalls();
+		for(GenericAccessibleObject genericAccessibleObject : testMethods) {
+			if(calls.contains(genericAccessibleObject)) {
+				calls.remove(genericAccessibleObject);
+			}
+		}
 
 		if (calls.isEmpty()) {
 			throw new ConstructionFailedException("No modifiers for " + clazz);
@@ -1173,7 +1193,7 @@ public class TestCluster {
 	 * @param testMethods
 	 * @return
 	 */
-	private List<GenericAccessibleObject<?>> filterConstructors(List<GenericAccessibleObject<?>> testMethods) {
+	public List<GenericAccessibleObject<?>> filterConstructors(List<GenericAccessibleObject<?>> testMethods) {
 		return testMethods.stream().filter(call -> !call.isConstructor()).collect(Collectors.toList());
 	}
 
@@ -1251,22 +1271,28 @@ public class TestCluster {
 			candidateTestMethods = sortCalls(candidateTestMethods);
 		}
 
-		GenericAccessibleObject<?> choice = Properties.SORT_CALLS ? ListUtil.selectRankBiased(candidateTestMethods) : Randomness.choice(candidateTestMethods);
-		logger.debug("Chosen call: " + choice);
+		// GenericAccessibleObject<?> choice = Properties.SORT_CALLS ? ListUtil.selectRankBiased(candidateTestMethods) : Randomness.choice(candidateTestMethods);
+		GenericAccessibleObject<?> choice = Properties.SORT_CALLS ? ListUtil.selectRankBiased(candidateTestMethods)
+			: ListUtil.selectByInvokeTimes(candidateTestMethods, testMethodsInvokeTimes);
+		logger.debug("Chosen call: {}", choice);
 		if (choice.getOwnerClass().hasWildcardOrTypeVariables()) {
 			GenericClass concreteClass = choice.getOwnerClass().getGenericInstantiation();
-			logger.debug("Concrete class is: " + concreteClass.getTypeName());
+			logger.debug("Concrete class is: {}", concreteClass.getTypeName());
 			choice = choice.copyWithNewOwner(concreteClass);
-			logger.debug("Concrete class is: " + choice.getOwnerClass().getTypeName());
-			logger.debug("Type variables: " + choice.getOwnerClass().getTypeVariableMap());
+			logger.debug("Concrete class is: {}", choice.getOwnerClass().getTypeName());
+			logger.debug("Type variables: {}", choice.getOwnerClass().getTypeVariableMap());
 			logger.debug(Arrays.asList(choice.getTypeParameters()).toString());
-			logger.debug("Chosen call with generic parameter set: " + choice);
-			logger.debug("Call owner type: " + choice.getOwnerClass().getTypeName());
+			logger.debug("Chosen call with generic parameter set: {}", choice);
+			logger.debug("Call owner type: {}", choice.getOwnerClass().getTypeName());
 		}
 		if (choice.hasTypeParameters()) {
-			logger.debug("Instantiating chosen call: " + choice);
+			logger.debug("Instantiating chosen call: {}", choice);
 			choice = choice.getGenericInstantiation();
-			logger.debug("Chosen instantiation: " + choice);
+			logger.debug("Chosen instantiation: {}", choice);
+		}
+
+		if(choice != null) {
+			testMethodsInvokeTimes.put(choice, testMethodsInvokeTimes.getOrDefault(choice, 0) + 1);
 		}
 		return choice;
 	}
@@ -1285,9 +1311,25 @@ public class TestCluster {
 	 */
 	public List<GenericAccessibleObject<?>> getTestCalls() {
 		// TODO: Check for generic methods
+		return getAllTestCalls(testMethods);
+	}
+
+	/**
+	 * Get a list of original all test calls (i.e., constructors and methods)
+	 *
+	 * @return
+	 * @throws ConstructionFailedException
+	 */
+	public List<GenericAccessibleObject<?>> getOriginalTestCalls() {
+		// TODO: Check for generic methods
+		return getAllTestCalls(originalTestMethods);
+	}
+
+	private List<GenericAccessibleObject<?>> getAllTestCalls(
+		Set<GenericAccessibleObject<?>> originalTestMethods) {
 		List<GenericAccessibleObject<?>> result = new ArrayList<>();
 
-		for (GenericAccessibleObject<?> ao : testMethods) {
+		for (GenericAccessibleObject<?> ao : originalTestMethods) {
 			if (ao.getOwnerClass().hasWildcardOrTypeVariables()) {
 				try {
 					GenericClass concreteClass = ao.getOwnerClass().getGenericInstantiation();

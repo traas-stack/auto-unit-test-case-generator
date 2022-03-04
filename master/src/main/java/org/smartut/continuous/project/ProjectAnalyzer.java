@@ -30,6 +30,7 @@ import java.util.Set;
 import org.smartut.Properties;
 import org.smartut.TestGenerationContext;
 import org.smartut.Properties.AvailableSchedule;
+import org.smartut.classpath.ClassPathHacker;
 import org.smartut.classpath.ClassPathHandler;
 import org.smartut.classpath.ResourceList;
 import org.smartut.continuous.job.schedule.HistorySchedule;
@@ -166,7 +167,7 @@ public class ProjectAnalyzer {
 			}
 			
 			try {
-				Class<?> clazz = Class.forName(className);
+				Class<?> clazz = ClassPathHacker.getContinuousClassLoader().loadClass(className);
 				if (!CoverageAnalysis.isTest(clazz)){
 					cuts.add(className);
 				}

@@ -42,6 +42,7 @@ import org.smartut.seeding.CastClassManager;
 import org.smartut.seeding.ObjectPoolManager;
 import org.smartut.setup.*;
 import org.smartut.testcase.mutation.RandomInsertion;
+import org.smartut.testcase.mutation.StructureInsertion;
 import org.smartut.testcase.statements.*;
 import org.smartut.testcase.statements.environment.EnvironmentStatements;
 import org.smartut.testcase.statements.reflection.PrivateFieldStatement;
@@ -160,7 +161,7 @@ public class TestFactory {
 			return true;
 		} catch (ConstructionFailedException e) {
 			// TODO: Check this!
-			logger.debug("Inserting call {} has failed: {} Removing statements", call, e);
+			logger.warn("Inserting call {} has failed: {} Removing statements", call, e);
 			// TODO: Doesn't work if position != test.size()
 			int lengthDifference = test.size() - previousLength;
 
@@ -173,7 +174,7 @@ public class TestFactory {
 				test.remove(position + i);
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("Test after removal: " + test.toCode());
+				logger.debug("Test after removal: {}", test.toCode());
 			}
 			return false;
 		}
@@ -915,6 +916,7 @@ public class TestFactory {
 				parameters.add(test.getRandomObject(type, position));
 			}
 			MethodStatement m = new MethodStatement(test, method, callee, parameters, retval);
+			m.setCouldMutationDelete(statement.couldMutateDelete());
 			test.setStatement(m, position);
 			logger.debug("Using method {}", m.getCode());
 
@@ -927,6 +929,7 @@ public class TestFactory {
 				parameters.add(test.getRandomObject(type, position));
 			}
 			ConstructorStatement c = new ConstructorStatement(test, constructor, retval, parameters);
+			c.setCouldMutationDelete(statement.couldMutateDelete());
 
 			test.setStatement(c, position);
 			logger.debug("Using constructor {}", c.getCode());
@@ -940,6 +943,7 @@ public class TestFactory {
 
 			try {
 				FieldStatement f = new FieldStatement(test, field, source, retval);
+				f.setCouldMutationDelete(statement.couldMutateDelete());
 				test.setStatement(f, position);
 				logger.debug("Using field {}", f.getCode());
 			} catch (Throwable e) {
@@ -1655,17 +1659,28 @@ public class TestFactory {
 	 * Delete the statement at position from the test case and remove all
 	 * references to it
 	 *
-	 * @param test
-	 * @param position
+	 * @param test        test case
+	 * @param position    delete position
+	 * @param isMutateDel whether mutateDel，if equal true, statements could NOT be deleted if contains mutateDel = false
 	 * @return false if it was not possible to delete the statement
 	 * @throws ConstructionFailedException
 	 */
-	public boolean deleteStatement(TestCase test, int position) {
+	public boolean deleteStatement(TestCase test, int position, boolean isMutateDel) {
 
 		logger.debug("Deleting target statement - {}", position);
 
 		Set<Integer> toDelete = new LinkedHashSet<>();
 		recursiveDeleteInclusion(test,toDelete,position);
+
+		// if isMutateDel, need to judge statements list contains mutateDel = false statement
+		if(isMutateDel) {
+			for(Integer pos : toDelete) {
+				Statement stmtToDel = test.getStatement(pos);
+				if(!stmtToDel.couldMutateDelete()) {
+					return false;
+				}
+			}
+		}
 
 		List<Integer> pos = new ArrayList<>(toDelete);
 		pos.sort(Collections.reverseOrder());
@@ -1676,6 +1691,10 @@ public class TestFactory {
 		}
 
 		return true;
+	}
+
+	public boolean deleteStatement(TestCase test, int position) {
+		return this.deleteStatement(test, position, false);
 	}
 
 	private void recursiveDeleteInclusion(TestCase test, Set<Integer> toDelete, int position){
@@ -1744,19 +1763,25 @@ public class TestFactory {
 	}
 
 
+	public boolean deleteStatementGracefully(TestCase test, int position)
+		throws ConstructionFailedException {
+		return this.deleteStatementGracefully(test, position, false);
+	}
+
 	/**
 	 *
 	 * @param test
 	 * @param position
+	 * @param isMutateDel
 	 * @return true if statements was deleted or any dependency was modified
 	 * @throws ConstructionFailedException
 	 */
-	public boolean deleteStatementGracefully(TestCase test, int position)
-	        throws ConstructionFailedException {
+	public boolean deleteStatementGracefully(TestCase test, int position, boolean isMutateDel)
+		throws ConstructionFailedException {
 		VariableReference var = test.getReturnValue(position);
 
 		if (var instanceof ArrayIndex) {
-			return deleteStatement(test, position);
+			return deleteStatement(test, position, isMutateDel);
 		}
 
 		boolean changed = false;
@@ -1870,7 +1895,7 @@ public class TestFactory {
 		}
 
 		// Remove everything else
-		boolean deleted = deleteStatement(test, position);
+		boolean deleted = deleteStatement(test, position, isMutateDel);
 		return  deleted || changed;
 	}
 
@@ -2198,6 +2223,32 @@ public class TestFactory {
                 logger.debug("Going to insert random reflection call");
 				return insertRandomReflectionCall(test,position, 0);
             }
+
+			double privateRefletionRatio = Randomness.nextDouble();
+
+			//insert reflection field with some probs
+			// only insert when test init
+			if(test.size() == 0 && TestFactory.getInstance().getPrivateFieldsSize() > 0) {
+				// return insertRandomReflectionFieldCall(test,position,0);
+				return insertAllPrivateField(test, position);
+			}
+
+			// private method ratio
+			double privateInsertProps = insertPrivateMethodCallProps();
+			// target_method should be taken into consideration before insert method
+			if(Properties.TARGET_METHOD.isEmpty()){
+				// no TARGET_METHOD
+				//if(reflectionFactory.hasPrivateMethods() && privateReflectionRatio < Properties.P_REFLECTION_ON_PRIVATE){
+				if(reflectionFactory.hasPrivateMethods() && privateRefletionRatio < privateInsertProps){
+					return insertRandomReflectionMethodCall(test,position,0);
+				}
+			}else{
+				// has TARGET_METHOD
+				if(reflectionFactory.doesTargetMethodExists()){
+					return insertRandomReflectionMethodCall(test,position,0);
+				}
+			}
+
 			GenericAccessibleObject<?> o = TestCluster.getInstance().getRandomTestCall(test);
 			if (o == null) {
 				logger.warn("Have no target methods to test");
@@ -2274,6 +2325,22 @@ public class TestFactory {
 	}
 
 	/**
+	 * calculate the private methods ratio
+	 * @return   privateMethod size / (privateMethodSize + publicMethodSize)
+	 */
+	private double insertPrivateMethodCallProps() {
+		// population size related to method size
+		List<GenericAccessibleObject<?>> allTestMethods = TestCluster.getInstance().getOriginalTestCalls();
+		// need to filter constructors, public method only
+		List<GenericAccessibleObject<?>> testMethodFilterCons = TestCluster.getInstance().filterConstructors(allTestMethods);
+		// need to add private Method
+		int privateMethodsSize = TestFactory.getInstance().getPrivateMethodsSize();
+		int totalSize = privateMethodsSize + testMethodFilterCons.size();
+
+		return totalSize > 0 ? privateMethodsSize * 1.00 / totalSize : 0.0;
+	}
+
+	/**
 	 * Within the given {@code test} case, inserts a random call at the specified {@code position}
 	 * on the object referenced by {@code var}. Returns {@code true} if the operation was successful
 	 * and {@code false} otherwise.
@@ -2343,6 +2410,186 @@ public class TestFactory {
 		return false;
 	}
 
+	/**
+	 * insert all private fields at once
+	 * @param test       test case to insert
+	 * @param position   insert start position
+	 * @return           {@code true} if successful, {@code false} otherwise
+	 */
+	public boolean insertAllPrivateField(TestCase test, int position) {
+		int previousLength = test.size();
+		String name = "";
+		currentRecursion.clear();
+		logger.debug("Inserting random call at position {}", position);
+		try {
+			if(reflectionFactory==null){
+				final Class<?> targetClass = Properties.getTargetClassAndDontInitialise();
+				reflectionFactory = new ReflectionFactory(targetClass);
+			}
+
+			// insert reflection field with some probs
+			return insertRandomReflectionFieldCall(test, position,0);
+		} catch (ConstructionFailedException e) {
+			logger.debug("Inserting statement {} has failed. Removing statements: {}", name, e);
+
+			// TODO: Doesn't work if position != test.size()
+			int lengthDifference = test.size() - previousLength;
+			for (int i = lengthDifference - 1; i >= 0; i--) {
+				//we need to remove them in order, so that the testcase is at all time consistent
+				if(logger.isDebugEnabled()) {
+					logger.debug("  Removing statement: {}", test.getStatement(position + i).getCode());
+				}
+				test.remove(position + i);
+			}
+			return false;
+		}
+	}
+
+	private boolean insertRandomReflectionMethodCall(TestCase test, int position, int recursionDepth)
+		throws ConstructionFailedException {
+
+		logger.debug("Recursion depth: " + recursionDepth);
+		if (recursionDepth > Properties.MAX_RECURSION) {
+			logger.debug("Max recursion depth reached");
+			throw new ConstructionFailedException("Max recursion depth reached");
+		}
+
+		List<VariableReference> parameters;
+		Statement st;
+
+		//method
+		int length = test.size();
+		Method method = reflectionFactory.nextMethod();
+		List<Type> list = new ArrayList<>();
+		list.add(reflectionFactory.getReflectedClass());
+		list.addAll(Arrays.asList(method.getGenericParameterTypes()));
+
+		// Added 'null' as additional parameter - fix for @NotNull annotations issue on evo mailing list
+		parameters = satisfyParameters(test, null, list, null, position,
+			recursionDepth + 1, Properties.ALLOW_NULL, false, true);
+		VariableReference callee = parameters.remove(0);
+
+		st = new PrivateMethodStatement(test, reflectionFactory.getReflectedClass(), method,
+			callee, parameters, Modifier.isStatic(method.getModifiers()));
+
+		int newLength = test.size();
+		position += (newLength - length);
+
+		test.addStatement(st, position);
+
+		return true;
+	}
+
+	private boolean insertRandomReflectionFieldCall(TestCase test, int position, int recursionDepth)
+		throws ConstructionFailedException {
+
+		logger.debug("Recursion depth: " + recursionDepth);
+		if (recursionDepth > Properties.MAX_RECURSION) {
+			logger.debug("Max recursion depth reached");
+			throw new ConstructionFailedException("Max recursion depth reached");
+		}
+
+		List<VariableReference> parameters;
+		Statement st;
+
+		List<Field> reflectFiledList = reflectionFactory.getFields();
+		for(Field field : reflectFiledList) {
+			int length = test.size();
+			// bugfix: some field like Map<String, Double>, List<String> may cause classCastException
+			Type fieldType = field.getGenericType();
+
+			List<Type> types = Arrays.asList(reflectionFactory.getReflectedClass(), fieldType);
+			parameters = satisfyParameters(test, null,
+				//we need a reference to the SUT, and one to a variable of same type of chosen field
+				types, null,
+				position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
+
+			try {
+				st = new PrivateFieldStatement(test,reflectionFactory.getReflectedClass(),field.getName(),
+					parameters.get(0),parameters.get(1), fieldType);
+			} catch (NoSuchFieldException e) {
+				logger.error("Reflection problem: "+e,e);
+				throw new ConstructionFailedException("Reflection problem");
+			}
+
+			int newLength = test.size();
+			position += (newLength - length);
+
+			test.addStatement(st, position);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Within the given {@code test} case, inserts a random call at the specified {@code position}
+	 * on the object referenced by {@code var}. Returns {@code true} if the operation was successful
+	 * and {@code false} otherwise.
+	 * <p>
+	 * This method is especially useful if someone wants to insert a random call to a variable
+	 * that is subsequently used as a parameter for the method under test (MUT). The idea is to
+	 * mutate the parameter so that new program states can be reached in the MUT.
+	 *
+	 * @param test the test case in which to insert
+	 * @param var the reference to the object on which to perform the random method call
+	 * @param position the position at which to insert the call
+	 * @return {@code true} if successful, {@code false} otherwise
+	 */
+	public boolean insertRandomCallOnObjectAtForMutate(TestCase test, VariableReference var, int position) {
+
+		// Select a random variable
+		logger.debug("Chosen object: {}", var.getName());
+
+		if (var instanceof ArrayReference) {
+			logger.debug("Chosen object is array ");
+
+			ArrayReference array = (ArrayReference) var;
+			if (array.getArrayLength() > 0) {
+				for (int i = 0; i < array.getArrayLength(); i++) {
+					logger.debug("Assigning array index " + i);
+					int old_len = test.size();
+					try {
+						assignArray(test, array, i, position);
+						position += test.size() - old_len;
+					} catch (ConstructionFailedException e) {
+						logger.debug("ConstructionFailedException", e);
+					}
+				}
+				return true;
+			}
+		} else if (var.getGenericClass().hasWildcardOrTypeVariables()) {
+			// TODO: If the object is of type Foo<?> then only
+			//       methods that don't return / need a type ?
+			//       should be called. For now, we just don't call
+			//       any methods at all.
+			logger.debug("Cannot add calls on unknown type");
+		} else {
+			logger.debug("Getting calls for object {}", var.toString());
+			try {
+				if(reflectionFactory==null){
+					final Class<?> targetClass = Properties.getTargetClassAndDontInitialise();
+					reflectionFactory = new ReflectionFactory(targetClass);
+				}
+
+				if(test.size() == 0 && TestFactory.getInstance().getPrivateFieldsSize() > 0) {
+					return insertAllPrivateField(test, position);
+				}
+
+				// For the specified object "var" (that is being used as a parameter in a
+				// subsequent but here unrelated call to the MUT), randomly choose a method that we
+				// can call so as to change the state of "var". This tactic makes it more likely
+				// that new program states will be reached and thus more code will be covered.
+				GenericAccessibleObject<?> call = TestCluster.getInstance().getRandomCallFor(var.getGenericClass(), test, position);
+				logger.debug("Chosen call {}", call);
+				return addCallFor(test, var, call, position);
+			} catch (ConstructionFailedException e) {
+				logger.debug("Found no modifier: {}", e.getMessage());
+			}
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Inserts one or perhaps multiple random statements into the given {@code test}. Callers
@@ -2360,6 +2607,29 @@ public class TestFactory {
 	public int insertRandomStatement(TestCase test, int lastPosition) {
 		RandomInsertion rs = new RandomInsertion();
 		return rs.insertStatement(test, lastPosition);
+	}
+
+	/**
+	 * Inserts one or perhaps multiple random statements into the given {@code test}. Callers
+	 * have to specify the position of the last valid statement of {@code test} by supplying an
+	 * appropriate index {@code lastPosition}. After a successful insertion, returns the updated
+	 * position of the last valid statement (which is always non-negative), or if there was an error
+	 * the constant {@link org.smartut.testcase.mutation.InsertionStrategy#
+	 * INSERTION_ERROR}.
+	 *
+	 * @param test the test case in which to insert
+	 * @param lastPosition the position of the last valid statement of {@code test} before insertion
+	 * @return the position of the last valid statement after insertion, or {@code INSERTION_ERROR}
+	 * (see above)
+	 */
+	public int insertRandomCallStatement(TestCase test, int lastPosition){
+		StructureInsertion si = new StructureInsertion(true);
+		return si.insertStatement(test, lastPosition);
+	}
+
+	public int insertRandomCallAtVarStatement(TestCase test, int lastPosition){
+		StructureInsertion si = new StructureInsertion(false);
+		return si.insertStatement(test, lastPosition);
 	}
 
 	/**
@@ -2388,6 +2658,16 @@ public class TestFactory {
 
 		for(int i = 0; i < parameterTypes.size(); i++) {
 			Type parameterType = parameterTypes.get(i);
+
+			// if object of class under test has already been initialized, not necessary to create more
+			if(parameterType.getTypeName().equals(reflectionFactory.getReflectedClass().getName())) {
+				if(test.hasObject(parameterType, test.size() - 1)) {
+					VariableReference existCallee = test.getRandomNonNullObject(parameterType, test.size() - 1);
+					parameters.add(existCallee);
+					continue;
+				}
+			}
+
 			Parameter parameter = null;
 			boolean allowNullForParameter = allowNull;
 			if(parameterList != null)
@@ -2444,5 +2724,21 @@ public class TestFactory {
 		return parameters;
 	}
 
+	public int getPrivateFieldsSize() {
+		if(reflectionFactory==null){
+			final Class<?> targetClass = Properties.getTargetClassAndDontInitialise();
+			reflectionFactory = new ReflectionFactory(targetClass);
+		}
 
+		return reflectionFactory.getFields().size();
+	}
+
+	public int getPrivateMethodsSize() {
+		if(reflectionFactory==null){
+			final Class<?> targetClass = Properties.getTargetClassAndDontInitialise();
+			reflectionFactory = new ReflectionFactory(targetClass);
+		}
+
+		return reflectionFactory.getMethods().size();
+	}
 }

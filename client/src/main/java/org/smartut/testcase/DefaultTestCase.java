@@ -48,6 +48,7 @@ import org.smartut.testcase.statements.*;
 import org.smartut.testcase.statements.environment.AccessedEnvironment;
 import org.smartut.testcase.execution.CodeUnderTestException;
 import org.smartut.testcase.execution.Scope;
+import org.smartut.testcase.statements.reflection.PrivateFieldStatement;
 import org.smartut.testcase.variable.*;
 import org.smartut.utils.generic.GenericClass;
 import org.smartut.utils.generic.GenericField;
@@ -357,6 +358,8 @@ public class DefaultTestCase implements TestCase, Serializable {
 			t.statements.add(copy);
 			copy.setRetval(s.getReturnValue().clone(t));
 			copy.setAssertions(s.copyAssertions(t, 0));
+			// copy mutate delete
+			copy.setCouldMutationDelete(s.couldMutateDelete());
 		}
 		t.coveredGoals.addAll(coveredGoals);
 		t.accessedEnvironment.copyFrom(accessedEnvironment);
@@ -1172,5 +1175,22 @@ public class DefaultTestCase implements TestCase, Serializable {
 	@Override
 	public String toString() {
 		return toCode();
+	}
+
+	/**
+	 * dynamic get last position
+	 * @return
+	 */
+	@Override
+	public int getPrivateFieldLastPosition() {
+		// search last private setVariable statement backward
+		int privateSetVariablePos = this.size() - 1;
+		while(privateSetVariablePos > 0) {
+			if(this.getStatement(privateSetVariablePos) instanceof PrivateFieldStatement) {
+				break;
+			}
+			privateSetVariablePos --;
+		}
+		return privateSetVariablePos;
 	}
 }

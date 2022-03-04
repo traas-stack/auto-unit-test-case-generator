@@ -298,8 +298,9 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
 		// Delete
 		if (Randomness.nextDouble() <= Properties.P_TEST_DELETE) {
 			logger.debug("Mutation: delete");
-			if(mutationDelete())
+			if(mutationDeleteOnCallAtVarStatement()) {
 				changed = true;
+			}
 		}
 
 		// Change
@@ -427,24 +428,82 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
 		return changed;
 	}
 
-	protected boolean deleteStatement(TestFactory testFactory, int num) {
+	/**
+	 * only delete call on object statement
+	 * Each statement is deleted with probability 1/length
+	 * @return
+	 */
+	private boolean mutationDeleteOnCallAtVarStatement() {
+
+		if(test.isEmpty()){
+			return false; //nothing to delete
+		}
+
+		boolean changed = false;
+		int lastMutableStatement = getLastMutatableStatement();
+		double pl = 1d / (lastMutableStatement + 1);
+		TestFactory testFactory = TestFactory.getInstance();
+
+		for (int num = lastMutableStatement; num >= 0; num--) {
+
+			if(num >= test.size()){
+				continue; //in case the delete remove more than one statement
+			}
+
+			Statement stmtToDel = test.getStatement(num);
+			if(!stmtToDel.couldMutateDelete()) {
+				continue;
+			}
+
+			// Each statement is deleted with probability 1/l
+			if (Randomness.nextDouble() <= pl) {
+				changed |= deleteStatement(testFactory, num, true);
+			}
+		}
+
+		return changed;
+	}
+
+	/**
+	 * we need to consider whether statement contains mutateDel = false statement,
+	 * if deleted these statements, method invoking statement will be deleted too.
+	 * 1. String string0 = "1";        // mutateDel = true                                                       |
+	 * -------------------------------------------------------------------------------------------------------
+	 * 2.  DelegateExecution delegateExecution0 = mock(DelegateExecution.class)  // mutateDel = false           |
+	 *   -------------------------------------------------------------------------------------------------------
+	 * 3.  doReturn(string0).when(delegateExecution0).getProcessBusinessKey();   // mutateDel = false           |
+	 *   -------------------------------------------------------------------------------------------------------
+	 * 4.  tableTruncateLeaderApproveStartService0.notify(delegateExecution0);   // mutateDel = false
+	 *
+	 * delete number 1 statement will cause 2,3,4 related statements delete
+	 *
+	 * @param testFactory     factory to produce test
+	 * @param num             delete position
+	 * @param isMutateDel     Could be deleted, we could delete statement like minimize
+	 * @return                {@code true} if deleted successfully, {@code false} otherwise
+	 */
+	protected boolean deleteStatement(TestFactory testFactory, int num, boolean isMutateDel) {
 
 		try {
 
-            TestCase copy = test.clone();
+			TestCase copy = test.clone();
 
-            mutationHistory.addMutationEntry(new TestMutationHistoryEntry(
-					TestMutationHistoryEntry.TestMutation.DELETION));
-            boolean modified = testFactory.deleteStatementGracefully(copy, num);
+			mutationHistory.addMutationEntry(new TestMutationHistoryEntry(
+				TestMutationHistoryEntry.TestMutation.DELETION));
+			boolean modified = testFactory.deleteStatementGracefully(copy, num, isMutateDel);
 
-            test = copy;
-           	return modified;
+			test = copy;
+			return modified;
 
-        } catch (ConstructionFailedException e) {
-            logger.warn("Deletion of statement failed: " + test.getStatement(num).getCode());
-            logger.warn(test.toCode());
+		} catch (ConstructionFailedException e) {
+			logger.warn("Deletion of statement failed: " + test.getStatement(num).getCode());
+			logger.warn(test.toCode());
 			return false; //modifications were on copy
-        }
+		}
+	}
+
+	protected boolean deleteStatement(TestFactory testFactory, int num) {
+		return this.deleteStatement(testFactory, num, false);
 	}
 
 	/**
@@ -524,7 +583,7 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
 
 			count++;
 			// Insert at position as during initialization (i.e., using helper sequences)
-			int position = testFactory.insertRandomStatement(test, getLastMutatableStatement());
+			int position = testFactory.insertRandomCallAtVarStatement(test, getLastMutatableStatement());
 
 			if (position >= 0 && position < test.size()) {
 				changed = true;
