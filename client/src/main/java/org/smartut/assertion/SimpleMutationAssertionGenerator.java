@@ -357,15 +357,13 @@ public class SimpleMutationAssertionGenerator extends MutationAssertionGenerator
 						}
 					}
 				}
+				Set<Assertion> target = new HashSet<>();
 				for (OutputTrace<?> trace : origResult.getTraces()) {
-					trace.getAllAssertions(test);
+					Set<Assertion> assertionSet = trace.getAssertionsByStatement(test.size() - 1, test.sizeWithAssertions());
+					target.addAll(assertionSet);
 				}
-
-				Set<Assertion> target = new HashSet<>(
-						test.getStatement(test.size() - 1).getAssertions());
 				logger.debug("Found assertions: " + target.size());
 
-				test.removeAssertions();
 				//test.addAssertions(clone);
 				VariableReference targetVar = test.getStatement(test.size() - 1).getReturnValue();
 				if (!targetVar.isVoid()) {

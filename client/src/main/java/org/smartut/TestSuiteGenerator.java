@@ -521,22 +521,8 @@ public class TestSuiteGenerator {
 				}
 			}
 		}
+		buildAssert(testSuite);
 
-		if (Properties.ASSERTIONS) {
-			LoggingUtils.getSmartUtLogger().warn("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
-			// progressMonitor.setCurrentPhase("Generating assertions");
-			ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
-			if (!TimeController.getInstance().hasTimeToExecuteATestCase()) {
-				LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
-                        + "Skipping assertion generation because not enough time is left");
-			} else {
-				TestSuiteGeneratorHelper.addAssertions(testSuite);
-			}
-			StatisticsSender.sendIndividualToMaster(testSuite); // FIXME: can we
-																// pass the list
-																// of
-																// testsuitechromosomes?
-		}
 
 		if(Properties.NO_RUNTIME_DEPENDENCY) {
 			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
@@ -642,6 +628,30 @@ public class TestSuiteGenerator {
 		ClientServices.track(RuntimeVariable.NumUnstableTests, numUnstable);
 		Properties.USE_SEPARATE_CLASSLOADER = junitSeparateClassLoader;
 
+	}
+
+	private void buildAssert(TestSuiteChromosome testSuite){
+		try {
+			//Get the class that makes the ut case
+			Class<?> targetClass = Class.forName(Properties.TARGET_CLASS, false, TestGenerationContext.getInstance().getClassLoaderForSUT());
+
+			//Determine whether to add Assert according to Properties and class type
+			if (Properties.ASSERTIONS && !targetClass.isEnum()) {
+				LoggingUtils.getSmartUtLogger().warn("* " + ClientProcess.getPrettyPrintIdentifier() + "Generating assertions");
+				logger.warn("Start adding assertions");
+				ClientServices.getInstance().getClientNode().changeState(ClientState.ASSERTION_GENERATION);
+				if (TimeController.getInstance().hasTimeToExecuteATestCase()) {
+					TestSuiteGeneratorHelper.addAssertions(testSuite);
+				}else {
+					LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier()
+							+ "Skipping assertion generation because not enough time is left");
+				}
+				StatisticsSender.sendIndividualToMaster(testSuite); // FIXME: can we
+				logger.warn("Add assertions DONE");
+			}
+		}catch (ClassNotFoundException e){
+			logger.error("add assert : targetClass not found ",e);
+		}
 	}
 
 	private static int checkAllTestsIfTime(List<TestCase> testCases, long delta) {
