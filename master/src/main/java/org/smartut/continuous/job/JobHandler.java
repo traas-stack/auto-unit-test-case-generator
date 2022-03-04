@@ -162,9 +162,9 @@ public class JobHandler extends Thread {
 				});
 				collectInputThread.start();
 
-				boolean exitVal = process.waitFor(Properties.CTG_TIME_PER_CLASS,  TimeUnit.MINUTES); //no need to have timeout here, as it is handled by the scheduler/executor
+				int exitCode = process.waitFor(); //no need to have timeout here, as it is handled by the scheduler/executor
 
-				if (!exitVal) {
+				if (exitCode != 0) {
 					handleProcessError(job, process);
 				}
 
