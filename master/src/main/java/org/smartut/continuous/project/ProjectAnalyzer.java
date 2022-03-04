@@ -224,7 +224,7 @@ public class ProjectAnalyzer {
 				/*
 				 * just to avoid possible issues with instrumenting classloader
 				 */
-				theClass = ClassLoader.getSystemClassLoader().loadClass(className);
+				theClass = ClassPathHacker.getContinuousClassLoader().loadClass(className);
 
 				//TODO kind
 				//if(theClass.isInterface()){
