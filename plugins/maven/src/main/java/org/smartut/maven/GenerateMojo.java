@@ -115,7 +115,7 @@ public class GenerateMojo extends AbstractMojo {
 	/**
 	 * Schedule used to run CTG (SIMPLE, BUDGET, SEEDING, BUDGET_AND_SEEDING, HISTORY)
 	 */
-	@Parameter( property = "schedule", defaultValue = "BUDGET" )
+	@Parameter( property = "schedule", defaultValue = "SIMPLE" )
 	private String schedule;
 
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)

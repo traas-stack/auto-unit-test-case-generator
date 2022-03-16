@@ -806,7 +806,7 @@ public class Properties extends AdaptedProperties {
 	public static int CTG_TIME = 3;
 
 	@Parameter(key = "ctg_time_per_class", group = "Continuous Test Generation", description = "How many minutes to allocate for each class. If this parameter is set, then ctg_time is going to be ignored. This parameter is mainly meant for debugging purposes.")
-	public static Integer CTG_TIME_PER_CLASS = 20;
+	public static Integer CTG_TIME_PER_CLASS = 3;
 
 	@Parameter(key = "ctg_min_time_per_job", group = "Continuous Test Generation", description = "How many minutes each class under test should have at least")
 	public static int CTG_MIN_TIME_PER_JOB = 1;
@@ -878,7 +878,7 @@ public class Properties extends AdaptedProperties {
 	 * Maven plugin will use the default, best one
 	 */
 	@Parameter(key = "ctg_schedule", group = "Continuous Test Generation", description = "Schedule used to run jobs")
-	public static AvailableSchedule CTG_SCHEDULE = AvailableSchedule.BUDGET;
+	public static AvailableSchedule CTG_SCHEDULE = AvailableSchedule.SIMPLE;
 
 
 	@Parameter(key = "ctg_extra_args", group = "Continuous Test Generation", description = "Extra '-D' arguments to pass to SmartUt test generation processes")
