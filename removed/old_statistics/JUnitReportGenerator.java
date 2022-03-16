@@ -1,36 +1,36 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.junit;
+package org.smartut.junit;
 
 import java.io.File;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.evosuite.Properties;
-import org.evosuite.ga.Chromosome;
-import org.evosuite.ga.metaheuristics.GeneticAlgorithm;
-import org.evosuite.utils.LoggingUtils;
-import org.evosuite.utils.ReportGenerator;
-import org.evosuite.utils.Utils;
+import org.smartut.Properties;
+import org.smartut.ga.Chromosome;
+import org.smartut.ga.metaheuristics.GeneticAlgorithm;
+import org.smartut.utils.LoggingUtils;
+import org.smartut.utils.ReportGenerator;
+import org.smartut.utils.Utils;
 
 /**
  * <p>
@@ -125,7 +125,7 @@ public class JUnitReportGenerator extends ReportGenerator {
 				sb.append("</p></div>\n");
 			} catch (Exception e) {
 				// Don't display source if there is an error
-				LoggingUtils.getEvoLogger().info("Cannot find class: " + clazz.getName());
+				LoggingUtils.getSmartUtLogger().info("Cannot find class: " + clazz.getName());
 			}
 			//sb.append("</div>");
 		}
@@ -172,7 +172,7 @@ public class JUnitReportGenerator extends ReportGenerator {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.ga.SearchListener#searchFinished(org.evosuite.ga.GeneticAlgorithm)
+	 * @see org.smartut.ga.SearchListener#searchFinished(org.smartut.ga.GeneticAlgorithm)
 	 */
 	/** {@inheritDoc} */
 	@Override
@@ -182,7 +182,7 @@ public class JUnitReportGenerator extends ReportGenerator {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.evosuite.utils.ReportGenerator#minimized(org.evosuite.ga.Chromosome)
+	 * @see org.smartut.utils.ReportGenerator#minimized(org.smartut.ga.Chromosome)
 	 */
 	/** {@inheritDoc} */
 	@Override

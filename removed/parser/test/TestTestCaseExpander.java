@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.evosuite.testsuite;
+package org.smartut.testsuite;
 
 import junit.framework.Assert;
 
-import org.evosuite.Properties;
-import org.evosuite.junit.JUnitTestReader;
-import org.evosuite.testcase.TestCase;
+import org.smartut.Properties;
+import org.smartut.junit.JUnitTestReader;
+import org.smartut.testcase.TestCase;
 import org.junit.Test;
 
 /**
@@ -37,7 +37,7 @@ public class TestTestCaseExpander {
 
 	@Test
 	public void testNoAssignment() {
-		Properties.PROJECT_PREFIX = "org.evosuite.testsuite";
+		Properties.PROJECT_PREFIX = "org.smartut.testsuite";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(ArrayTestExample1.class.getName()
 		        + "#test1");
@@ -55,7 +55,7 @@ public class TestTestCaseExpander {
 
 	@Test
 	public void testSomeAssignments() {
-		Properties.PROJECT_PREFIX = "org.evosuite.testsuite";
+		Properties.PROJECT_PREFIX = "org.smartut.testsuite";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(ArrayTestExample1.class.getName()
 		        + "#test2");
@@ -72,7 +72,7 @@ public class TestTestCaseExpander {
 
 	@Test
 	public void testHiddenAssignments() {
-		Properties.PROJECT_PREFIX = "org.evosuite.testsuite";
+		Properties.PROJECT_PREFIX = "org.smartut.testsuite";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(ArrayTestExample1.class.getName()
 		        + "#test3");
@@ -90,7 +90,7 @@ public class TestTestCaseExpander {
 
 	@Test
 	public void testOneAssignments() {
-		Properties.PROJECT_PREFIX = "org.evosuite.testsuite";
+		Properties.PROJECT_PREFIX = "org.smartut.testsuite";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(ArrayTestExample1.class.getName()
 		        + "#test4");
@@ -108,7 +108,7 @@ public class TestTestCaseExpander {
 
 	@Test
 	public void testArrayAssignment() {
-		Properties.PROJECT_PREFIX = "org.evosuite.testsuite";
+		Properties.PROJECT_PREFIX = "org.smartut.testsuite";
 		JUnitTestReader reader = new JUnitTestReader(null, new String[] { SRCDIR });
 		TestCase testCase = reader.readJUnitTestCase(ArrayTestExample1.class.getName()
 		        + "#test5");

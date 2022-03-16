@@ -1,33 +1,33 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.junit;
+package org.smartut.junit;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.evosuite.Properties;
-import org.evosuite.testcase.ExecutionResult;
-import org.evosuite.testcase.ExecutionTrace;
-import org.evosuite.testcase.ExecutionTracer;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.TestCaseExecutor;
+import org.smartut.Properties;
+import org.smartut.testcase.ExecutionResult;
+import org.smartut.testcase.ExecutionTrace;
+import org.smartut.testcase.ExecutionTracer;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.TestCaseExecutor;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class JUnitUtils {
 	 * 
 	 * @param failingTest
 	 *            a {@link java.lang.String} object.
-	 * @return a {@link org.evosuite.testcase.TestCase} object.
+	 * @return a {@link org.smartut.testcase.TestCase} object.
 	 */
 	public static TestCase readTestCase(String failingTest) {
 		String[] classpath = Properties.CLASSPATH;
@@ -76,7 +76,7 @@ public class JUnitUtils {
 	 * 
 	 * @param originalTest
 	 *            a {@link java.lang.String} object.
-	 * @return a {@link org.evosuite.junit.TestRun} object.
+	 * @return a {@link org.smartut.junit.TestRun} object.
 	 */
 	public static TestRun runTest(String originalTest) {
 		if (originalTest.contains("#")) {
@@ -103,8 +103,8 @@ public class JUnitUtils {
 	 * </p>
 	 * 
 	 * @param testCase
-	 *            a {@link org.evosuite.testcase.TestCase} object.
-	 * @return a {@link org.evosuite.testcase.ExecutionResult} object.
+	 *            a {@link org.smartut.testcase.TestCase} object.
+	 * @return a {@link org.smartut.testcase.ExecutionResult} object.
 	 */
 	public static ExecutionResult runTest(TestCase testCase) {
 		logger.debug("Execution testCase with timeout {}: \n{}", Properties.TIMEOUT,

@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.junit;
+package org.smartut.junit;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -87,45 +87,45 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
-import org.evosuite.TestGenerationContext;
-import org.evosuite.instrumentation.BytecodeInstrumentation;
-import org.evosuite.junit.CompoundTestCase.MethodDef;
-import org.evosuite.junit.CompoundTestCase.ReturnStatementPlaceholder;
-import org.evosuite.junit.CompoundTestCase.TestScope;
-import org.evosuite.junit.TestRuntimeValuesDeterminer.CursorableTrace;
-import org.evosuite.testcase.ArrayIndex;
-import org.evosuite.testcase.ArrayReference;
-import org.evosuite.testcase.ArrayStatement;
-import org.evosuite.testcase.AssignmentStatement;
-import org.evosuite.testcase.BooleanPrimitiveStatement;
-import org.evosuite.testcase.BytePrimitiveStatement;
-import org.evosuite.testcase.CharPrimitiveStatement;
-import org.evosuite.testcase.ConstructorStatement;
-import org.evosuite.testcase.DoublePrimitiveStatement;
-import org.evosuite.testcase.FieldReference;
-import org.evosuite.testcase.FieldStatement;
-import org.evosuite.testcase.FloatPrimitiveStatement;
-import org.evosuite.testcase.IntPrimitiveStatement;
-import org.evosuite.testcase.LongPrimitiveStatement;
-import org.evosuite.testcase.MethodStatement;
-import org.evosuite.testcase.NullStatement;
-import org.evosuite.testcase.PrimitiveExpression;
-import org.evosuite.testcase.PrimitiveExpression.Operator;
-import org.evosuite.testcase.PrimitiveStatement;
-import org.evosuite.testcase.ShortPrimitiveStatement;
-import org.evosuite.testcase.StatementInterface;
-import org.evosuite.testcase.StringPrimitiveStatement;
-import org.evosuite.testcase.TestCase;
-import org.evosuite.testcase.VariableReference;
-import org.evosuite.testcase.VariableReferenceImpl;
-import org.evosuite.utils.GenericClass;
-import org.evosuite.utils.GenericConstructor;
-import org.evosuite.utils.GenericField;
-import org.evosuite.utils.GenericMethod;
+import org.smartut.TestGenerationContext;
+import org.smartut.instrumentation.BytecodeInstrumentation;
+import org.smartut.junit.CompoundTestCase.MethodDef;
+import org.smartut.junit.CompoundTestCase.ReturnStatementPlaceholder;
+import org.smartut.junit.CompoundTestCase.TestScope;
+import org.smartut.junit.TestRuntimeValuesDeterminer.CursorableTrace;
+import org.smartut.testcase.ArrayIndex;
+import org.smartut.testcase.ArrayReference;
+import org.smartut.testcase.ArrayStatement;
+import org.smartut.testcase.AssignmentStatement;
+import org.smartut.testcase.BooleanPrimitiveStatement;
+import org.smartut.testcase.BytePrimitiveStatement;
+import org.smartut.testcase.CharPrimitiveStatement;
+import org.smartut.testcase.ConstructorStatement;
+import org.smartut.testcase.DoublePrimitiveStatement;
+import org.smartut.testcase.FieldReference;
+import org.smartut.testcase.FieldStatement;
+import org.smartut.testcase.FloatPrimitiveStatement;
+import org.smartut.testcase.IntPrimitiveStatement;
+import org.smartut.testcase.LongPrimitiveStatement;
+import org.smartut.testcase.MethodStatement;
+import org.smartut.testcase.NullStatement;
+import org.smartut.testcase.PrimitiveExpression;
+import org.smartut.testcase.PrimitiveExpression.Operator;
+import org.smartut.testcase.PrimitiveStatement;
+import org.smartut.testcase.ShortPrimitiveStatement;
+import org.smartut.testcase.StatementInterface;
+import org.smartut.testcase.StringPrimitiveStatement;
+import org.smartut.testcase.TestCase;
+import org.smartut.testcase.VariableReference;
+import org.smartut.testcase.VariableReferenceImpl;
+import org.smartut.utils.GenericClass;
+import org.smartut.utils.GenericConstructor;
+import org.smartut.utils.GenericField;
+import org.smartut.utils.GenericMethod;
 
 /**
  * This class implements the Eclipse JDT Visitor to turn an existing test case
- * (in source code form) into an EvoSuite {@link TestCase}.
+ * (in source code form) into an SmartUt {@link TestCase}.
  * 
  * @author roessler
  */
@@ -343,13 +343,13 @@ public class TestExtractingVisitor extends ASTVisitor {
 	 * </p>
 	 * 
 	 * @param testCase
-	 *            a {@link org.evosuite.junit.CompoundTestCase} object.
+	 *            a {@link org.smartut.junit.CompoundTestCase} object.
 	 * @param testClass
 	 *            a {@link java.lang.String} object.
 	 * @param testMethod
 	 *            a {@link java.lang.String} object.
 	 * @param testReader
-	 *            a {@link org.evosuite.junit.TestExtractingVisitor.TestReader}
+	 *            a {@link org.smartut.junit.TestExtractingVisitor.TestReader}
 	 *            object.
 	 */
 	public TestExtractingVisitor(CompoundTestCase testCase, String testClass,
@@ -977,7 +977,7 @@ public class TestExtractingVisitor extends ASTVisitor {
 	 *            a {@link java.lang.Object} object.
 	 * @param varType
 	 *            a {@link java.lang.Class} object.
-	 * @return a {@link org.evosuite.testcase.VariableReference} object.
+	 * @return a {@link org.smartut.testcase.VariableReference} object.
 	 */
 	protected VariableReference retrieveVariableReference(Object argument,
 	        Class<?> varType) {

@@ -4,20 +4,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.evosuite.plugins</groupId>
-        <artifactId>evosuite-plugins</artifactId>
+        <groupId>org.smartut.plugins</groupId>
+        <artifactId>smartut-plugins</artifactId>
         <version>1.1.0</version>
     </parent>
 
-    <artifactId>evosuite-maven-plugin</artifactId>
+    <artifactId>smartut-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
     <prerequisites>
         <maven>3.1</maven>
     </prerequisites>
 
-    <name>Maven Plugin for EvoSuite</name>
-    <description>Plugin used to run EvoSuite to automatically generate high coverage JUnit tests</description>
+    <name>Maven Plugin for SmartUt</name>
+    <description>Plugin used to run SmartUt to automatically generate high coverage JUnit tests</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,18 +25,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-runtime</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-client</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-master</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-master</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

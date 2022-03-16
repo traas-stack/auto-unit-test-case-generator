@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * contributors
+ *
+ * This file is part of SmartUt.
+ *
+ * SmartUt is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * SmartUt is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.smartut.localsearch;
+
+import org.smartut.SmartUt;
+import org.smartut.Properties;
+import org.smartut.Properties.Criterion;
+import org.smartut.Properties.SolverType;
+import org.smartut.Properties.StoppingCondition;
+import org.smartut.SystemTestBase;
+import org.smartut.ga.metaheuristics.GeneticAlgorithm;
+import org.smartut.testsuite.TestSuiteChromosome;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.examples.with.different.packagename.concolic.PostCodeValidator;
+
+/**
+ * Created by Andrea Arcuri on 19/03/15.
+ */
+public class PostCodeValidatorSystemTest extends SystemTestBase {
+
+	
+	@Before
+	public void checkZ3() {
+		Assume.assumeTrue(System.getenv("z3_str2_path")!=null);
+	}
+
+	@Test
+	public void testZ3DSE() {
+		Properties.LOCAL_SEARCH_PROBABILITY = 1.0;
+		Properties.LOCAL_SEARCH_RATE = 1;
+		Properties.LOCAL_SEARCH_BUDGET_TYPE = Properties.LocalSearchBudgetType.TESTS;
+		Properties.LOCAL_SEARCH_BUDGET = 100;
+		Properties.SEARCH_BUDGET = 50000;
+		Properties.Z3_PATH = System.getenv("z3_str2_path");
+		Properties.DSE_SOLVER = SolverType.Z3_SOLVER;
+		Properties.RESET_STATIC_FIELD_GETS = true;
+
+		Properties.STOPPING_CONDITION = StoppingCondition.MAXTIME;
+		Properties.SEARCH_BUDGET = 10;
+		
+		SmartUt smartut = new SmartUt();
+		String targetClass = PostCodeValidator.class.getCanonicalName();
+		Properties.TARGET_CLASS = targetClass;
+
+		Properties.CRITERION = new Criterion[] {Criterion.LINE, Criterion.BRANCH, Criterion.EXCEPTION, Criterion.WEAKMUTATION, 
+				Criterion.OUTPUT, Criterion.METHOD, Criterion.METHODNOEXCEPTION, Criterion.CBRANCH};
+		
+		Properties.MINIMIZE = false;
+		Properties.ASSERTIONS = false;
+		
+		Properties.DSE_PROBABILITY = 1.0; // force using only DSE, no LS
+
+		String[] command = new String[] { "-generateSuite", "-class",
+				targetClass };
+
+		Object result = smartut.parseCommandLine(command);
+		GeneticAlgorithm<?> ga = getGAFromResult(result);
+		TestSuiteChromosome best = (TestSuiteChromosome) ga.getBestIndividual();
+		System.out.println("EvolvedTestSuite:\n" + best);
+
+
+	}
+}

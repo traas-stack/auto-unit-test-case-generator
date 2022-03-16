@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.evosuite</groupId>
-        <artifactId>evosuite</artifactId>
+        <groupId>org.smartut</groupId>
+        <artifactId>smartut</artifactId>
         <version>1.1.0</version>
     </parent>
 
-    <artifactId>evosuite-runtime</artifactId>
+    <artifactId>smartut-runtime</artifactId>
     <packaging>jar</packaging>
 
     <!-- "runtime" is what is going to be linked in the user's applications.
-        As such, it should have no reference to any other EvoSuite module, and we
+        As such, it should have no reference to any other SmartUt module, and we
         should try to keep the number of external dependencies to a minimum -->
 
     <profiles>

@@ -3,13 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.evosuite</groupId>
-    <artifactId>evosuite</artifactId>
-    <name>EvoSuite</name>
+    <groupId>org.smartut</groupId>
+    <artifactId>smartut</artifactId>
+    <name>smartut</name>
     <description>n/a</description>
     <version>1.1.0</version>
     <packaging>pom</packaging>
-    <url>http://www.evosuite.org/</url>
     <inceptionYear>2010</inceptionYear>
 
     <licenses>
@@ -19,17 +18,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <issueManagement>
-        <system>Github</system>
-        <url>https://github.com/EvoSuite/evosuite/issues</url>
-    </issueManagement>
-
-    <mailingLists>
-        <mailingList>
-            <archive>https://groups.google.com/forum/#!forum/evosuite</archive>
-        </mailingList>
-    </mailingLists>
 
     <modules>
         <module>master</module>
@@ -77,16 +65,8 @@
         </developer>
     </developers>
 
-    <scm>
-        <connection>scm:git:https://github.com/EvoSuite/evosuite.git</connection>
-        <developerConnection>scm:git:https://github.com/EvoSuite/evosuite.git</developerConnection>
-        <url>https://github.com/EvoSuite/evosuite/tree/master</url>
-    </scm>
 
-    <organization>
-        <name>EvoSuite</name>
-        <url>http://www.evosuite.org/</url>
-    </organization>
+
 
 
     <profiles>
@@ -317,7 +297,7 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <!-- Unfortunately, recent versions (eg 1.1.6 and 1.1.7) hang
-                    on Windows, making EvoSuite unusable. If want to try to
+                    on Windows, making SmartUt unusable. If want to try to
                     update it (eg after 1.1.7), need to make sure tests (eg,
                     JobExecutorIntTest and all the Maven ones) work fine
                     on Windows -->
@@ -334,7 +314,7 @@
                 <!-- Common Public License Version 1.0 -->
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13</version>
+                <version>4.13.1</version>
             </dependency>
             <dependency>
                 <!-- Adhoc license, copyright holder is INRIA -->
@@ -383,7 +363,7 @@
                 <!-- BSD -->
                 <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
-                <version>1.4.13</version>
+                <version>1.4.15</version>
             </dependency>
             <dependency>
                 <!-- Apache 2 -->
@@ -478,7 +458,7 @@
                 </configuration>
             </plugin>
 
-            <!-- we need at least Maven 3.1 due to special features in EvoSuite Maven Plugin -->
+            <!-- we need at least Maven 3.1 due to special features in SmartUt Maven Plugin -->
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -525,8 +505,8 @@
                     </platforms>
                     <programs>
                         <program>
-                            <mainClass>org.evosuite.EvoSuite</mainClass>
-                            <name>EvoSuite</name>
+                            <mainClass>org.smartut.SmartUt</mainClass>
+                            <name>SmartUt</name>
                             <commandLineArguments>
                                 <!-- Add two predefined command line arguments <commandLineArgument>arg1</commandLineArgument>
                                      <commandLineArgument>arg2</commandLineArgument> -->
@@ -736,49 +716,49 @@
                             <configuration>
                                 <shadedArtifactAttached>false</shadedArtifactAttached>
                                 <createDependencyReducedPom>true</createDependencyReducedPom>
-                                <!-- do not change "org.evosuite.shaded." as it used in some of the java classes -->
+                                <!-- do not change "org.smartut.shaded." as it used in some of the java classes -->
                                 <relocations>
                                     <relocation>
                                         <pattern>org.objectweb.asm</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.objectweb.asm</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.objectweb.asm</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>org.apache.commons.logging</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.apache.commons.logging</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.apache.commons.logging</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>javassist</pattern>
-                                        <shadedPattern>org.evosuite.shaded.javassist</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.javassist</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>antlr</pattern>
-                                        <shadedPattern>org.evosuite.shaded.antlr</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.antlr</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>org.dom4j</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.dom4j</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.dom4j</shadedPattern>
                                     </relocation>
                                     <!--
                                     <relocation>
                                         <pattern>org.xml</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.xml</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.xml</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>org.w3c</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.w3c</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.w3c</shadedPattern>
                                     </relocation>
                                     -->
                                     <relocation>
                                         <pattern>org.aopalliance</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.aopalliance</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.aopalliance</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>org.mockito</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.mockito</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.mockito</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>net.bytebuddy</pattern>
-                                        <shadedPattern>org.evosuite.shaded.net.bytebuddy</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.net.bytebuddy</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <!-- This is special. Originally we wanted to handle it directly, but
@@ -787,11 +767,11 @@
                                          compatibility issues
                                          -->
                                         <pattern>javax.servlet</pattern>
-                                        <shadedPattern>org.evosuite.shaded.javax.servlet</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.javax.servlet</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>org.apache</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.apache</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.apache</shadedPattern>
                                         <excludes>
                                             <!-- Important, otherwise AntInitializingListener would not work in Ant -->
                                             <exclude>org.apache.tools.ant.taskdefs.optional.junit.JUnitResultFormatter</exclude>
@@ -801,20 +781,28 @@
                                     </relocation>
                                     <relocation>
                                         <pattern>org.hamcrest</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.hamcrest</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.hamcrest</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>org.objenesis</pattern>
-                                        <shadedPattern>org.evosuite.shaded.org.objenesis</shadedPattern>
+                                        <shadedPattern>org.smartut.shaded.org.objenesis</shadedPattern>
                                     </relocation>
-                                    <!--<relocation>-->
-                                        <!--<pattern>org.slf4j</pattern>-->
-                                        <!--<shadedPattern>org.evosuite.shaded.org.slf4j</shadedPattern>-->
-                                    <!--</relocation>-->
-                                    <!--<relocation>-->
-                                        <!--<pattern>ch.qos.logback</pattern>-->
-                                        <!--<shadedPattern>org.evosuite.shaded.ch.qos.logback</shadedPattern>-->
-                                    <!--</relocation>-->
+                                    <relocation>
+                                        <pattern>org.slf4j</pattern>
+                                        <shadedPattern>org.smartut.shaded.org.slf4j</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>ch.qos.logback</pattern>
+                                        <shadedPattern>org.smartut.shaded.ch.qos.logback</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.thoughtworks.xstream</pattern>
+                                        <shadedPattern>org.smartut.shaded.com.thoughtworks.xstream</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.jgrapht</pattern>
+                                        <shadedPattern>org.smartut.shaded.org.jgrapht</shadedPattern>
+                                    </relocation>
                                 </relocations>
                             </configuration>
                         </execution>

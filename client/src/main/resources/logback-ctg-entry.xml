@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+    Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
     contributors
 
-    This file is part of EvoSuite.
+    This file is part of SmartUt.
 
-    EvoSuite is free software: you can redistribute it and/or modify it
+    SmartUt is free software: you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as published
     by the Free Software Foundation, either version 3.0 of the License, or
     (at your option) any later version.
 
-    EvoSuite is distributed in the hope that it will be useful, but
+    SmartUt is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     Lesser Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public
-    License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+    License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <!--  This is special logback configuration for spawn process running entry point of CTG, eg the Maven plugin -->
@@ -25,14 +25,14 @@
 
 <configuration>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="STDOUT" class="org.smartut.shaded.ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
             <pattern>[MASTER] %d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="EVO_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="SMARTUT_LOGGER" class="org.smartut.shaded.ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
             <pattern>%msg%n</pattern>
@@ -43,20 +43,20 @@
     <!-- Loggers  -->
 
 
-    <logger name="evo_logger" level="ALL" additivity="false">
-        <appender-ref ref="EVO_LOGGER" />
+    <logger name="smartut_logger" level="ALL" additivity="false">
+        <appender-ref ref="SMARTUT_LOGGER" />
     </logger>
 
 
-    <logger name="org.evosuite" level="${log.level:-WARN}">
+    <logger name="org.smartut" level="${log.level:-WARN}">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="shaded.org.evosuite" level="${log.level:-WARN}">
+    <logger name="shaded.org.smartut" level="${log.level:-WARN}">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.evosuite.shaded" level="OFF" />
+    <logger name="org.smartut.shaded" level="OFF" />
 
     <root level="OFF" />
 

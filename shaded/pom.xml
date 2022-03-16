@@ -3,18 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>evosuite</artifactId>
-        <groupId>org.evosuite</groupId>
+        <artifactId>smartut</artifactId>
+        <groupId>org.smartut</groupId>
         <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>evosuite-shaded</artifactId>
+    <artifactId>smartut-shaded</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-master</artifactId>
+            <groupId>org.smartut</groupId>
+            <artifactId>smartut-master</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -47,10 +47,10 @@
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.evosuite</pattern>
+                                    <pattern>org.smartut</pattern>
                                     <!-- Note: besides this file, the prefix "shaded." will also be used in other
                                     files, eg the log configuration ones  -->
-                                    <shadedPattern>shaded.org.evosuite</shadedPattern>
+                                    <shadedPattern>shaded.org.smartut</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -77,9 +77,9 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Main-Class>shaded.org.evosuite.EvoSuite</Main-Class>
-                            <Premain-Class>shaded.org.evosuite.runtime.agent.InstrumentingAgent</Premain-Class>
-                            <Agent-Class>shaded.org.evosuite.runtime.agent.InstrumentingAgent</Agent-Class>
+                            <Main-Class>shaded.org.smartut.SmartUt</Main-Class>
+                            <Premain-Class>shaded.org.smartut.runtime.agent.InstrumentingAgent</Premain-Class>
+                            <Agent-Class>shaded.org.smartut.runtime.agent.InstrumentingAgent</Agent-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>

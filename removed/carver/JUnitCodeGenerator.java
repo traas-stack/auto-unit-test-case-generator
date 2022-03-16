@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
  * contributors
  *
- * This file is part of EvoSuite.
+ * This file is part of SmartUt.
  *
- * EvoSuite is free software: you can redistribute it and/or modify it
+ * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
  *
- * EvoSuite is distributed in the hope that it will be useful, but
+ * SmartUt is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.evosuite.testcarver.codegen;
+package org.smartut.testcarver.codegen;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -73,9 +73,9 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.evosuite.testcarver.capture.CaptureLog;
-import org.evosuite.testcarver.capture.CaptureUtil;
-import org.evosuite.utils.Utils;
+import org.smartut.testcarver.capture.CaptureLog;
+import org.smartut.testcarver.capture.CaptureUtil;
+import org.smartut.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -497,7 +497,7 @@ public final class JUnitCodeGenerator implements ICodeGenerator<CompilationUnit>
 		final CatchClause      cc      = (CatchClause) tryStmt.catchClauses().get(0);
 		final MethodInvocation m       = ast.newMethodInvocation();
 		
-		m.setExpression(ast.newName(new String[]{"org", "evosuite","testcarver","codegen", "PostProcessor"}));
+		m.setExpression(ast.newName(new String[]{"org", "smartut","testcarver","codegen", "PostProcessor"}));
 		m.setName(ast.newSimpleName("captureException"));
 		m.arguments().add(ast.newNumberLiteral(String.valueOf(logRecNo)));
 		cc.getBody().statements().add(ast.newExpressionStatement(m));
@@ -657,7 +657,7 @@ public final class JUnitCodeGenerator implements ICodeGenerator<CompilationUnit>
 	
 	
 	/* (non-Javadoc)
-	 * @see org.evosuite.testcarver.codegen.ICodeGenerator#createMethodCallStmt(org.evosuite.testcarver.capture.CaptureLog, int)
+	 * @see org.smartut.testcarver.codegen.ICodeGenerator#createMethodCallStmt(org.smartut.testcarver.capture.CaptureLog, int)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override

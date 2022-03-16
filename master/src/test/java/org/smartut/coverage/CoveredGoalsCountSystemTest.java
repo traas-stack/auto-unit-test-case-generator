@@ -1,0 +1,249 @@
+/*
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * contributors
+ *
+ * This file is part of SmartUt.
+ *
+ * SmartUt is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * SmartUt is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SmartUt. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.smartut.coverage;
+
+import com.opencsv.CSVReader;
+import com.examples.with.different.packagename.Calculator;
+import com.examples.with.different.packagename.PureEnum;
+import com.examples.with.different.packagename.mutation.MutationPropagation;
+import com.opencsv.exceptions.CsvException;
+import org.apache.commons.io.FileUtils;
+import org.smartut.SmartUt;
+import org.smartut.Properties;
+import org.smartut.Properties.StatisticsBackend;
+import org.smartut.SystemTestBase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Created by jrojas
+ * Edited by José Campos
+ * 
+ */
+public class CoveredGoalsCountSystemTest extends SystemTestBase {
+
+	@Before
+	public void prepare() {
+		try {
+			FileUtils.deleteDirectory(new File("smartut-report"));
+		} catch (IOException e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+    @Test
+    public void testCoveredGoalsCountCSV_SingleCriterion() throws IOException, CsvException {
+
+    	SmartUt smartut = new SmartUt();
+
+    	String targetClass = Calculator.class.getCanonicalName();
+        Properties.TARGET_CLASS = targetClass;
+
+        Properties.CRITERION = new Properties.Criterion[] {
+        	Properties.Criterion.WEAKMUTATION
+        };
+        Properties.OUTPUT_VARIABLES="TARGET_CLASS,criterion,Coverage,Covered_Goals,Total_Goals";
+        Properties.STATISTICS_BACKEND = StatisticsBackend.CSV;
+
+        String[] command = new String[] {
+    		"-class", targetClass,
+    		"-generateSuite"
+        };
+
+        Object result = smartut.parseCommandLine(command);
+        Assert.assertNotNull(result);
+
+        String statistics_file = System.getProperty("user.dir") + File.separator + Properties.REPORT_DIR + File.separator + "statistics.csv";
+        System.out.println("Statistics file " + statistics_file);
+
+        CSVReader reader = new CSVReader(new FileReader(statistics_file));
+        List<String[]> rows = reader.readAll();
+        assertEquals(2, rows.size());
+        reader.close();
+
+        assertEquals(targetClass, rows.get(1)[0]); // TARGET_CLASS
+        assertEquals("WEAKMUTATION", rows.get(1)[1]); // criterion
+        assertEquals("1.0", rows.get(1)[2]); // Coverage
+        assertEquals("48", rows.get(1)[3]); // Covered_Goals
+        assertEquals("48", rows.get(1)[4]); // Total_Goals
+    }
+
+    @Test
+    public void testCoveredGoalsCountCSV_MultipleCriterion() throws IOException, CsvException {
+
+    	SmartUt smartut = new SmartUt();
+
+    	String targetClass = Calculator.class.getCanonicalName();
+        Properties.TARGET_CLASS = targetClass;
+
+        Properties.CRITERION = new Properties.Criterion[] {
+        	Properties.Criterion.BRANCH,
+        	Properties.Criterion.LINE,
+        	Properties.Criterion.ONLYMUTATION
+        };
+        Properties.OUTPUT_VARIABLES="TARGET_CLASS,criterion,Coverage,Covered_Goals,Total_Goals";
+        Properties.STATISTICS_BACKEND = StatisticsBackend.CSV;
+
+        String[] command = new String[] {
+    		"-class", targetClass,
+    		"-generateSuite"
+        };
+
+        Object result = smartut.parseCommandLine(command);
+        Assert.assertNotNull(result);
+
+        String statistics_file = System.getProperty("user.dir") + File.separator + Properties.REPORT_DIR + File.separator + "statistics.csv";
+        System.out.println("Statistics file " + statistics_file);
+
+        CSVReader reader = new CSVReader(new FileReader(statistics_file));
+        List<String[]> rows = reader.readAll();
+        assertEquals(2, rows.size());
+        reader.close();
+
+        assertEquals(targetClass, rows.get(1)[0]); // TARGET_CLASS
+        assertEquals("BRANCH;LINE;ONLYMUTATION", rows.get(1)[1]); // criterion
+        assertEquals("1.0", rows.get(1)[2]); // Coverage
+        assertEquals("58", rows.get(1)[3]); // Covered_Goals
+        assertEquals("58", rows.get(1)[4]); // Total_Goals
+    }
+
+    @Test
+    public void testCoveredGoalsCountCSV_WithMinimizationTimeout() throws IOException, CsvException {
+
+    	SmartUt smartut = new SmartUt();
+
+    	String targetClass = MutationPropagation.class.getCanonicalName();
+        Properties.TARGET_CLASS = targetClass;
+
+        Properties.CRITERION = new Properties.Criterion[] {
+        	Properties.Criterion.STRONGMUTATION
+        };
+        Properties.OUTPUT_VARIABLES="TARGET_CLASS,criterion,Coverage,Covered_Goals,Total_Goals";
+        Properties.STATISTICS_BACKEND = StatisticsBackend.CSV;
+
+        String[] command = new String[] {
+    		"-class", targetClass,
+    		"-Dsearch_budget=40000",
+    		"-Dminimization_timeout=0",
+    		"-generateSuite"
+        };
+
+        Object result = smartut.parseCommandLine(command);
+        Assert.assertNotNull(result);
+
+        String statistics_file = System.getProperty("user.dir") + File.separator + Properties.REPORT_DIR + File.separator + "statistics.csv";
+        System.out.println("Statistics file " + statistics_file);
+
+        CSVReader reader = new CSVReader(new FileReader(statistics_file));
+        List<String[]> rows = reader.readAll();
+        assertEquals(2, rows.size());
+        reader.close();
+
+        assertEquals(targetClass, rows.get(1)[0]); // TARGET_CLASS
+        assertEquals("STRONGMUTATION", rows.get(1)[1]); // criterion
+        assertEquals("1.0", rows.get(1)[2]); // Coverage
+        assertEquals("24", rows.get(1)[3]); // Covered_Goals
+        assertEquals("24", rows.get(1)[4]); // Total_Goals
+    }
+    
+    @Test
+    public void testCoveredGoalsCountCSV_SingleCriterionBranch_Enums() throws IOException, CsvException {
+
+    	SmartUt smartut = new SmartUt();
+
+    	String targetClass = PureEnum.class.getCanonicalName();
+        Properties.TARGET_CLASS = targetClass;
+
+        Properties.CRITERION = new Properties.Criterion[] {
+        	Properties.Criterion.BRANCH
+        };
+        Properties.OUTPUT_VARIABLES="TARGET_CLASS,criterion,Coverage,Covered_Goals,Total_Goals,BranchCoverage";
+        Properties.STATISTICS_BACKEND = StatisticsBackend.CSV;
+
+        String[] command = new String[] {
+    		"-class", targetClass,
+    		"-generateSuite"
+        };
+
+        Object result = smartut.parseCommandLine(command);
+        Assert.assertNotNull(result);
+
+        String statistics_file = System.getProperty("user.dir") + File.separator + Properties.REPORT_DIR + File.separator + "statistics.csv";
+        System.out.println("Statistics file " + statistics_file);
+
+        CSVReader reader = new CSVReader(new FileReader(statistics_file));
+        List<String[]> rows = reader.readAll();
+        assertEquals(2, rows.size());
+        reader.close();
+
+        assertEquals(targetClass, rows.get(1)[0]); // TARGET_CLASS
+        assertEquals("BRANCH", rows.get(1)[1]); // criterion
+        assertEquals("1.0", rows.get(1)[2]); // Coverage
+        assertEquals("0", rows.get(1)[3]); // Covered_Goals
+        assertEquals("0", rows.get(1)[4]); // Total_Goals
+        assertEquals("1.0", rows.get(1)[5]); // BranchCoverage
+    }
+    
+    @Test
+    public void testCoveredGoalsCountCSV_SingleCriterionBranch_Random_Enums() throws IOException, CsvException {
+
+    	SmartUt smartut = new SmartUt();
+
+    	String targetClass = PureEnum.class.getCanonicalName();
+        Properties.TARGET_CLASS = targetClass;
+
+        Properties.CRITERION = new Properties.Criterion[] {
+        	Properties.Criterion.BRANCH
+        };
+        Properties.OUTPUT_VARIABLES="TARGET_CLASS,criterion,Coverage,Covered_Goals,Total_Goals";
+        Properties.STATISTICS_BACKEND = StatisticsBackend.CSV;
+
+        String[] command = new String[] {
+    		"-class", targetClass,
+    		"-generateRandom"
+        };
+
+        Object result = smartut.parseCommandLine(command);
+        Assert.assertNotNull(result);
+
+        String statistics_file = System.getProperty("user.dir") + File.separator + Properties.REPORT_DIR + File.separator + "statistics.csv";
+        System.out.println("Statistics file " + statistics_file);
+
+        CSVReader reader = new CSVReader(new FileReader(statistics_file));
+        List<String[]> rows = reader.readAll();
+        assertEquals(2, rows.size());
+        reader.close();
+
+        assertEquals(targetClass, rows.get(1)[0]); // TARGET_CLASS
+        assertEquals("BRANCH", rows.get(1)[1]); // criterion
+        assertEquals("1.0", rows.get(1)[2]); // Coverage
+        assertEquals("0", rows.get(1)[3]); // Covered_Goals
+        assertEquals("0", rows.get(1)[4]); // Total_Goals
+    }
+}
