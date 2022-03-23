@@ -740,7 +740,7 @@ public class Scaffolding {
 
 		bd.append(BLOCK_SPACE);
 		bd.append("" + RuntimeSettings.class.getName() + ".maxNumberOfIterationsPerLoop = "
-				+ Properties.MAX_LOOP_ITERATIONS + "; \n");
+				+ Properties.MAX_LOOP_ITERATIONS + "L; \n");
 
 		if (Properties.REPLACE_SYSTEM_IN) {
 			bd.append(BLOCK_SPACE);
