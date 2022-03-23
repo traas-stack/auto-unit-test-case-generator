@@ -132,7 +132,7 @@ public class ClassStateSupport {
 			logger.warn("initializing classes meet exception {}", e.getMessage());
 		}
 
-		EXECUTOR.shutdown();
+//		EXECUTOR.shutdown();
 		return false;
 	}
 
@@ -199,7 +199,7 @@ public class ClassStateSupport {
 		} catch (Exception e) {
 			logger.warn("reset classes meet exception {}", e.getMessage());
 		}
-		EXECUTOR.shutdown();
+//		EXECUTOR.shutdown();
 	}
 
 	/**
