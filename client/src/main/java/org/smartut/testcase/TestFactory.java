@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -294,6 +295,61 @@ public class TestFactory {
 			//create a statement for the constructor
 			Statement st = new ConstructorStatement(test, constructor, parameters);
 			VariableReference ref =  test.addStatement(st, position);
+
+			// if this is collections (e.g., list) constructor，insert element with the
+			// Properties.COLLECTION_ADD_OBJECT_PROBABILITY probability
+			try {
+				if(Collection.class.isAssignableFrom(constructor.getDeclaringClass())) {
+					Random random = new Random();
+					if (random.nextDouble() < Properties.COLLECTION_ADD_OBJECT_PROBABILITY) {
+						// judge mock or not
+						if (exactType instanceof ParameterizedType) {
+
+							Type[] types = ((ParameterizedType)exactType).getActualTypeArguments();
+							// length is 1 for list
+							if (types.length == 1) {
+								Type listType = types[0];
+
+								// mock
+								if (FunctionalMockStatement.canBeFunctionalMocked(listType)) {
+									FunctionalMockStatement fms = new FunctionalMockStatement(test, listType,
+										new GenericClass(listType));
+									VariableReference mockObjRef = test.addStatement(fms, position + 1);
+
+									// get collection's add method by reflect
+									Method listAddMethod = Collection.class.getDeclaredMethod("add",
+										new Class[] {Object.class});
+									GenericMethod addGenericMethod = new GenericMethod(listAddMethod,
+										ref.getType().getClass());
+									Statement addMethodStatement = new MethodStatement(test, addGenericMethod, ref,
+										Arrays.asList(new VariableReference[] {mockObjRef}));
+									VariableReference x = test.addStatement(addMethodStatement, position + 2);
+								} else { // new
+									VariableReference newOrReUseObjRef = createOrReuseVariable(test, listType, position + 1,
+										0, null, false, false, false);
+									// get collection's add method by reflect
+									Method listAddMethod = Collection.class.getDeclaredMethod("add",
+										new Class[] {Object.class});
+									GenericMethod addGenericMethod = new GenericMethod(listAddMethod,
+										ref.getType().getClass());
+									Statement addMethodStatement = new MethodStatement(test, addGenericMethod, ref,
+										Arrays.asList(new VariableReference[] {newOrReUseObjRef}));
+
+									int insertPos = newOrReUseObjRef.getStPosition() + 1;
+									// is reuse obj
+									if(newOrReUseObjRef.getStPosition() < position + 1) {
+										insertPos = position + 1;
+									}
+									VariableReference eleVar = test.addStatement(addMethodStatement, insertPos);
+
+								}
+							}
+						}
+					}
+				}
+			} catch (Exception e) {
+				logger.warn("add object to collection fail, exception: ", e);
+			}
 
 			return ref;
 		} catch (Exception e) {
