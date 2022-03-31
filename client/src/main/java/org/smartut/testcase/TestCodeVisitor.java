@@ -1594,6 +1594,9 @@ public class TestCodeVisitor extends TestVisitor {
 	}
 
 	private String getSourceClassName(Throwable exception){
+		if(exception == null || exception.getStackTrace() == null) {
+			return null;
+		}
 		if(exception.getStackTrace().length == 0){
 			return null;
 		}

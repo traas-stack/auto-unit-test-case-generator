@@ -1778,7 +1778,14 @@ public class TestFactory {
 	 */
 	public boolean deleteStatementGracefully(TestCase test, int position, boolean isMutateDel)
 		throws ConstructionFailedException {
-		VariableReference var = test.getReturnValue(position);
+		VariableReference var;
+
+		try {
+			var = test.getReturnValue(position);
+		} catch (IllegalArgumentException e) {
+			logger.warn("deleteStatementGracefully test.getReturnValue exception", e);
+			return false;
+		}
 
 		if (var instanceof ArrayIndex) {
 			return deleteStatement(test, position, isMutateDel);
@@ -2230,7 +2237,10 @@ public class TestFactory {
 			// only insert when test init
 			if(test.size() == 0 && TestFactory.getInstance().getPrivateFieldsSize() > 0) {
 				// return insertRandomReflectionFieldCall(test,position,0);
-				return insertAllPrivateField(test, position);
+				boolean success = insertAllPrivateField(test, position);
+				if(success) {
+					return true;
+				}
 			}
 
 			// private method ratio
@@ -2269,8 +2279,30 @@ public class TestFactory {
 					VariableReference callee = null;
 					Type target = m.getOwnerType();
 
+					// if CUT contains TypeVariable, target type probability be different with cut object
+					// e.g. we define ClassA <T>，the object of CUT before may be classA0<String>，target here may be ClassA<Integer>
+					// test.hasObject result is false，and create another CUT object,
+					if(target instanceof ParameterizedType) {
+						Type targetRawType = ((ParameterizedType)target).getRawType();
+						// 判断是否是被测类，只有被测类对象才擦出type
+						if(targetRawType.getTypeName().equals(Properties.TARGET_CLASS)) {
+							target = targetRawType;
+						}
+					}
+
 					if (!test.hasObject(target, position)) {
-						callee = createObject(test, target, position, 0, null, false, false,true); //no FM for SUT
+						try {
+							callee = createObject(test, target, position, 0, null, false, false, true); //no FM for SUT
+						} catch (ConstructionFailedException e) {
+							// first remove insert
+							int lengthDifference = test.size() - previousLength;
+							for (int i = lengthDifference - 1; i >= 0; i--) {
+								test.remove(position + i);
+							}
+							// abstract class could be mocked
+							callee = createObject(test, target, position, 0, null, false, true, true);
+						}
+
 						position += test.size() - previousLength;
 						previousLength = test.size();
 					} else {
@@ -2503,6 +2535,14 @@ public class TestFactory {
 				//we need a reference to the SUT, and one to a variable of same type of chosen field
 				types, null,
 				position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
+
+			// if enum class, object could not be null, otherwise will throw NPE when invoke privateAccess setVariable
+			if(parameters.size() > 0) {
+				Statement callee = test.getStatement(parameters.get(0).getStPosition());
+				if(callee instanceof EnumPrimitiveStatement && ((EnumPrimitiveStatement)callee).getValue() == null) {
+					throw new ConstructionFailedException("Null enum primitive");
+				}
+			}
 
 			try {
 				st = new PrivateFieldStatement(test,reflectionFactory.getReflectedClass(),field.getName(),

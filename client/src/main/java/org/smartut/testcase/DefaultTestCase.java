@@ -24,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -353,20 +354,26 @@ public class DefaultTestCase implements TestCase, Serializable {
 		}
 		*/
 
-		for (Statement s : statements) {
-			Statement copy = s.clone(t);
-			t.statements.add(copy);
-			copy.setRetval(s.getReturnValue().clone(t));
-			copy.setAssertions(s.copyAssertions(t, 0));
-			// copy mutate delete
-			copy.setCouldMutationDelete(s.couldMutateDelete());
+		try {
+			for (Statement s : statements) {
+				Statement copy = s.clone(t);
+				t.statements.add(copy);
+				copy.setRetval(s.getReturnValue().clone(t));
+				copy.setAssertions(s.copyAssertions(t, 0));
+				// copy mutate delete
+				copy.setCouldMutationDelete(s.couldMutateDelete());
+			}
+			t.coveredGoals.addAll(coveredGoals);
+			t.accessedEnvironment.copyFrom(accessedEnvironment);
+			t.isFailing = isFailing;
+			t.id = idGenerator.getAndIncrement(); //always create new ID when making a clone
+			//t.exception_statement = exception_statement;
+			//t.exceptionThrown = exceptionThrown;
+		} catch (IllegalArgumentException e) {
+			// may cause exception when copy statement
+			logger.warn("Get exception when statement clone, return empty case, exception is: ", e);
+			t = new DefaultTestCase();
 		}
-		t.coveredGoals.addAll(coveredGoals);
-		t.accessedEnvironment.copyFrom(accessedEnvironment);
-		t.isFailing = isFailing;
-		t.id = idGenerator.getAndIncrement(); //always create new ID when making a clone
-		//t.exception_statement = exception_statement;
-		//t.exceptionThrown = exceptionThrown;
 		return t;
 	}
 
@@ -673,9 +680,21 @@ public class DefaultTestCase implements TestCase, Serializable {
 		Inputs.checkNull(type);
 
 		List<VariableReference> variables = getObjects(type, position);
+		boolean abstractClass = false;
+		if(type instanceof Class<?>) {
+			if( Modifier.isAbstract(((Class<?>)type).getModifiers())) {
+				abstractClass = true;
+			}
+		}
+		boolean finalAbstractClass = abstractClass;
 		variables.removeIf(ref -> {
 			final Statement statement = this.getStatement(ref.getStPosition());
-			return ref instanceof NullReference || statement instanceof FunctionalMockStatement;
+			// abstract class could be mocked
+			if(finalAbstractClass) {
+				return ref instanceof NullReference;
+			} else {
+				return ref instanceof NullReference || statement instanceof FunctionalMockStatement;
+			}
 		});
 		if (variables.isEmpty())
 			throw new ConstructionFailedException("Found no variables of type " + type
