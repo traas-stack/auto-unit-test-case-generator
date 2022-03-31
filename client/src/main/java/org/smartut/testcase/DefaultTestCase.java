@@ -90,6 +90,8 @@ public class DefaultTestCase implements TestCase, Serializable {
 
 	private int id;
 
+	private String testMethodName;
+
 	/**
 	 * test method number in one test case
 	 */
@@ -374,6 +376,7 @@ public class DefaultTestCase implements TestCase, Serializable {
 			t.id = idGenerator.getAndIncrement(); //always create new ID when making a clone
 			//t.exception_statement = exception_statement;
 			//t.exceptionThrown = exceptionThrown;
+			t.testMethodName = this.testMethodName;
 			t.testMethodSize = this.testMethodSize;
 		} catch (IllegalArgumentException e) {
 			// may cause exception when copy statement
@@ -1217,6 +1220,15 @@ public class DefaultTestCase implements TestCase, Serializable {
 			privateSetVariablePos --;
 		}
 		return privateSetVariablePos;
+	}
+
+	@Override
+	public void setTestMethodName(String testMethodName) {
+		this.testMethodName = testMethodName;
+	}
+	@Override
+	public String getTestMethodName() {
+		return testMethodName;
 	}
 
 	@Override

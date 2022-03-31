@@ -2380,7 +2380,9 @@ public class TestFactory {
 					addMethod(test, m, position, 0);
 				}
 
-				// set test method size
+				// set test method name
+				test.setTestMethodName(o.getName());
+				// increase test method size
 				test.setTestMethodSize(test.getTestMethodSize() + 1);
 			} else if (o.isField()) {
 				GenericField f = (GenericField) o;
@@ -2568,6 +2570,9 @@ public class TestFactory {
 
 		test.addStatement(st, position);
 
+		// set test method name
+		test.setTestMethodName(method.getName());
+		// increase test method size
 		test.setTestMethodSize(test.getTestMethodSize() + 1);
 
 		return true;

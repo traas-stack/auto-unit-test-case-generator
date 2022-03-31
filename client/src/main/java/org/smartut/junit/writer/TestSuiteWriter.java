@@ -23,9 +23,11 @@ package org.smartut.junit.writer;
 import org.smartut.Properties;
 import org.smartut.Properties.Criterion;
 import org.smartut.Properties.OutputGranularity;
+import org.smartut.Properties.TestNamingStrategy;
 import org.smartut.TimeController;
 import org.smartut.coverage.dataflow.DefUseCoverageTestFitness;
 import org.smartut.junit.naming.methods.CoverageGoalTestNameGenerationStrategy;
+import org.smartut.junit.naming.methods.MethodNameTestNameGenerationStrategy;
 import org.smartut.junit.naming.methods.NumberedTestNameGenerationStrategy;
 import org.smartut.junit.naming.methods.TestNameGenerationStrategy;
 import org.smartut.junit.UnitTestAdapter;
@@ -190,7 +192,8 @@ public class TestSuiteWriter implements Opcodes {
             /*
              * This is VERY important, as otherwise tests can get ignored by "mvn test"
              */
-            throw new IllegalArgumentException("Test classes should have name ending with 'Test'. Invalid input name: " + name);
+            throw new IllegalArgumentException(
+                "Test classes should have name ending with 'Test'. Invalid input name: " + name);
         }
 
         List<File> generated = new ArrayList<>();
@@ -199,7 +202,8 @@ public class TestSuiteWriter implements Opcodes {
 
         // Execute all tests
         executor.newObservers();
-        LoopCounter.getInstance().setActive(true); //be sure it is active here, as JUnit checks might have left it to false
+        LoopCounter.getInstance().setActive(
+            true); //be sure it is active here, as JUnit checks might have left it to false
 
         List<ExecutionResult> results = new ArrayList<>();
         for (TestCase test : testCases) {
@@ -220,8 +224,10 @@ public class TestSuiteWriter implements Opcodes {
             }
         }
 
-        if(Properties.TEST_NAMING_STRATEGY == Properties.TestNamingStrategy.NUMBERED) {
+        if (Properties.TEST_NAMING_STRATEGY == Properties.TestNamingStrategy.NUMBERED) {
             nameGenerator = new NumberedTestNameGenerationStrategy(testCases, results);
+        } else if(Properties.TEST_NAMING_STRATEGY == Properties.TestNamingStrategy.METHODNAME) {
+            nameGenerator = new MethodNameTestNameGenerationStrategy(testCases, results);
         } else if(Properties.TEST_NAMING_STRATEGY == Properties.TestNamingStrategy.COVERAGE) {
             nameGenerator = new CoverageGoalTestNameGenerationStrategy(testCases, results);
         } else {
