@@ -91,6 +91,11 @@ public class DefaultTestCase implements TestCase, Serializable {
 	private int id;
 
 	/**
+	 * test method number in one test case
+	 */
+	private int testMethodSize = 0;
+
+	/**
 	 * Constructs an empty test case, i.e., initially containing no statements.
 	 */
 	public DefaultTestCase() {
@@ -369,6 +374,7 @@ public class DefaultTestCase implements TestCase, Serializable {
 			t.id = idGenerator.getAndIncrement(); //always create new ID when making a clone
 			//t.exception_statement = exception_statement;
 			//t.exceptionThrown = exceptionThrown;
+			t.testMethodSize = this.testMethodSize;
 		} catch (IllegalArgumentException e) {
 			// may cause exception when copy statement
 			logger.warn("Get exception when statement clone, return empty case, exception is: ", e);
@@ -1211,5 +1217,14 @@ public class DefaultTestCase implements TestCase, Serializable {
 			privateSetVariablePos --;
 		}
 		return privateSetVariablePos;
+	}
+
+	@Override
+	public void setTestMethodSize(int size) {
+		this.testMethodSize = size;
+	}
+	@Override
+	public int getTestMethodSize() {
+		return this.testMethodSize;
 	}
 }

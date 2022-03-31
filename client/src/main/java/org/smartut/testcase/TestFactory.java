@@ -2379,6 +2379,9 @@ public class TestFactory {
 					// We only use this for static methods to avoid using wrong constructors (?)
 					addMethod(test, m, position, 0);
 				}
+
+				// set test method size
+				test.setTestMethodSize(test.getTestMethodSize() + 1);
 			} else if (o.isField()) {
 				GenericField f = (GenericField) o;
 				name = f.getName();
@@ -2564,6 +2567,8 @@ public class TestFactory {
 		position += (newLength - length);
 
 		test.addStatement(st, position);
+
+		test.setTestMethodSize(test.getTestMethodSize() + 1);
 
 		return true;
 	}
