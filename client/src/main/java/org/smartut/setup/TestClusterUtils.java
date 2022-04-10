@@ -104,6 +104,28 @@ public class TestClusterUtils {
 		return false;
 	}
 
+	public static boolean isLambdaMethod(String methodName){
+		String afterExtract = extractLambdaMethod(methodName);
+		return !methodName.equals(afterExtract);
+	}
+
+	public static String extractLambdaMethod(String methodName){
+		String extractedMethodName = methodName;
+		if (methodName.startsWith("lambda$")) {
+			int firstLambdaIndex = methodName.indexOf("$");
+			int lastLambdaIndex = methodName.lastIndexOf("$");
+			int methodDescIndex = methodName.indexOf("(");
+			if(firstLambdaIndex + 1  < lastLambdaIndex) {
+				extractedMethodName =  methodName.substring(firstLambdaIndex + 1, lastLambdaIndex);
+				if(methodDescIndex > 0 && lastLambdaIndex + 1 < methodDescIndex){
+					extractedMethodName += methodName.substring(methodDescIndex);
+				}
+			}
+		}
+		logger.info("in function extractLambdaMethod: {} --> {}",methodName, extractedMethodName);
+		return extractedMethodName;
+	}
+
 	public static void makeAccessible(Field field) {
 		if (!Modifier.isPublic(field.getModifiers())
 		        || !Modifier.isPublic(field.getDeclaringClass().getModifiers())) {
