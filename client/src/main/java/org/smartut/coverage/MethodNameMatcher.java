@@ -20,6 +20,7 @@
 package org.smartut.coverage;
 
 import org.smartut.Properties;
+import org.smartut.setup.TestClusterUtils;
 
 public class MethodNameMatcher {
 
@@ -65,6 +66,8 @@ public class MethodNameMatcher {
 	 * @return
 	 */
 	public boolean methodMatches(String methodName) {
+		methodName = TestClusterUtils.extractLambdaMethod(methodName);
+
 		String targetMethod = Properties.TARGET_METHOD;
 		if (!targetMethod.isEmpty() && methodName.equals(targetMethod))
 			return true;
