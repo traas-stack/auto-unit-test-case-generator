@@ -418,7 +418,10 @@ public class TestClusterGenerator {
 		}
 		targetClasses.add(targetClass);
 		addDeclaredClasses(targetClasses, targetClass);
-		if ((!targetClass.isInterface() && Modifier.isAbstract(targetClass.getModifiers())) || isInterfaceWithDefaultMethods(targetClass)) {
+
+		// abstract class could create object by mock
+		if (isInterfaceWithDefaultMethods(targetClass)) {
+		// if ((!targetClass.isInterface() && Modifier.isAbstract(targetClass.getModifiers())) || isInterfaceWithDefaultMethods(targetClass)) {
 			logger.info("SUT is an abstract class");
 
 			Set<Class<?>> subclasses = ConcreteClassAnalyzer.getInstance().getConcreteClasses(targetClass,

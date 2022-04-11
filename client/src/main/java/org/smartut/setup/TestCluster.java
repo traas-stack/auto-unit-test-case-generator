@@ -20,6 +20,7 @@
 package org.smartut.setup;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.Map.Entry;
@@ -1092,6 +1093,10 @@ public class TestCluster {
 			}
 
 			generator = Randomness.choice(candidates);
+			// if CUT is abstract，return null and create object by mock
+			if(Properties.TARGET_CLASS.equals(clazz.getClassName()) && Modifier.isAbstract(clazz.getRawClass().getModifiers())) {
+				return null;
+			}
 			logger.debug("Chosen generator: " + generator);
 		}
 

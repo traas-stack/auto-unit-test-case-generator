@@ -352,11 +352,26 @@ public class TestSuiteGenerator {
 	 */
 	protected void postProcessTests(TestSuiteChromosome testSuite) {
 
-
+		logger.warn("start postProcessTests");
 		// last check for update mock methods, we have done this in TestCodeVisitor before, however, before minimize &
 		// assertion generation will be better. So move st.doesNeedToUpdateInputs() in TestCodeVisitor here
 		for(TestChromosome testChromosome : testSuite.getTestChromosomes()){
 			testChromosome.mockChange();
+		}
+
+		// should refresh last run result and re-calculate covered goals
+		List<TestFitnessFunction> goals = new ArrayList<>();
+		List<TestFitnessFactory<? extends TestFitnessFunction>> testFitnessFactories = getFitnessFactories();
+		for (TestFitnessFactory<?> ff : testFitnessFactories) {
+			goals.addAll(ff.getCoverageGoals());
+		}
+		for (TestChromosome test : testSuite.getTestChromosomes()) {
+			test.setChanged(true);
+			test.clearCachedResults();
+			test.getTestCase().clearCoveredGoals();
+			for (TestFitnessFunction goal : goals) {
+				goal.isCovered(test);
+			}
 		}
 
 		// If overall time is short, the search might not have had enough time
@@ -367,7 +382,7 @@ public class TestSuiteGenerator {
 				.removeIf(t -> t.getLastExecutionResult() != null && (t.getLastExecutionResult().hasTimeout() ||
 																	  t.getLastExecutionResult().hasTestException()));
 
-		logger.warn("start postProcessTests");
+		logger.warn("after last mock change");
 		if (Properties.CTG_SEEDS_FILE_OUT != null) {
 			TestSuiteSerialization.saveTests(testSuite, new File(Properties.CTG_SEEDS_FILE_OUT));
 		} else if (Properties.TEST_FACTORY == TestFactory.SERIALIZATION) {
@@ -384,10 +399,6 @@ public class TestSuiteGenerator {
 		// TODO: This creates an inconsistency between
 		// suite.getCoveredGoals().size() and suite.getNumCoveredGoals()
 		// but it is not clear how to update numcoveredgoals
-		List<TestFitnessFunction> goals = new ArrayList<>();
-		for (TestFitnessFactory<?> ff : getFitnessFactories()) {
-			goals.addAll(ff.getCoverageGoals());
-		}
 		for (TestFitnessFunction f : testSuite.getCoveredGoals()) {
 			if (!goals.contains(f)) {
 				testSuite.removeCoveredGoal(f);
@@ -399,10 +410,6 @@ public class TestSuiteGenerator {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.INLINING);
 			ConstantInliner inliner = new ConstantInliner(true);
 			// progressMonitor.setCurrentPhase("Inlining constants");
-
-			// Map<FitnessFunction<? extends TestSuite<?>>, Double> fitnesses =
-			// testSuite.getFitnesses();
-
 			inliner.inline(testSuite);
 		}
 		logger.warn("postProcessTests testSuite after inline, size is {}", testSuite.size());
@@ -419,10 +426,8 @@ public class TestSuiteGenerator {
 		if (Properties.MINIMIZE) {
 			ClientServices.getInstance().getClientNode().changeState(ClientState.MINIMIZATION);
 
-
-			List<TestFitnessFactory<? extends TestFitnessFunction>> fitnessFactories = getFitnessFactories();
 			// 1. whole test minimize
-			TestSuiteMinimizer minimizer = new TestSuiteMinimizer(fitnessFactories);
+			TestSuiteMinimizer minimizer = new TestSuiteMinimizer(testFitnessFactories);
 			logger.warn("Start remove redundant test suite");
 			LoggingUtils.getSmartUtLogger().info("* " + ClientProcess.getPrettyPrintIdentifier() + "Minimizing test suite");
 			// remove redundant and without mut cases
@@ -431,7 +436,7 @@ public class TestSuiteGenerator {
 
 			// 2. pre minimize
 			double before = testSuite.getFitness();
-			PreTestSuiteMiniMizer preMinimizer = new PreTestSuiteMiniMizer(fitnessFactories);
+			PreTestSuiteMiniMizer preMinimizer = new PreTestSuiteMiniMizer(testFitnessFactories);
 			logger.warn("Start pre minimizing test suite");
 			preMinimizer.minimize(testSuite);
 			logger.warn("Pre minimize test suite DONE");
@@ -532,7 +537,7 @@ public class TestSuiteGenerator {
 		}
         else if (Properties.JUNIT_TESTS && (Properties.JUNIT_CHECK == Properties.JUnitCheckValues.TRUE ||
                 Properties.JUNIT_CHECK == Properties.JUnitCheckValues.OPTIONAL)) {
-			logger.warn("Start JUNIT COMPILE AND CHECK");
+			logger.warn("Start JUNIT COMPILE AND CHECK, test suite size is {}", testSuite.size());
             if(ClassPathHacker.isJunitCheckAvailable())
                 compileAndCheckTests(testSuite);
             else

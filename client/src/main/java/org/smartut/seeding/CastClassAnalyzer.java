@@ -215,6 +215,10 @@ public class CastClassAnalyzer {
 	}
 
 	private void handleVariableTypesInMethod(ClassNode cn, MethodNode mn) {
+		if(mn == null || mn.localVariables == null) {
+			return;
+		}
+
 		for (LocalVariableNode localVariableNode : mn.localVariables) {
 			String variableClassName = localVariableNode.desc;
 

@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -294,6 +295,61 @@ public class TestFactory {
 			//create a statement for the constructor
 			Statement st = new ConstructorStatement(test, constructor, parameters);
 			VariableReference ref =  test.addStatement(st, position);
+
+			// if this is collections (e.g., list) constructor，insert element with the
+			// Properties.COLLECTION_ADD_OBJECT_PROBABILITY probability
+			try {
+				if(Collection.class.isAssignableFrom(constructor.getDeclaringClass())) {
+					Random random = new Random();
+					if (random.nextDouble() < Properties.COLLECTION_ADD_OBJECT_PROBABILITY) {
+						// judge mock or not
+						if (exactType instanceof ParameterizedType) {
+
+							Type[] types = ((ParameterizedType)exactType).getActualTypeArguments();
+							// length is 1 for list
+							if (types.length == 1) {
+								Type listType = types[0];
+
+								// mock
+								if (FunctionalMockStatement.canBeFunctionalMocked(listType)) {
+									FunctionalMockStatement fms = new FunctionalMockStatement(test, listType,
+										new GenericClass(listType));
+									VariableReference mockObjRef = test.addStatement(fms, position + 1);
+
+									// get collection's add method by reflect
+									Method listAddMethod = Collection.class.getDeclaredMethod("add",
+										new Class[] {Object.class});
+									GenericMethod addGenericMethod = new GenericMethod(listAddMethod,
+										ref.getType().getClass());
+									Statement addMethodStatement = new MethodStatement(test, addGenericMethod, ref,
+										Arrays.asList(new VariableReference[] {mockObjRef}));
+									VariableReference x = test.addStatement(addMethodStatement, position + 2);
+								} else { // new
+									VariableReference newOrReUseObjRef = createOrReuseVariable(test, listType, position + 1,
+										0, null, false, false, false);
+									// get collection's add method by reflect
+									Method listAddMethod = Collection.class.getDeclaredMethod("add",
+										new Class[] {Object.class});
+									GenericMethod addGenericMethod = new GenericMethod(listAddMethod,
+										ref.getType().getClass());
+									Statement addMethodStatement = new MethodStatement(test, addGenericMethod, ref,
+										Arrays.asList(new VariableReference[] {newOrReUseObjRef}));
+
+									int insertPos = newOrReUseObjRef.getStPosition() + 1;
+									// is reuse obj
+									if(newOrReUseObjRef.getStPosition() < position + 1) {
+										insertPos = position + 1;
+									}
+									VariableReference eleVar = test.addStatement(addMethodStatement, insertPos);
+
+								}
+							}
+						}
+					}
+				}
+			} catch (Exception e) {
+				logger.warn("add object to collection fail, exception: ", e);
+			}
 
 			return ref;
 		} catch (Exception e) {
@@ -1778,7 +1834,14 @@ public class TestFactory {
 	 */
 	public boolean deleteStatementGracefully(TestCase test, int position, boolean isMutateDel)
 		throws ConstructionFailedException {
-		VariableReference var = test.getReturnValue(position);
+		VariableReference var;
+
+		try {
+			var = test.getReturnValue(position);
+		} catch (IllegalArgumentException e) {
+			logger.warn("deleteStatementGracefully test.getReturnValue exception", e);
+			return false;
+		}
 
 		if (var instanceof ArrayIndex) {
 			return deleteStatement(test, position, isMutateDel);
@@ -2230,7 +2293,10 @@ public class TestFactory {
 			// only insert when test init
 			if(test.size() == 0 && TestFactory.getInstance().getPrivateFieldsSize() > 0) {
 				// return insertRandomReflectionFieldCall(test,position,0);
-				return insertAllPrivateField(test, position);
+				boolean success = insertAllPrivateField(test, position);
+				if(success) {
+					return true;
+				}
 			}
 
 			// private method ratio
@@ -2269,8 +2335,30 @@ public class TestFactory {
 					VariableReference callee = null;
 					Type target = m.getOwnerType();
 
+					// if CUT contains TypeVariable, target type probability be different with cut object
+					// e.g. we define ClassA <T>，the object of CUT before may be classA0<String>，target here may be ClassA<Integer>
+					// test.hasObject result is false，and create another CUT object,
+					if(target instanceof ParameterizedType) {
+						Type targetRawType = ((ParameterizedType)target).getRawType();
+						// 判断是否是被测类，只有被测类对象才擦出type
+						if(targetRawType.getTypeName().equals(Properties.TARGET_CLASS)) {
+							target = targetRawType;
+						}
+					}
+
 					if (!test.hasObject(target, position)) {
-						callee = createObject(test, target, position, 0, null, false, false,true); //no FM for SUT
+						try {
+							callee = createObject(test, target, position, 0, null, false, false, true); //no FM for SUT
+						} catch (ConstructionFailedException e) {
+							// first remove insert
+							int lengthDifference = test.size() - previousLength;
+							for (int i = lengthDifference - 1; i >= 0; i--) {
+								test.remove(position + i);
+							}
+							// abstract class could be mocked
+							callee = createObject(test, target, position, 0, null, false, true, true);
+						}
+
 						position += test.size() - previousLength;
 						previousLength = test.size();
 					} else {
@@ -2291,6 +2379,11 @@ public class TestFactory {
 					// We only use this for static methods to avoid using wrong constructors (?)
 					addMethod(test, m, position, 0);
 				}
+
+				// set test method name
+				test.setTestMethodName(o.getName());
+				// increase test method size
+				test.setTestMethodSize(test.getTestMethodSize() + 1);
 			} else if (o.isField()) {
 				GenericField f = (GenericField) o;
 				name = f.getName();
@@ -2477,6 +2570,11 @@ public class TestFactory {
 
 		test.addStatement(st, position);
 
+		// set test method name
+		test.setTestMethodName(method.getName());
+		// increase test method size
+		test.setTestMethodSize(test.getTestMethodSize() + 1);
+
 		return true;
 	}
 
@@ -2503,6 +2601,14 @@ public class TestFactory {
 				//we need a reference to the SUT, and one to a variable of same type of chosen field
 				types, null,
 				position, recursionDepth + 1, Properties.ALLOW_NULL, false, true);
+
+			// if enum class, object could not be null, otherwise will throw NPE when invoke privateAccess setVariable
+			if(parameters.size() > 0) {
+				Statement callee = test.getStatement(parameters.get(0).getStPosition());
+				if(callee instanceof EnumPrimitiveStatement && ((EnumPrimitiveStatement)callee).getValue() == null) {
+					throw new ConstructionFailedException("Null enum primitive");
+				}
+			}
 
 			try {
 				st = new PrivateFieldStatement(test,reflectionFactory.getReflectedClass(),field.getName(),

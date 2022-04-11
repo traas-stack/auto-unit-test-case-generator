@@ -20,6 +20,7 @@
 package org.smartut.junit.writer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.smartut.Properties.OutputFormat;
 import org.smartut.junit.JUnit3TestAdapter;
 import org.smartut.junit.JUnit4TestAdapter;
 import org.smartut.junit.UnitTestAdapter;
+import org.smartut.junit.naming.methods.MethodNameTestNameGenerationStrategy;
 import org.smartut.testcarver.testcase.CarvedTestCase;
 import org.smartut.testcase.TestCase;
 import org.smartut.testcase.execution.ExecutionResult;
@@ -100,11 +102,15 @@ public class TestSuiteWriterUtils {
 		String testName = null;
 		if (test instanceof CarvedTestCase) {
 			testName = ((CarvedTestCase)test).getName();
+		} else if(Properties.TEST_NAMING_STRATEGY == Properties.TestNamingStrategy.METHODNAME){
+			MethodNameTestNameGenerationStrategy nameStrategy = new MethodNameTestNameGenerationStrategy(tests, new ArrayList<>());
+			TestCase testCaseLocal = tests.get(position);
+			testName = nameStrategy.getName(testCaseLocal);
 		} else {
 			int totalNumberOfTests = tests.size();
 			String totalNumberOfTestsString = String.valueOf(totalNumberOfTests - 1);
 			String testNumber = StringUtils.leftPad(String.valueOf(position),
-					totalNumberOfTestsString.length(), "0");
+				totalNumberOfTestsString.length(), "0");
 			testName = "test" + testNumber;
 		}
 		return testName;

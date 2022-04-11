@@ -146,6 +146,10 @@ public class Properties extends AdaptedProperties {
 	@DoubleValue(min = 0.0, max = 1.0)
 	public static double NULL_PROBABILITY = 0.0;
 
+	@Parameter(key = "null_probability", group = "Test Creation", description = "Probability to insert an object after collect new")
+	@DoubleValue(min = 0.0, max = 1.0)
+	public static double COLLECTION_ADD_OBJECT_PROBABILITY = 0.90;
+
 	@Parameter(key = "object_reuse_probability", group = "Test Creation", description = "Probability to reuse an existing reference, if available")
 	@DoubleValue(min = 0.0, max = 1.0)
 	public static double OBJECT_REUSE_PROBABILITY = 0.9;
@@ -1158,11 +1162,11 @@ public class Properties extends AdaptedProperties {
 	public static int MAX_COVERAGE_DEPTH = -1;
 
 	public enum TestNamingStrategy {
-		NUMBERED, COVERAGE
+		NUMBERED, COVERAGE, METHODNAME
 	}
 
 	@Parameter(key = "test_naming_strategy", group = "Output", description = "What strategy to use to derive names for tests")
-	public static TestNamingStrategy TEST_NAMING_STRATEGY = TestNamingStrategy.NUMBERED;
+	public static TestNamingStrategy TEST_NAMING_STRATEGY = TestNamingStrategy.METHODNAME;
 
 	// ---------------------------------------------------------------
 	// Sandbox

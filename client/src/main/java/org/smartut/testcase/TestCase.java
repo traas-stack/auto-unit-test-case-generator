@@ -519,5 +519,15 @@ public interface TestCase extends Iterable<Statement>, Cloneable, Listenable<Voi
 	 * @return
 	 */
 	int getPrivateFieldLastPosition();
+
+	void setTestMethodName(String testMethodName);
+	String getTestMethodName();
+
+	/**
+	 * test method size in this test case
+	 * @param size    method under test size
+	 */
+	void setTestMethodSize(int size);
+	int getTestMethodSize();
 	
 }
