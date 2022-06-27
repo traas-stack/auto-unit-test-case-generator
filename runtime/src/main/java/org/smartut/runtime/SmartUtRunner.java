@@ -68,7 +68,8 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
      * key:loaded case name
      * value:case build smartutclassloader object
      */
-    public static final Map<String,SmartUtClassLoader> SMART_UT_CLASS_LOADER_MAP = new HashMap<>();
+
+    public static final SmartUtClassLoader SMART_UT_CLASS_LOADER = new SmartUtClassLoader();
     /**
      * key:Thread id
      * value:contextClassloader corresponding to thread
@@ -147,16 +148,14 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
 	    	 * then loading CUTs will fail (this does happen in "mvn test")
 	    	 */
 
-            SmartUtClassLoader classLoader = new SmartUtClassLoader();
-            classLoader.skipInstrumentation(clazz.getName());
-            //Record the corresponding SmartUtClassLoader
-            SMART_UT_CLASS_LOADER_MAP.put(clazz.getName(), classLoader);
+            SMART_UT_CLASS_LOADER.skipInstrumentation(clazz.getName());
+            //Record
             RuntimeSettings.caseName = clazz.getName();
             if (!RESET_CLASS_LOADER_MAP.containsKey(Thread.currentThread().getId())) {
                 RESET_CLASS_LOADER_MAP.put(Thread.currentThread().getId(), Thread.currentThread().getContextClassLoader());
             }
 //            Thread.currentThread().setContextClassLoader(classLoader);
-            return Class.forName(clazz.getName(), true, classLoader);
+            return Class.forName(clazz.getName(), true, SMART_UT_CLASS_LOADER);
         } catch (ClassNotFoundException e) {
             throw new InitializationError(e);
         }
@@ -165,9 +164,9 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
     /**
      * use smartut classloader
      */
-    public static void useSmartUtClassLoader(){
+    public static void useSmartUtClassLoader(ClassLoader classLoader){
         if(RuntimeSettings.useSeparateClassLoader && useClassLoader) {
-           Thread.currentThread().setContextClassLoader(SMART_UT_CLASS_LOADER_MAP.get(RuntimeSettings.caseName));
+           Thread.currentThread().setContextClassLoader(classLoader);
         }
     }
 
@@ -176,7 +175,11 @@ public class SmartUtRunner extends BlockJUnit4ClassRunner {
      */
     public static void resetSmartUtClassLoader(){
         if(RuntimeSettings.useSeparateClassLoader && useClassLoader) {
-            Thread.currentThread().setContextClassLoader(RESET_CLASS_LOADER_MAP.get(Thread.currentThread().getId()));
+            Long threadId = Thread.currentThread().getId();
+            if(RESET_CLASS_LOADER_MAP.containsKey(threadId)) {
+                Thread.currentThread().setContextClassLoader(RESET_CLASS_LOADER_MAP.get(Thread.currentThread().getId()));
+                RESET_CLASS_LOADER_MAP.remove(Thread.currentThread().getId());
+            }
         }
     }
 

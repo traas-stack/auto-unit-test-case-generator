@@ -96,7 +96,7 @@ public class SmartUtClassLoader extends ClassLoader {
 
 	private Class<?> normalInstrumentClass(String name) throws ClassNotFoundException{
 		if (Thread.currentThread().getContextClassLoader() == null) {
-			Thread.currentThread().setContextClassLoader(SmartUtRunner.SMART_UT_CLASS_LOADER_MAP.get(RuntimeSettings.caseName));
+			Thread.currentThread().setContextClassLoader(SmartUtRunner.SMART_UT_CLASS_LOADER);
 		}
 		logger.info("Seeing class for first time: " + name);
 		return instrumentClass(name,InstrumentType.NORMAL);
@@ -151,7 +151,7 @@ public class SmartUtClassLoader extends ClassLoader {
 	/**
 	 * Before a new class is defined, we need to create a package definition for it
 	 * 
-	 * @param className
+	 * @param className class-name
 	 */
 	private void createPackageDefinition(String className){
 		int i = className.lastIndexOf('.');
@@ -169,6 +169,8 @@ public class SmartUtClassLoader extends ClassLoader {
 	public RuntimeInstrumentation getInstrumentation() {
 		return instrumentation;
 	}
-
+	public ClassLoader getOriginalClassLoader() {
+		return classLoader;
+	}
 	
 }
