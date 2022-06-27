@@ -36,9 +36,12 @@ import java.security.Permission;
 import java.security.SecurityPermission;
 import java.security.UnresolvedPermission;
 import java.sql.SQLPermission;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.PropertyPermission;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -128,6 +131,9 @@ public class MSecurityManager extends SecurityManager {
 	 * we can end up in a infinite recursion.
 	 */
 	private final Set<File> filesToDelete;
+
+	private static final List<String> permissionWhiteList = new ArrayList<>(Arrays.asList( "logging",
+			"logback", "log4j", "jacoco", "java.security.Security"));
 
 	static{
 		File tmp = null;
@@ -429,9 +435,17 @@ public class MSecurityManager extends SecurityManager {
 	public void checkPermission(Permission perm) throws SecurityException {
 		// check access
 		if (!allowPermission(perm)) {
-			String stack = "\n";
+			StringBuilder stack = new StringBuilder("\n");
 			for (StackTraceElement e : Thread.currentThread().getStackTrace()) {
-				stack += e + "\n";
+				stack.append(e).append("\n");
+				for (String oneWhite : permissionWhiteList) {
+					if (e.toString().contains(oneWhite)) {
+						if (executingTestCase) {
+							statistics.permissionAllowed(perm);
+						}
+						return;
+					}
+				}
 			}
 			if (executingTestCase) {
 				/*
