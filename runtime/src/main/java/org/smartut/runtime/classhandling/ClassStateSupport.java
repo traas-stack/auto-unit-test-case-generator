@@ -103,7 +103,7 @@ public class ClassStateSupport {
 		if (classLoader instanceof SmartUtClassLoader) {
 			ClassLoader originalClassLoader = ((SmartUtClassLoader) classLoader).getOriginalClassLoader();
 			try {
-				Class<?> aClass = Class.forName(org.smartut.runtime.RuntimeSettings.className, true, originalClassLoader);
+				Class.forName(org.smartut.runtime.RuntimeSettings.className, true, originalClassLoader);
 			} catch (Throwable e) {
 				logger.warn("load class error with default classloader: {}", classLoader, e);
 			}

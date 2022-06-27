@@ -132,7 +132,7 @@ public class MSecurityManager extends SecurityManager {
 	 */
 	private final Set<File> filesToDelete;
 
-	private static final List<String> permissionWhiteList = new ArrayList<>(Arrays.asList( "logging",
+	private static final List<String> PERMISSION_WHITE_LIST = new ArrayList<>(Arrays.asList( "logging",
 			"logback", "log4j", "jacoco", "java.security.Security"));
 
 	static{
@@ -438,7 +438,7 @@ public class MSecurityManager extends SecurityManager {
 			StringBuilder stack = new StringBuilder("\n");
 			for (StackTraceElement e : Thread.currentThread().getStackTrace()) {
 				stack.append(e).append("\n");
-				for (String oneWhite : permissionWhiteList) {
+				for (String oneWhite : PERMISSION_WHITE_LIST) {
 					if (e.toString().contains(oneWhite)) {
 						if (executingTestCase) {
 							statistics.permissionAllowed(perm);
