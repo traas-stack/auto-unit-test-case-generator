@@ -85,8 +85,9 @@ public class PrivateAccess {
         } catch (NoSuchFieldException e) {
             // add field in parent class
             boolean found = false;
+            Class child = klass;
             while(parentClassIndex++ < REFLECTION_PARENT_DEPTH) {
-                Class<?> superClass = klass.getSuperclass();
+                Class<?> superClass = child.getSuperclass();
                 if(superClass == null || superClass.getName().equals(Object.class.getName())) {
                     break;
                 }
@@ -98,6 +99,7 @@ public class PrivateAccess {
                 } catch (NoSuchFieldException e2) {
 
                 }
+                child = superClass;
             }
 
             if(!found) {
