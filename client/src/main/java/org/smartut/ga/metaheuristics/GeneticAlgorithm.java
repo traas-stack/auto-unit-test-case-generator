@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -400,7 +400,7 @@ public abstract class GeneticAlgorithm<T extends Chromosome<T>> implements Searc
     }
 
     protected List<T> getRandomPopulation(int population_size) {
-        logger.debug("Creating random population");
+        logger.debug("Creating random population with size {}", population_size);
 
         List<T> newPopulation = new ArrayList<>(population_size);
 
@@ -413,7 +413,7 @@ public abstract class GeneticAlgorithm<T extends Chromosome<T>> implements Searc
             if (isFinished())
                 break;
         }
-        logger.debug("Created " + newPopulation.size() + " individuals");
+        logger.debug("Created {} individuals" ,newPopulation.size());
 
         return newPopulation;
     }

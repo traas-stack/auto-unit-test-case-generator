@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -184,7 +184,7 @@ public class TimeController {
 					//just check if phase went over by more than 10%...
 					logger.warn("Phase "+state + " lasted too long, "+ (-left/1000) + " seconds more than allowed.");
 				}
-                if(Properties.REUSE_LEFTOVER_TIME) {
+                if(Properties.REUSE_LEFTOVER_TIME & left > 0) {
                     timeLeftFromPreviousPhases += left;
                     logger.info("Time left from previous phases: {}/{} -> {}, {}", left, timeoutInMs, timeLeftFromPreviousPhases, getLeftTimeBeforeEnd());
                 }
@@ -221,7 +221,7 @@ public class TimeController {
 		int time = Properties.EXTRA_TIMEOUT;
 
 		time += Properties.INITIALIZATION_TIMEOUT;
-		
+
 		time += getSearchBudgetInSeconds();
 
 		if (Properties.MINIMIZE) {
@@ -242,6 +242,14 @@ public class TimeController {
         }
 
 		return time;
+	}
+
+	/**
+	 * simple time calculate
+	 * @return
+	 */
+	public int simpleCalculateClientWillRunInSeconds() {
+		return Properties.CTG_TIME_PER_CLASS * 60;
 	}
 
 	/**
@@ -283,6 +291,8 @@ public class TimeController {
 			long phaseLeft = timeoutInMs - timeSincePhaseStarted + timeLeftFromPreviousPhases;
 			logger.debug("Time left for current phase {}: {}", state, phaseLeft);
 			if(ms > phaseLeft){
+				logger.warn("Time no left for current phase {}: phase Left {} ms, threshold {} ms, "
+					+ "timeout in current phase {} ms, timeSincePhaseStarted {} ms", state, phaseLeft, ms, timeoutInMs, timeSincePhaseStarted);
 				return false;
 			}
 		}

@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -100,7 +100,10 @@ public class ExecutionPathClassAdapter extends ClassVisitor {
 		// Don't touch bridge and synthetic methods
 		if ((methodAccess & Opcodes.ACC_SYNTHETIC) > 0
 		        || (methodAccess & Opcodes.ACC_BRIDGE) > 0) {
-			return mv;
+			//consider lambda in jdk8
+			if(!TestClusterUtils.isLambdaMethod(name)) {
+				return mv;
+			}
 		}
 		if (name.equals("<clinit>"))
 			return mv;

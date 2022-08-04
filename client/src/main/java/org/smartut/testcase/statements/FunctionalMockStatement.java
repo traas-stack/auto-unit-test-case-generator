@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -202,6 +202,7 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
                 rawClass.equals(Class.class) ||
                 rawClass.isArray() || rawClass.isPrimitive() || rawClass.isAnonymousClass() ||
                 rawClass.isEnum() ||
+                Collection.class.isAssignableFrom(rawClass) ||
                 //note: Mockito can handle package-level classes, but we get all kinds of weird exceptions with instrumentation :(
                 !Modifier.isPublic(rawClass.getModifiers())) {
             return false;
@@ -249,11 +250,15 @@ public class FunctionalMockStatement extends EntityWithParametersStatement {
 
         //ad-hoc list of classes we should not really mock
         List<Class<?>> avoid = Arrays.asList(
-                //add here if needed
+            //             java.util.Map.class, java.util.stream.Stream.class
+            java.util.stream.Stream.class
+            //add here if needed
         );
 
-        if(avoid.contains(rawClass)){
-            return false;
+        for(Class<?> clazz: avoid) {
+            if(clazz.isAssignableFrom(rawClass)) {
+                return false;
+            }
         }
 
         return true;

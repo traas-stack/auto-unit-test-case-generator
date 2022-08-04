@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -145,6 +145,10 @@ public class Properties extends AdaptedProperties {
 	@Parameter(key = "null_probability", group = "Test Creation", description = "Probability to use null instead of constructing an object")
 	@DoubleValue(min = 0.0, max = 1.0)
 	public static double NULL_PROBABILITY = 0.0;
+
+	@Parameter(key = "null_probability", group = "Test Creation", description = "Probability to insert an object after collect new")
+	@DoubleValue(min = 0.0, max = 1.0)
+	public static double COLLECTION_ADD_OBJECT_PROBABILITY = 0.90;
 
 	@Parameter(key = "object_reuse_probability", group = "Test Creation", description = "Probability to reuse an existing reference, if available")
 	@DoubleValue(min = 0.0, max = 1.0)
@@ -806,7 +810,7 @@ public class Properties extends AdaptedProperties {
 	public static int CTG_TIME = 3;
 
 	@Parameter(key = "ctg_time_per_class", group = "Continuous Test Generation", description = "How many minutes to allocate for each class. If this parameter is set, then ctg_time is going to be ignored. This parameter is mainly meant for debugging purposes.")
-	public static Integer CTG_TIME_PER_CLASS = 20;
+	public static Integer CTG_TIME_PER_CLASS = 3;
 
 	@Parameter(key = "ctg_min_time_per_job", group = "Continuous Test Generation", description = "How many minutes each class under test should have at least")
 	public static int CTG_MIN_TIME_PER_JOB = 1;
@@ -878,7 +882,7 @@ public class Properties extends AdaptedProperties {
 	 * Maven plugin will use the default, best one
 	 */
 	@Parameter(key = "ctg_schedule", group = "Continuous Test Generation", description = "Schedule used to run jobs")
-	public static AvailableSchedule CTG_SCHEDULE = AvailableSchedule.BUDGET;
+	public static AvailableSchedule CTG_SCHEDULE = AvailableSchedule.SIMPLE;
 
 
 	@Parameter(key = "ctg_extra_args", group = "Continuous Test Generation", description = "Extra '-D' arguments to pass to SmartUt test generation processes")
@@ -1158,11 +1162,11 @@ public class Properties extends AdaptedProperties {
 	public static int MAX_COVERAGE_DEPTH = -1;
 
 	public enum TestNamingStrategy {
-		NUMBERED, COVERAGE
+		NUMBERED, COVERAGE, METHODNAME
 	}
 
 	@Parameter(key = "test_naming_strategy", group = "Output", description = "What strategy to use to derive names for tests")
-	public static TestNamingStrategy TEST_NAMING_STRATEGY = TestNamingStrategy.NUMBERED;
+	public static TestNamingStrategy TEST_NAMING_STRATEGY = TestNamingStrategy.METHODNAME;
 
 	// ---------------------------------------------------------------
 	// Sandbox

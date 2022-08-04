@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,7 +25,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.smartut.Properties;
 import org.smartut.Properties.StoppingCondition;
 import org.smartut.classpath.ClassPathHandler;
@@ -136,12 +138,37 @@ public class JobHandler extends Thread {
 				}
 				process = builder.start();
 				latestProcess = process;
-				
-				int exitCode = process.waitFor(); //no need to have timeout here, as it is handled by the scheduler/executor				
+
+				final Process finalProcess = process;
+
+				Thread collectInputThread = new Thread(() -> {
+					// close resources
+					//try (
+					StringWriter writer = new StringWriter();
+					InputStream ins = finalProcess.getInputStream();
+					try {
+						// add thread interrupt
+						if(interrupted()) {
+							return;
+						}
+						IOUtils.copy(ins, writer);
+						writer.flush();
+					}  catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						IOUtils.closeQuietly(writer);
+						IOUtils.closeQuietly(ins);
+					}
+				});
+				collectInputThread.start();
+
+				int exitCode = process.waitFor(); //no need to have timeout here, as it is handled by the scheduler/executor
 
 				if (exitCode != 0) {
 					handleProcessError(job, process);
 				}
+
+				collectInputThread.interrupt();
 
 			} catch (InterruptedException e) {
 				this.interrupt();
@@ -163,6 +190,17 @@ public class JobHandler extends Thread {
 				 * if there were problems with this job, still
 				 * be sure to decrease the job counter
 				 */
+				if (process != null) {
+					try {
+						//be sure streamers are closed, otherwise process might hang on Windows
+						process.getOutputStream().close();
+						process.getInputStream().close();
+						process.getErrorStream().close();
+					} catch (Exception t){
+						logger.error("Failed to close process stream: "+t.toString());
+					}
+					process.destroy();
+				}
 				executor.doneWithJob(job);
 			}
 		}

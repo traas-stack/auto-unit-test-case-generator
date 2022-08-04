@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -740,7 +740,7 @@ public class Scaffolding {
 
 		bd.append(BLOCK_SPACE);
 		bd.append("" + RuntimeSettings.class.getName() + ".maxNumberOfIterationsPerLoop = "
-				+ Properties.MAX_LOOP_ITERATIONS + "; \n");
+				+ Properties.MAX_LOOP_ITERATIONS + "L; \n");
 
 		if (Properties.REPLACE_SYSTEM_IN) {
 			bd.append(BLOCK_SPACE);

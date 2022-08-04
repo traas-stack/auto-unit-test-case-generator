@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -215,6 +215,10 @@ public class CastClassAnalyzer {
 	}
 
 	private void handleVariableTypesInMethod(ClassNode cn, MethodNode mn) {
+		if(mn == null || mn.localVariables == null) {
+			return;
+		}
+
 		for (LocalVariableNode localVariableNode : mn.localVariables) {
 			String variableClassName = localVariableNode.desc;
 

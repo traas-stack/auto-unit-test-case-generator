@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -102,6 +102,28 @@ public class TestClusterUtils {
 			return true;
 
 		return false;
+	}
+
+	public static boolean isLambdaMethod(String methodName){
+		String afterExtract = extractLambdaMethod(methodName);
+		return !methodName.equals(afterExtract);
+	}
+
+	public static String extractLambdaMethod(String methodName){
+		String extractedMethodName = methodName;
+		if (methodName.startsWith("lambda$")) {
+			int firstLambdaIndex = methodName.indexOf("$");
+			int lastLambdaIndex = methodName.lastIndexOf("$");
+			int methodDescIndex = methodName.indexOf("(");
+			if(firstLambdaIndex + 1  < lastLambdaIndex) {
+				extractedMethodName =  methodName.substring(firstLambdaIndex + 1, lastLambdaIndex);
+				if(methodDescIndex > 0 && lastLambdaIndex + 1 < methodDescIndex){
+					extractedMethodName += methodName.substring(methodDescIndex);
+				}
+			}
+		}
+		logger.info("in function extractLambdaMethod: {} --> {}",methodName, extractedMethodName);
+		return extractedMethodName;
 	}
 
 	public static void makeAccessible(Field field) {

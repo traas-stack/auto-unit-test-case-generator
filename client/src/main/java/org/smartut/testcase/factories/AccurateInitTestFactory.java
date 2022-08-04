@@ -18,6 +18,7 @@ import org.smartut.testcase.execution.ExecutionTracer;
 public class AccurateInitTestFactory implements ChromosomeFactory<TestChromosome> {
 
     private static final long serialVersionUID = -5202578461625984100L;
+    private static final int INIT_TEST_MAX_LENGTH = 50;
 
     /** Constant <code>logger</code> */
     protected static final Logger logger = LoggerFactory.getLogger(FixedLengthTestChromosomeFactory.class);
@@ -41,15 +42,22 @@ public class AccurateInitTestFactory implements ChromosomeFactory<TestChromosome
 
         // Then add random statements until the test case reaches the chosen length or we run out of
         // generation attempts.
-        int testLength = Properties.INIT_METHOD_SIZE;
-        if(TestFactory.getInstance().getPrivateFieldsSize() > 0) {
-            testLength = Properties.INIT_METHOD_SIZE + 1;
-        }
-        for (int num = 0; num < testLength; num++) {
+        int testMethodSize = test.getTestMethodSize();
+        int tryTimes = 0;
+
+        /**
+         * exit condition: method inserted size >= Properties.INIT_METHOD_SIZE
+         * Or tryTimes >= INIT_TEST_MAX_LENGTH (in case of exception cause )
+         */
+        while(testMethodSize < Properties.INIT_METHOD_SIZE && tryTimes ++ < INIT_TEST_MAX_LENGTH) {
             // NOTE: Even though extremely unlikely, insertRandomStatement could fail every time
             // with return code -1, thus eventually exceeding MAX_ATTEMPTS. In this case, the
             // returned test case would indeed be empty!
-            testFactory.insertRandomCallStatement(test, test.size() - 1);
+            // testFactory.insertRandomStatement(test, test.size() - 1);
+            testFactory.insertRandomCallStatement(test,test.size() - 1);
+
+            // 更新testMethodSize
+            testMethodSize = test.getTestMethodSize();
         }
 
         if (logger.isDebugEnabled())

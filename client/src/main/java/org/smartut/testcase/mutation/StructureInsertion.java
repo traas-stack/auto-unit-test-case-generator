@@ -53,7 +53,9 @@ public class StructureInsertion implements InsertionStrategy {
             if (test.size() - oldSize > 1) {
                 position += (test.size() - oldSize - 1);
             }
-        } else {
+        }
+        // insert private filed maybe fail, insert random call if failed
+        if(!success) {
             position = test.size();
             success = TestFactory.getInstance().insertRandomCall(test, lastPosition + 1);
 

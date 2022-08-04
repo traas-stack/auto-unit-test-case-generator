@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -336,13 +336,15 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
 				ClassLoader loader = TestGenerationContext.getInstance().getClassLoaderForSUT();
 				BytecodeInstructionPool pool = BytecodeInstructionPool.getInstance(loader);
 				BytecodeInstruction instruction = pool.getFirstInstructionAtLineNumber(line.getClassName(), line.getMethod(), line.getLine());
-				Set<ControlDependency> cds = instruction.getControlDependencies();
-				if(cds.size() == 0)
-					this.currentGoals.add(ff);
-				else {
-					for (ControlDependency cd : cds) {
-						BranchCoverageTestFitness fitness = BranchCoverageFactory.createBranchCoverageTestFitness(cd);
-						this.dependencies.get(fitness).add(ff);
+				if(instruction != null) {
+					Set<ControlDependency> cds = instruction.getControlDependencies();
+					if (cds.size() == 0)
+						this.currentGoals.add(ff);
+					else {
+						for (ControlDependency cd : cds) {
+							BranchCoverageTestFitness fitness = BranchCoverageFactory.createBranchCoverageTestFitness(cd);
+							this.dependencies.get(fitness).add(ff);
+						}
 					}
 				}
 			}

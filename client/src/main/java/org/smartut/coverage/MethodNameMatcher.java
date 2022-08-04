@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 package org.smartut.coverage;
 
 import org.smartut.Properties;
+import org.smartut.setup.TestClusterUtils;
 
 public class MethodNameMatcher {
 
@@ -65,6 +66,8 @@ public class MethodNameMatcher {
 	 * @return
 	 */
 	public boolean methodMatches(String methodName) {
+		methodName = TestClusterUtils.extractLambdaMethod(methodName);
+
 		String targetMethod = Properties.TARGET_METHOD;
 		if (!targetMethod.isEmpty() && methodName.equals(targetMethod))
 			return true;

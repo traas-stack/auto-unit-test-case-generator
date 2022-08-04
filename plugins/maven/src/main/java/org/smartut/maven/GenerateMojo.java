@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -115,7 +115,7 @@ public class GenerateMojo extends AbstractMojo {
 	/**
 	 * Schedule used to run CTG (SIMPLE, BUDGET, SEEDING, BUDGET_AND_SEEDING, HISTORY)
 	 */
-	@Parameter( property = "schedule", defaultValue = "BUDGET" )
+	@Parameter( property = "schedule", defaultValue = "SIMPLE" )
 	private String schedule;
 
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)

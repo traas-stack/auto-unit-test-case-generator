@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and SmartUt
+ * Copyright (C) 2010-2018 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
  *
- * This file is part of SmartUt.
+ * Copyright (C) 2021- SmartUt contributors
  *
  * SmartUt is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -432,10 +432,11 @@ public class TestSuiteMinimizer {
 
         // Remove previous results as they do not contain method calls
         // in the case of whole suite generation
-        for (TestChromosome test : suite.getTestChromosomes()) {
-            test.setChanged(true);
-            test.clearCachedResults();
-        }
+        // because re-calculate coverage after last mock change, no longer needed here
+        //for (TestChromosome test : suite.getTestChromosomes()) {
+        //    test.setChanged(true);
+        //    test.clearCachedResults();
+        //}
 
         SecondaryObjective strategy = Properties.SECONDARY_OBJECTIVE[0];
 
@@ -453,6 +454,10 @@ public class TestSuiteMinimizer {
         }
 
         removeEmptyTestCases(suite);
+
+        if(suite.size() == 1) {
+            return;
+        }
         this.removeRedundantTestCasesWithRerun(suite, goals);
     }
 
@@ -557,16 +562,16 @@ public class TestSuiteMinimizer {
             }
             long coveredFilterGoals1 = 0L;
             for (TestFitnessFunction fitnessFunction : o1.getTestCase().getCoveredGoals()) {
-                if (((fitnessFunction instanceof LineCoverageTestFitness)
-                    || (fitnessFunction instanceof BranchCoverageTestFitness))) {
+                if (((fitnessFunction instanceof LineCoverageTestFitness))) {
+                    // || (fitnessFunction instanceof BranchCoverageTestFitness))) {
                     coveredFilterGoals1++;
                 }
             }
 
             long coveredFilterGoals2 = 0L;
             for (TestFitnessFunction testFitnessFunction : o2.getTestCase().getCoveredGoals()) {
-                if (((testFitnessFunction instanceof LineCoverageTestFitness
-                    || testFitnessFunction instanceof BranchCoverageTestFitness))) {
+                if (((testFitnessFunction instanceof LineCoverageTestFitness))) {
+                    //|| testFitnessFunction instanceof BranchCoverageTestFitness))) {
                     coveredFilterGoals2++;
                 }
             }
@@ -576,8 +581,14 @@ public class TestSuiteMinimizer {
             // check exception number first, then check length
             if (i == 0) {
                 // less exception rank higher
-                int o1ExceptsSize = o1.getLastExecutionResult().getAllThrownExceptions().size();
-                int o2ExceptSize = o2.getLastExecutionResult().getAllThrownExceptions().size();
+                int o1ExceptsSize = 0;
+                int o2ExceptSize = 0;
+                if(o1.getLastExecutionResult() != null) {
+                    o1ExceptsSize = o1.getLastExecutionResult().getAllThrownExceptions().size();
+                }
+                if(o2.getLastExecutionResult() != null) {
+                    o2ExceptSize = o2.getLastExecutionResult().getAllThrownExceptions().size();
+                }
                 int exceptCmpRet = (int)Math.signum(o1ExceptsSize - o2ExceptSize);
 
                 // for Total_length, the shorter, the better
@@ -599,14 +610,19 @@ public class TestSuiteMinimizer {
         List<TestChromosome> tests = suite.getTestChromosomes();
         logger.warn("Before removing redundant tests with rerun: {}", tests.size());
 
-        for (TestChromosome test : tests) {
-            test.setChanged(true);
-            for (TestFitnessFunction goal : goals) {
-                goal.isCovered(test);
-            }
-        }
+        // because re-calculate coverage after last mock change, no longer needed here
+        //for (TestChromosome test : tests) {
+        //    test.setChanged(true);
+        //    for (TestFitnessFunction goal : goals) {
+        //        goal.isCovered(test);
+        //    }
+        //}
 
         if(Properties.MINIMIZATION_GOALS_FILTER) {
+            // filter goals by line & branch coverage
+            goals = goals.stream()
+                .filter(goal -> goal instanceof LineCoverageTestFitness || goal instanceof BranchCoverageTestFitness)
+                .collect(Collectors.toList());
             sortTestChromosomeByCoveredGoalsDesc(tests);
         } else {
             Collections.reverse(tests);
@@ -629,7 +645,7 @@ public class TestSuiteMinimizer {
                             }
                         }
                         addsNewGoals = true;
-                        coveredGoals.add(goal);
+                        break;
                     }
                 }
             }
@@ -667,6 +683,10 @@ public class TestSuiteMinimizer {
         // cache method name
         Set<String> methodNameSet = testMethodFilterCons.stream().map(GenericAccessibleObject::getName).collect(
             Collectors.toSet());
+
+        if(methodNameSet.size() == 0) {
+            return;
+        }
 
         for (TestChromosome test : tests) {
             // first check whether has method of class under test
