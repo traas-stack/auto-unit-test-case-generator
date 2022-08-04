@@ -1,0 +1,21 @@
+apikey: 944da9cf-60ee-4ff6-bf8d-c01f923a3e3e
+
+rules:
+   - .*:
+       #保留的方法
+      keep:
+        .*
+
+#
+# - .*:
+#     #保留的方法
+#     keep:
+#     - .*
+
+
+#生成的动态库名字
+#libname: j2j_tj
+
+file_type: jar
+
+#需要生成的平台

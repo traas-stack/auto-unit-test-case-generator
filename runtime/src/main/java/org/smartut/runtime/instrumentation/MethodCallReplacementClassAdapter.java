@@ -21,9 +21,11 @@
 package org.smartut.runtime.instrumentation;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.smartut.runtime.RuntimeSettings;
 import org.smartut.runtime.annotation.SmartUtExclude;
+import org.smartut.runtime.mock.MethodStaticReplacementMock;
 import org.smartut.runtime.mock.MockList;
 import org.smartut.runtime.mock.StaticReplacementMock;
 import org.objectweb.asm.ClassVisitor;
@@ -141,12 +143,14 @@ public class MethodCallReplacementClassAdapter extends ClassVisitor {
 			 */
 			
 			Class<?> mockSuperClass = MockList.getMockClass(superNameWithDots);
-			if(StaticReplacementMock.class.isAssignableFrom(mockSuperClass)) {
-				super.visit(version, access, name, signature, superName, interfaces);
-
-			} else {
-				String mockSuperClassName = mockSuperClass.getCanonicalName().replace('.', '/');
-				super.visit(version, access, name, signature, mockSuperClassName, interfaces);
+			//check mockSuperClass non null,avoid npe
+			if (Objects.nonNull(mockSuperClass) ){
+				if(StaticReplacementMock.class.isAssignableFrom(mockSuperClass) || MethodStaticReplacementMock.class.isAssignableFrom(mockSuperClass)){
+					super.visit(version, access, name, signature, superName, interfaces);
+				}else {
+					String mockSuperClassName = mockSuperClass.getCanonicalName().replace('.', '/');
+					super.visit(version, access, name, signature, mockSuperClassName, interfaces);
+				}
 			}
 		} else {
 			super.visit(version, access, name, signature, superName, interfaces);
