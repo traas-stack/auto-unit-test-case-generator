@@ -63,6 +63,46 @@
                 <role>Developer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Hailian Zhou</name>
+            <email>hailian.zhl@alibaba-inc.com</email>
+            <organization>Ant Group</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Jianfei Zhang</name>
+            <email>ryan.zjf@alibaba-inc.com</email>
+            <organization>Ant Group</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Danyang Qin</name>
+            <email>qindanyang.qdy@antgroup.com</email>
+            <organization>Ant Group</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Shiwang Ding</name>
+            <email>dingshiwang.dsw@antgroup.com</email>
+            <organization>Ant Group</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Changze Huang</name>
+            <email>huangchangze.hcz@antgroup.com</email>
+            <organization>Ant Group</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
     </developers>
 
 
