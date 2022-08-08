@@ -61,4 +61,7 @@ com.alipay.compassagent.
 com.taobao.arthas.
 org.testng.
 org.eclipse.
+org.osgi.
 com.alibaba.fastjson.
+net.bytebuddy.
+org.mockito.

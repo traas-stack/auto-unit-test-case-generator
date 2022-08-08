@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.smartut.runtime.RuntimeSettings;
+import org.smartut.runtime.mock.biz.MockJSON;
+import org.smartut.runtime.mock.biz.MockJSONObject;
 import org.smartut.runtime.mock.java.io.MockFile;
 import org.smartut.runtime.mock.java.io.MockFileInputStream;
 import org.smartut.runtime.mock.java.io.MockFileOutputStream;
@@ -110,6 +112,10 @@ public class MockList {
 			list.add(MockSecureRandom.class);
 //			list.add(MockUUID.class);
 			// MockTimeZone, MockLocale are not actual mocks
+
+			//JSON
+			list.add(MockJSON.class);
+			list.add(MockJSONObject.class);
 
 			// java.time
 			list.add(MockClock.class);
@@ -239,7 +245,15 @@ public class MockList {
 					logger.error("Failed to create instance of mock " + mock.getCanonicalName());
 					continue;
 				}
-			} else {
+			} else if (MethodStaticReplacementMock.class.isAssignableFrom(mock)){
+				try {
+					MethodStaticReplacementMock m = (MethodStaticReplacementMock) mock.newInstance();
+					name = m.getMockedClassName();
+				} catch (Exception e) {
+					logger.error("Failed to create instance of mock {}" , mock.getCanonicalName());
+					continue;
+				}
+			}else {
 				// should never happen
 				logger.error("Cannot handle " + mock);
 				continue;

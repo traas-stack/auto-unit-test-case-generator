@@ -28,6 +28,7 @@ import org.smartut.runtime.SmartUtRunner;
 import org.smartut.runtime.agent.InstrumentingAgent;
 import org.smartut.runtime.instrumentation.ExcludedClasses;
 import org.smartut.runtime.instrumentation.InstrumentedClass;
+import org.smartut.runtime.instrumentation.SmartUtClassLoader;
 import org.smartut.runtime.sandbox.Sandbox;
 import org.smartut.runtime.util.AtMostOnceLogger;
 
@@ -75,7 +76,7 @@ public class ClassStateSupport {
 	private static final List<String> INITIALIZED_CLASSES = new ArrayList<>();
 
 	//Classes containing these are not reset
-	private static final List<String> NOT_RESET_CLASS_CONTAINS = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil");
+	private static final List<String> NOT_RESET_CLASS_CONTAINS = Arrays.asList("smartut", "MockitoMock", "EnhancerByMockito", "__CLR", "LoggerUtil","SpringContextUtil");
 
 	//Classes ending with these Strings are not reset
 	private static final List<String> NOT_RESET_CLASS_SUFFIX = Arrays.asList("_SSTest", "scaffolding");
@@ -93,12 +94,20 @@ public class ClassStateSupport {
 	 *     This method will usually be called in a @BeforeClass initialization
 	 * </p>
 	 *
-     * @param classLoader
-     * @param classNames
+     * @param classLoader use classloader
+     * @param classNames class-name
      */
 	public static boolean initializeClasses(ClassLoader classLoader, String... classNames) {
 		//Only smartut case uses smartutclassloader, which is set in before class
-		SmartUtRunner.useSmartUtClassLoader();
+		SmartUtRunner.useSmartUtClassLoader(classLoader);
+		if (classLoader instanceof SmartUtClassLoader) {
+			ClassLoader originalClassLoader = ((SmartUtClassLoader) classLoader).getOriginalClassLoader();
+			try {
+				Class.forName(org.smartut.runtime.RuntimeSettings.className, true, originalClassLoader);
+			} catch (Throwable e) {
+				logger.warn("load class error with default classloader: {}", classLoader, e);
+			}
+		}
 		// initializeClasses may block, use thread pool and increase timeout control
 		// Compatibility: set classloader at the beginning, and no explicit call is required during reset
 		ClassResetter.getInstance().setClassLoader(classLoader);
@@ -124,8 +133,7 @@ public class ClassStateSupport {
 		try {
 			Future<Boolean> result = EXECUTOR.submit(call);
 			// Set timeout
-			Boolean obj = result.get(CLASS_TIME_OUT, TimeUnit.SECONDS);
-			return obj;
+			return result.get(CLASS_TIME_OUT, TimeUnit.SECONDS);
 		} catch (TimeoutException e) {
 			logger.warn("initializing classes are timeout, time out seconds is {}", CLASS_TIME_OUT);
 		} catch (Exception e) {

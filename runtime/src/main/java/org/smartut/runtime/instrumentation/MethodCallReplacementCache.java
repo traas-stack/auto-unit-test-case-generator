@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.smartut.PackageInfo;
 import org.smartut.runtime.RuntimeSettings;
+import org.smartut.runtime.mock.MethodStaticReplacementMock;
 import org.smartut.runtime.mock.SmartUtMock;
 import org.smartut.runtime.mock.MockList;
 import org.smartut.runtime.mock.OverrideMock;
@@ -229,10 +230,41 @@ public class MethodCallReplacementCache {
 					continue;
 				}
 
-				replaceAllStaticMethods(mock, mocked);
+				replaceStaticMethods(mock, mocked);
 				replaceAllInstanceMethodsWithStatic(mock, mocked);
 				replaceAllConstructorsWithStaticCalls(mock, mocked);
+			}else if(MethodStaticReplacementMock.class.isAssignableFrom(mock)){
+				String mockedName;
+				try {
+					mockedName = ((MethodStaticReplacementMock) mock.newInstance()).getMockedClassName();
+				} catch (InstantiationException | IllegalAccessException e1) {
+					logger.error("Cannot instantiate mock {}" , mock.getCanonicalName());
+					continue;
+				}
+				Class<?> mocked;
+				try {
+					mocked = MethodStaticReplacementMock.class.getClassLoader().loadClass(mockedName);
+				} catch (ClassNotFoundException e) {
+					// should never happen
+					logger.error("Mock class {} has non-existent mocked target {}" ,mock.getCanonicalName() , mockedName);
+					continue;
+				}
+
+				replaceStaticMethods(mock, mocked);
 			}
+		}
+	}
+
+	/**
+	 * static method mock
+	 * @param mockClass
+	 * @param target
+	 * @throws IllegalArgumentException
+	 */
+	private void replaceStaticMethods(Class<?> mockClass, Class<?> target) throws IllegalArgumentException {
+
+		for (Method m : mockClass.getMethods()) {
+			addStaticMethodCall(m, mockClass, target);
 		}
 	}
 
@@ -398,10 +430,19 @@ public class MethodCallReplacementCache {
 	private void replaceAllStaticMethods(Class<?> mockClass, Class<?> target) throws IllegalArgumentException {
 
 		for (Method m : target.getMethods()) {
-			if (!Modifier.isStatic(m.getModifiers())) {
-				continue;
-			}
+			addStaticMethodCall(m,mockClass,target);
+		}
+	}
 
+
+	/**
+	 * static method replace cache
+	 * @param m
+	 * @param mockClass
+	 * @param target
+	 */
+	private void addStaticMethodCall(Method m,Class<?> mockClass, Class<?> target){
+		if (Modifier.isStatic(m.getModifiers())) {
 			String desc = Type.getMethodDescriptor(m);
 			addReplacementCall(new MethodCallReplacement(target.getCanonicalName().replace('.', '/'), m.getName(), desc,
 					Opcodes.INVOKESTATIC, mockClass.getCanonicalName().replace('.', '/'), m.getName(), desc, false,
