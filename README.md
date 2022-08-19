@@ -55,15 +55,15 @@ To generate unit test suites, the generator needs to be set up by project classp
 ```shell
 java -jar ./smartut.jar -setup example/target/classes/ example/target/dependency/*.jar
 ```
-## Generate for entire folder
-You can run this command to generate unit test suites for all classes in `classes` folder:
-```shell
-java -jar ./smartut.jar -target example/target/classes/
-```
 ## Generate for a specific class
 You can run this command to generate unit test suites for a specific class
 ```shell
 java -jar ./smartut.jar -class com.alipay.test.example
+```
+## Generate for entire folder
+You can run this command to generate unit test suites for all classes in `classes` folder:
+```shell
+java -jar ./smartut.jar -target example/target/classes/
 ```
 
 # 
