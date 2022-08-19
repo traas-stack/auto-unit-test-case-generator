@@ -58,30 +58,12 @@ java -jar ./smartut.jar -setup example/target/classes/ example/target/dependency
 ## Generate for entire folder
 You can run this command to generate unit test suites for all classes in `classes` folder:
 ```shell
-java -jar ./smartut.jar -Dctg_cores=2 -Dctg_memory=4000 -target example/target/classes/
+java -jar ./smartut.jar -target example/target/classes/
 ```
 ## Generate for a specific class
 You can run this command to generate unit test suites for a specific class
 ```shell
-java -jar ./smartut.jar -Dctg_cores=2 -Dctg_memory=4000 -Dcuts=com.alipay.test.example
-```
-## parameters
-### ctg_cores [required]
-This parameter controls how many how many CPU cores used for test generation
-Minimum number of this parameter is 1
-Do not use all cores of the device for test generation!
-example:
-```shell
--Dctg_cores=2
-```
-
-### ctg_memory [required]
-This parameter controls how many how many memories used for test generation
-We recommend that each core should have 2000MB memories.
-Do not use all memories of the device for test generation!
-example:
-```shell
--Dctg_memory=2000
+java -jar ./smartut.jar -class com.alipay.test.example
 ```
 
 # 
