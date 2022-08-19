@@ -32,14 +32,6 @@ In Auto-Unit-Test-Case-Generator, the optimal call sequence algorithm is used th
 Auto-Unit-Test-Case-Generator is also providing Software-as-a-Service (SaaS). It supports the full lifecycle/evolution of unit test cases, including test case generation, execution,iteration and regression analysis . All stages are triggered automatically by simply providing [Github](https://github.com/) or [Gitee](https://gitee.com/) link. 
 
 # Building Auto-Unit-Test-Case-Generator
-To build Auto-Unit-Test-Case-Generator on the command line, install maven and then call:
-```shell
-mvn compile
-```
-To create a binary distribution that includes all dependencies you can use Maven as well:
-```shell
-mvn package
-```
 To install Auto-Unit-Test-Case-Generator by using Maven, run:
 ```shell
 mvn install -Dmaven.test.skip=true
