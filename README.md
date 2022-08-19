@@ -43,9 +43,16 @@ cp ${user.home}/.m2/repository/org/smartut/smartut-master/1.1.0/smartut-master-1
 
 
 # Using Auto-Unit-Test-Case-Generator
+## Prepare dependencies
+Before using smartut.jar to generate cases, You need execute following commands to prepare dependencies in project under test.
+```shell
+mvn clean compile
+mvn clean install -Dmaven.test.skip=true
+mvn dependency:copy-dependencies
+```
 ## Setup
-To generate unit test suites, the generator needs to add SUT(software under test) and dependencies  to class path. 
-Commonly, for a MAVEN project, classes file and dependencies located in the `target` folder.
+Set up SmartUt in a project directory to save parameters and the classpath
+To generate unit test suites, the generator needs to be set up by project classpath first.
 ```shell
 java -jar ./smartut.jar -setup example/target/classes/ example/target/dependency/*.jar
 ```
