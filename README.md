@@ -51,7 +51,6 @@ mvn clean install -Dmaven.test.skip=true
 mvn dependency:copy-dependencies
 ```
 ## Setup
-Set up SmartUt in a project directory to save parameters and the classpath
 To generate unit test suites, the generator needs to be set up by project classpath first.
 ```shell
 java -jar ./smartut.jar -setup example/target/classes/ example/target/dependency/*.jar
