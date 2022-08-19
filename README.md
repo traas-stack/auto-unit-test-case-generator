@@ -36,6 +36,12 @@ To install Auto-Unit-Test-Case-Generator by using Maven, run:
 ```shell
 mvn clean install -Dmaven.test.skip=true
 ```
+Copy smartut.jar to your own Execution path, for example, current path.
+```shell
+cp ${user.home}/.m2/repository/org/smartut/smartut-master/1.1.0/smartut-master-1.1.0.jar smartut.jar
+```
+
+
 # Using Auto-Unit-Test-Case-Generator
 ## Setup
 To generate unit test suites, the generator needs to add SUT(software under test) and dependencies  to class path. 
