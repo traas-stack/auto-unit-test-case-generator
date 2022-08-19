@@ -44,7 +44,7 @@ cp ${user.home}/.m2/repository/org/smartut/smartut-master/1.1.0/smartut-master-1
 
 # Using Auto-Unit-Test-Case-Generator
 ## Prepare dependencies
-Before using smartut.jar to generate cases, You need execute following commands to prepare dependencies in project under test.
+Before using smartut.jar to generate cases, You need to execute the following commands to prepare dependencies in project under test.
 ```shell
 mvn clean compile
 mvn clean install -Dmaven.test.skip=true
