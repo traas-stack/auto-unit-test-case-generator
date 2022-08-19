@@ -34,7 +34,7 @@ Auto-Unit-Test-Case-Generator is also providing Software-as-a-Service (SaaS). It
 # Building Auto-Unit-Test-Case-Generator
 To install Auto-Unit-Test-Case-Generator by using Maven, run:
 ```shell
-mvn install -Dmaven.test.skip=true
+mvn clean install -Dmaven.test.skip=true
 ```
 # Using Auto-Unit-Test-Case-Generator
 ## Setup
