@@ -36,40 +36,34 @@ To install Auto-Unit-Test-Case-Generator by using Maven, run:
 ```shell
 mvn clean install -Dmaven.test.skip=true
 ```
+Copy smartut.jar to your own Execution path, for example, current path.
+```shell
+cp ${user.home}/.m2/repository/org/smartut/smartut-master/1.1.0/smartut-master-1.1.0.jar smartut.jar
+```
+
+
 # Using Auto-Unit-Test-Case-Generator
+## Prepare dependencies
+Before using smartut.jar to generate cases, You need to execute the following commands to prepare dependencies in project under test.
+```shell
+mvn clean compile
+mvn clean install -Dmaven.test.skip=true
+mvn dependency:copy-dependencies
+```
 ## Setup
-To generate unit test suites, the generator needs to add SUT(software under test) and dependencies  to class path. 
-Commonly, for a MAVEN project, classes file and dependencies located in the `target` folder.
+To generate unit test suites, the generator needs to be set up by project classpath first.
 ```shell
 java -jar ./smartut.jar -setup example/target/classes/ example/target/dependency/*.jar
-```
-## Generate for entire folder
-You can run this command to generate unit test suites for all classes in `classes` folder:
-```shell
-java -jar ./smartut.jar -Dctg_cores=2 -Dctg_memory=4000 -target example/target/classes/
 ```
 ## Generate for a specific class
 You can run this command to generate unit test suites for a specific class
 ```shell
-java -jar ./smartut.jar -Dctg_cores=2 -Dctg_memory=4000 -Dcuts=com.alipay.test.example
+java -jar ./smartut.jar -class com.alipay.test.example
 ```
-## parameters
-### ctg_cores [required]
-This parameter controls how many how many CPU cores used for test generation
-Minimum number of this parameter is 1
-Do not use all cores of the device for test generation!
-example:
+## Generate for entire folder
+You can run this command to generate unit test suites for all classes in `classes` folder:
 ```shell
--Dctg_cores=2
-```
-
-### ctg_memory [required]
-This parameter controls how many how many memories used for test generation
-We recommend that each core should have 2000MB memories.
-Do not use all memories of the device for test generation!
-example:
-```shell
--Dctg_memory=2000
+java -jar ./smartut.jar -target example/target/classes/
 ```
 
 # 
