@@ -50,12 +50,6 @@ public class JavaExecCmdUtilUnixTest {
   }
 
   @Test
-  public void unixOldBehaviorJava() {
-    // return "java" value
-    assertThat(JavaExecCmdUtil.getJavaBinExecutablePath(), IsEqual.equalTo("java"));
-  }
-
-  @Test
   public void unixOldBehaviorJavaCmd() {
     System.setProperty("os.name", MOCK_OS);
     System.setProperty("file.separator", SEPARATOR);
