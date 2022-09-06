@@ -32,10 +32,6 @@ In Auto-Unit-Test-Case-Generator, the optimal call sequence algorithm is used th
 Auto-Unit-Test-Case-Generator is also providing Software-as-a-Service (SaaS). It supports the full lifecycle/evolution of unit test cases, including test case generation, execution,iteration and regression analysis . All stages are triggered automatically by simply providing [Github](https://github.com/) or [Gitee](https://gitee.com/) link. 
 
 
-# Contact us
-Contact us via email: smartunit_opensource@service.alipay.com
-
-
 # Building Auto-Unit-Test-Case-Generator
 To install Auto-Unit-Test-Case-Generator by using Maven, run:
 ```shell
@@ -70,6 +66,11 @@ You can run this command to generate unit test suites for all classes in `classe
 ```shell
 java -jar ./smartut.jar -target example/target/classes/
 ```
+
+
+# Contact us
+If you encounter any problems during use this generator, please contact us via email: smartunit_opensource@service.alipay.com
+
 
 # 
  
