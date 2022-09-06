@@ -28,10 +28,6 @@ Like EvoSuite, Auto-Unit-Test-Case-Generator also use the Search Based Software 
 In Auto-Unit-Test-Case-Generator, the optimal call sequence algorithm is used through the initialization, insertion, modification and deletion of test case statements, so that the structure of test case is more readable and logical.
 
 
-# Software-as-a-Service (SaaS)
-Auto-Unit-Test-Case-Generator is also providing Software-as-a-Service (SaaS). It supports the full lifecycle/evolution of unit test cases, including test case generation, execution,iteration and regression analysis . All stages are triggered automatically by simply providing [Github](https://github.com/) or [Gitee](https://gitee.com/) link. 
-
-
 # Building Auto-Unit-Test-Case-Generator
 To install Auto-Unit-Test-Case-Generator by using Maven, run:
 ```shell
@@ -70,7 +66,7 @@ java -jar ./smartut.jar -target example/target/classes/
 
 # Contact us
 If you encounter any problems during use this generator, please contact us via email: smartunit_opensource@service.alipay.com
-
+Also, Auto-Unit-Test-Case-Generator is providing Software-as-a-Service (SaaS). It supports the full lifecycle/evolution of unit test cases, including test case generation, execution,iteration and regression analysis . All stages are triggered automatically by simply providing [Github](https://github.com/) or [Gitee](https://gitee.com/) link. You can visit our SaaS website through https://smartunit.opentrs.com.
 
 # 
  
