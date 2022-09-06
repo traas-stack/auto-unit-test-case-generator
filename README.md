@@ -65,6 +65,7 @@ You can run this command to generate unit test suites for all classes in `classe
 ```shell
 java -jar ./smartut.jar -target example/target/classes/
 ```
-
+## Contact us
+Contact us via email: smartunit_opensource@service.alipay.com
 # 
  
