@@ -26,24 +26,24 @@ cp ${user.home}/.m2/repository/org/smartut/smartut-master/1.1.0/smartut-master-1
 ```
 
 # 使用Auto-Unit-Test-Case-Generator
-## 1)依赖准备
+## 1) 依赖准备
 在使用Auto-Unit-Test-Case-Generator，需要先对被测工程进行编译和依赖准备，命令如下：
 ```shell
 mvn clean compile
 mvn clean install -Dmaven.test.skip=true
 mvn dependency:copy-dependencies
 ```
-## 2)Setup
+## 2) Setup
 依赖准备完成后，首先需要使用smartut的setup命令进行环境准备，命令如下：
 ```shell
 java -jar ./smartut.jar -setup example/target/classes/ example/target/dependency/*.jar
 ```
-## 3)Class级别用例生成
+## 3) Class级别用例生成
 针对单个class进行用例生成的命令如下：
 ```shell
 java -jar ./smartut.jar -class com.alipay.test.example
 ```
-## 4)Module级别用例生成
+## 4) Module级别用例生成
 针对单个module进行用例生成的命令如下：
 ```shell
 java -jar ./smartut.jar -target example/target/classes/
