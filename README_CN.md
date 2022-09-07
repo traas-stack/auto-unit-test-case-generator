@@ -1,4 +1,6 @@
+# Auto-Unit-Test-Case-Generator介绍
 Auto-Unit-Test-Case-Generator是一款工业级智能单元测试用例生成产品，致力于解决单测领域下用例的自动生成、执行、汰换、管理。使用Auto-Unit-Test-Case-Generator，能够在无人介入的情况下自动生成高覆盖率、高有效性的单元测试用例集，智能化提升质量水位、提高研发效能。目前在蚂蚁内部已经有超过1000个工程在使用Auto-Unit-Test-Case-Generator进行用例生成。
+
 # 核心能力
 Auto-Unit-Test-Case-Generator是基于EvoSuite开发的智能单元测试生成产品。与EvoSuite相比，Auto-Unit-Test-Case-Generator优化了一系列算法，使得用例的覆盖率、有效性、可读性都有提升。
 Auto-Unit-Test-Case-Generator的核心能力包括：
