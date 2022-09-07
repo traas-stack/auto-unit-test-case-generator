@@ -1,4 +1,4 @@
-[中文](https://github.com/TRaaSStack/auto-unit-test-case-generator/blob/main/README_CN.md)
+[中文README传送门](https://github.com/TRaaSStack/auto-unit-test-case-generator/blob/main/README_CN.md)
 # What is Auto-Unit-Test-Case-Generator
 Auto-Unit-Test-Case-Generator generates JUnit test suites for Java class just as its name. During test generation, Auto-Unit-Test-Case-Generator aims to generate high code-coverage (e.g., Branch Coverage and Line Coverage) unit test suites with full automation. This tools is widely used in ANT Group, supports automatic generation of unit tests for more than 1000 projects. 
 Advantages of Auto-Unit-Test-Case-Generator:
