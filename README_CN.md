@@ -25,7 +25,7 @@ mvn install后，将构建出的smartut.jar拷贝到使用路径下：
 cp ${user.home}/.m2/repository/org/smartut/smartut-master/1.1.0/smartut-master-1.1.0.jar smartut.jar
 ```
 
-# 使用Auto-Unit-Test-Case-Generator
+# 使用Auto-Unit-Test-Case-Generator进行用例生成
 ## 1) 依赖准备
 在使用Auto-Unit-Test-Case-Generator，需要先对被测工程进行编译和依赖准备，命令如下：
 ```shell
@@ -48,6 +48,30 @@ java -jar ./smartut.jar -class com.alipay.test.example
 ```shell
 java -jar ./smartut.jar -target example/target/classes/
 ```
+
+# 运行Auto-Unit-Test-Case-Generator自动生成的用例
+## 1) 引入junit依赖
+在被测系统的主pom中引入junit 4.12或更高版本：
+```
+<dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+</dependency>
+```
+## 2) 引入用例运行时依赖
+在被测系统的主pom中引入用例运行时依赖：
+```
+<dependency>
+      <groupId>org.smartut</groupId>
+      <artifactId>smartut-standalone-runtime</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+</dependency>
+```
+## 3) 运行用例
+与人工书写的用例一样，可通过IDEA运行用例，或执行mvn test来运行用例。
+
 # 新闻报道
 信通院软件质效领航者优秀案例：[https://mp.weixin.qq.com/s/DOgXE66ldZJWpJ3SBWNfJg](https://mp.weixin.qq.com/s/DOgXE66ldZJWpJ3SBWNfJg)
 # 联系我们
