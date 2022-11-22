@@ -70,7 +70,15 @@ java -jar ./smartut.jar -target example/target/classes/
 </dependency>
 ```
 ## 3) 运行用例
-与人工书写的用例一样，可通过IDEA运行用例，或执行mvn test来运行用例。
+与人工书写的用例一样，可通过IntelliJ/Eclipse运行用例，或执行mvn test来运行用例。
+- IntelliJ/Eclipse
+以IntelliJ为例，将自动生成的用例移动至test目录下后，可直接执行用例
+![image](https://user-images.githubusercontent.com/106229399/203310902-0e1fb039-9688-4e6e-89c6-6e3cedac9b7a.png)
+- mvn test
+在项目根目录下，可通过执行mvn test来执行对应的用例。以单个用例文件(如TestConcolic_SSTest)为例，执行命令如下：
+```
+mvn -Dtest=TestConcolic_SSTest test
+```
 
 # 新闻报道
 信通院软件质效领航者优秀案例：[https://mp.weixin.qq.com/s/DOgXE66ldZJWpJ3SBWNfJg](https://mp.weixin.qq.com/s/DOgXE66ldZJWpJ3SBWNfJg)
