@@ -51,7 +51,7 @@
 </build>
 ```
 
-2)修改dependencies
+2) 修改dependencies
 ```
 <dependency>
   <groupId>org.jacoco</groupId>
