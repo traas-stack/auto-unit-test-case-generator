@@ -1,8 +1,8 @@
 使用Auto-unit-test-case-generator生成测试用例后，可通过jacoco来采集覆盖率结果。目前Auto-unit-test-case-generator自动生成的测试用例仅支持通过jacoco离线模式统计覆盖率。
-本文介绍如何配置jacoco为离线模式。
 
 ## 配置Jacoco为离线模式
 在被测系统的主pom中引入jacoco的离线模式配置：
+
 1）新增plugin
 ```
 <build>
