@@ -1,0 +1,63 @@
+使用Auto-unit-test-case-generator生成测试用例后，可通过jacoco来采集覆盖率结果。目前Auto-unit-test-case-generator自动生成的测试用例仅支持通过jacoco离线模式统计覆盖率。
+本文介绍如何配置jacoco为离线模式。
+
+## 配置Jacoco为离线模式
+在被测系统的主pom中引入jacoco的离线模式配置：
+1）新增plugin
+```
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>2.22.2</version>
+      <configuration>
+        <systemPropertyVariables>
+          <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco-agent.destfile>
+        </systemPropertyVariables>
+      </configuration>
+    </plugin>
+    <plugin>
+      <groupId>org.jacoco</groupId>
+      <artifactId>jacoco-maven-plugin</artifactId>
+      <version>0.8.6</version>
+      <configuration>
+        <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+        <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+        <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+      </configuration>
+      <executions>
+        <execution>
+          <id>default-instrument</id>
+          <goals>
+            <goal>instrument</goal>
+          </goals>
+        </execution>
+        <execution>
+          <id>default-restore-instrumented-classes</id>
+          <goals>
+            <goal>restore-instrumented-classes</goal>
+          </goals>
+        </execution>
+        <execution>
+          <id>default-report</id>
+          <goals>
+            <goal>report</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+2)修改dependencies
+```
+<dependency>
+  <groupId>org.jacoco</groupId>
+  <artifactId>org.jacoco.agent</artifactId>
+  <classifier>runtime</classifier>
+  <scope>test</scope>
+  <version>0.8.6</version>
+</dependency>
+```
