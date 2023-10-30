@@ -1,6 +1,6 @@
 [中文README传送门](https://github.com/TRaaSStack/auto-unit-test-case-generator/blob/main/README_CN.md)
 # Using LLM for test case generation
-Now you can use LLM for test case generation!  Welcome to visit our project: [TestAgent](https://github.com/codefuse-ai/Test-Agent) and experience the revolution of LLM in the field of test case generation.
+Now you can use LLM for test case generation!  Welcome to visit our project: [TestAgent](https://github.com/codefuse-ai/Test-Agent) , try out the revolution of LLM in the field of test case generation.
 
 
 # What is Auto-Unit-Test-Case-Generator
